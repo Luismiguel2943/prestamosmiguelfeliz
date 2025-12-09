@@ -1,0 +1,3584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sistema de Préstamos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --dark-color: #1f2937;
+            --light-color: #f3f4f6;
+            --sidebar-width: 260px;
+        }
+
+        body.theme-blue {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+        }
+        body.theme-green {
+            --primary-color: #10b981;
+            --secondary-color: #059669;
+        }
+        body.theme-purple {
+            --primary-color: #8b5cf6;
+            --secondary-color: #7c3aed;
+        }
+        body.theme-red {
+            --primary-color: #ef4444;
+            --secondary-color: #dc2626;
+        }
+        body.theme-orange {
+            --primary-color: #f59e0b;
+            --secondary-color: #d97706;
+        }
+        body.theme-dark {
+            --primary-color: #1f2937;
+            --secondary-color: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-color);
+            overflow-x: hidden;
+        }
+
+        /* Login Screen - Responsive */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 1rem;
+        }
+
+        .login-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-card .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-card .logo i {
+            color: var(--primary-color);
+        }
+
+        .app-container {
+            display: none;
+        }
+
+        .app-container.active {
+            display: block;
+        }
+
+        /* Sidebar - Responsive */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar .logo h4 {
+            font-size: 1.1rem;
+            word-wrap: break-word;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 15px;
+            margin: 5px 0;
+            border-radius: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1001;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        /* Main Content - Responsive */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stat Cards - Responsive */
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .stat-card.primary { border-left-color: var(--primary-color); }
+        .stat-card.success { border-left-color: var(--success-color); }
+        .stat-card.danger { border-left-color: var(--danger-color); }
+        .stat-card.warning { border-left-color: var(--warning-color); }
+        .stat-card.info { border-left-color: var(--info-color); }
+
+        .stat-card h3 {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+        }
+
+        .stat-card h6 {
+            font-size: clamp(0.875rem, 2vw, 1rem);
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            border-radius: 12px 12px 0 0 !important;
+            font-weight: 600;
+        }
+
+        /* Tables - Responsive */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table {
+            min-width: 650px;
+        }
+
+        /* Badges */
+        .badge-pending {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .badge-paid {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .badge-overdue {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        /* Search Box */
+        .search-box {
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+        .search-box input {
+            padding-left: 45px;
+        }
+
+        /* Modals */
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        /* Logout Button - Responsive */
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+        }
+
+        /* Print Styles */
+        @media print {
+            /* Mejorando estilos de impresión para lista de préstamos */
+            .sidebar, .no-print, .mobile-menu-toggle, .logout-btn, .search-box, .btn, button {
+                display: none !important;
+            }
+            .main-content {
+                margin-left: 0 !important;
+                padding: 20px !important;
+                width: 100% !important;
+            }
+            body * {
+                visibility: hidden;
+            }
+            
+            /* Mostrar contenido de sección activa para impresión */
+            .section.active,
+            .section.active * {
+                visibility: visible;
+            }
+            
+            #invoiceModal.show .modal-content,
+            #invoiceModal.show .modal-content *,
+            #contractModal.show .modal-content,
+            #contractModal.show .modal-content *,
+            #reportModal.show .modal-content,
+            #reportModal.show .modal-content *,
+            #clearanceLetterModal.show .modal-content,
+            #clearanceLetterModal.show .modal-content * {
+                visibility: visible;
+            }
+            
+            .section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100% !important;
+            }
+            
+            .modal-dialog {
+                position: absolute;
+                left: 0;
+                top: 0;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .modal-content {
+                border: none !important;
+                box-shadow: none !important;
+                background: white !important;
+            }
+            .modal-header, .modal-footer {
+                display: none !important;
+            }
+            .modal-body {
+                padding: 20px !important;
+            }
+            table {
+                page-break-inside: auto;
+                width: 100% !important;
+            }
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            body {
+                color: black !important;
+            }
+            .card {
+                page-break-inside: avoid;
+                border: 1px solid #dee2e6 !important;
+            }
+            .bg-primary, .table-dark { background-color: #0d6efd !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-success { background-color: #198754 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-info { background-color: #0dcaf0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-danger { background-color: #dc3545 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-warning { background-color: #ffc107 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-secondary { background-color: #6c757d !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .text-white { color: white !important; }
+            .badge {
+                border: 1px solid #333 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            /* Impresión de lista de préstamos */
+            .print-header {
+                text-align: center;
+                margin-bottom: 20px;
+                visibility: visible !important;
+            }
+        }
+
+        /* Tablet Styles (768px - 1024px) */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .main-content {
+                padding: 20px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .sidebar {
+                width: 220px;
+            }
+
+            .main-content {
+                margin-left: 220px;
+            }
+        }
+
+        /* Mobile and Small Tablet Styles (max 768px) */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+                padding-top: 60px;
+            }
+
+            .logout-btn {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 0.875rem;
+            }
+
+            .logout-btn i {
+                display: none;
+            }
+
+            .logout-btn::after {
+                content: 'Salir';
+            }
+
+            /* Stack stat cards on mobile */
+            .stat-card {
+                margin-bottom: 15px;
+            }
+
+            .stat-card .d-flex {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+
+            /* Responsive buttons */
+            .btn {
+                font-size: 0.875rem;
+                padding: 0.5rem 0.75rem;
+            }
+
+            /* Modal adjustments */
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+
+            .modal-body {
+                padding: 1rem;
+            }
+
+            /* Form adjustments */
+            .form-label {
+                font-size: 0.875rem;
+            }
+
+            .form-control, .form-select {
+                font-size: 0.875rem;
+            }
+
+            /* Card headers */
+            .card-header h5 {
+                font-size: 1rem;
+            }
+
+            /* Table font size */
+            .table {
+                font-size: 0.875rem;
+            }
+
+            /* Action buttons in tables */
+            .table td:last-child {
+                white-space: nowrap;
+            }
+
+            /* Flex wrap for action groups */
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch !important;
+            }
+
+            .d-flex.justify-content-between > div {
+                width: 100%;
+            }
+
+            .d-flex.justify-content-between button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            /* Alert text */
+            .alert {
+                font-size: 0.875rem;
+            }
+        }
+
+        /* Extra Small Mobile (max 480px) */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 1.5rem;
+            }
+
+            .login-card .logo h3 {
+                font-size: 1.25rem;
+            }
+
+            .main-content {
+                padding: 10px;
+                padding-top: 55px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .stat-card h3 {
+                font-size: 1.25rem;
+            }
+
+            .stat-card h6 {
+                font-size: 0.75rem;
+            }
+
+            /* Stack all buttons vertically */
+            .text-end {
+                text-align: center !important;
+            }
+
+            .text-end .btn {
+                display: block;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            /* Reduce table padding */
+            .table td, .table th {
+                padding: 0.5rem 0.25rem;
+                font-size: 0.75rem;
+            }
+
+            /* Hide less important columns on very small screens */
+            .table .hide-mobile {
+                display: none;
+            }
+
+            .sidebar .logo h4 {
+                font-size: 0.95rem;
+            }
+
+            .sidebar .nav-link {
+                font-size: 0.875rem;
+                padding: 10px 12px;
+            }
+        }
+
+        /* Landscape Mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .sidebar .logo {
+                padding: 10px 0;
+                margin-bottom: 10px;
+            }
+
+            .sidebar .nav-link {
+                padding: 8px 12px;
+                font-size: 0.875rem;
+            }
+        }
+
+        /* Large Desktop */
+        @media (min-width: 1400px) {
+            .main-content {
+                max-width: 1600px;
+                margin-left: auto;
+                margin-right: auto;
+                padding-left: calc(var(--sidebar-width) + 30px);
+            }
+        }
+
+        /* Utility Classes for Responsive */
+        .mobile-only {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-only {
+                display: block;
+            }
+            .desktop-only {
+                display: none;
+            }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading State */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="theme-blue">
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle no-print" onclick="toggleMobileMenu()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" onclick="toggleMobileMenu()"></div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="logo">
+                <i class="fas fa-hand-holding-usd fa-4x mb-3"></i>
+                <h3>Sistema de Préstamos</h3>
+                <p class="text-muted">Iniciar Sesión</p>
+            </div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">Usuario</label>
+                    <input type="text" class="form-control" id="loginUsername" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-sign-in-alt me-2"></i>Ingresar
+                </button>
+                <div id="loginError" class="alert alert-danger mt-3" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="appContainer" class="app-container">
+        <!-- Logout Button -->
+        <button class="btn btn-danger logout-btn no-print" onclick="logout()">
+            <i class="fas fa-sign-out-alt me-2"></i><span class="desktop-only">Cerrar Sesión</span>
+        </button>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <i class="fas fa-hand-holding-usd fa-3x mb-3"></i>
+                <h4 id="companyNameSidebar">Sistema de Préstamos</h4>
+            </div>
+            <nav class="nav flex-column">
+                <a class="nav-link active" href="#" onclick="showSection('dashboard'); closeMobileMenu(); return false;">
+                    <i class="fas fa-home"></i> <span>Inicio</span>
+                </a>
+                <a class="nav-link" href="#" onclick="showSection('clients'); closeMobileMenu(); return false;">
+                    <i class="fas fa-users"></i> <span>Ver Clientes</span>
+                </a>
+                <a class="nav-link" href="#" onclick="showSection('loans'); closeMobileMenu(); return false;">
+                    <i class="fas fa-money-bill-wave"></i> <span>Préstamos Activos</span>
+                </a>
+                <a class="nav-link" href="#" onclick="showSection('finished-loans'); closeMobileMenu(); return false;">
+                    <i class="fas fa-check-circle"></i> <span>Préstamos Finalizados</span>
+                </a>
+                <a class="nav-link" href="#" onclick="showSection('payments'); closeMobileMenu(); return false;">
+                    <i class="fas fa-credit-card"></i> <span>Realizar Pago</span>
+                </a>
+                <a class="nav-link" href="#" onclick="showSection('overdue-payments'); closeMobileMenu(); return false;">
+                    <i class="fas fa-exclamation-triangle"></i> <span>Pagos Vencidos</span>
+                </a>
+                <a class="nav-link" href="#" onclick="showSection('payment-history'); closeMobileMenu(); return false;">
+                    <i class="fas fa-history"></i> <span>Historial de Pagos</span>
+                </a>
+                <a class="nav-link" href="#" onclick="showSection('pending-payments'); closeMobileMenu(); return false;">
+                    <i class="fas fa-exclamation-circle"></i> <span>Pagos Pendientes</span>
+                </a>
+                <a class="nav-link" href="#" onclick="showSection('administration'); closeMobileMenu(); return false;">
+                    <i class="fas fa-cog"></i> <span>Administración</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="section active">
+                <h2 class="mb-4">Panel de Control</h2>
+                <div class="row">
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="stat-card primary">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Total Clientes</h6>
+                                    <h3 class="mb-0" id="totalClients">0</h3>
+                                </div>
+                                <i class="fas fa-users fa-3x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="stat-card info">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Préstamos Activos</h6>
+                                    <h3 class="mb-0" id="activeLoans">0</h3>
+                                </div>
+                                <i class="fas fa-file-invoice-dollar fa-3x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="stat-card warning">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Pagos Pendientes</h6>
+                                    <h3 class="mb-0" id="pendingPayments">RD$ 0.00</h3>
+                                </div>
+                                <i class="fas fa-clock fa-3x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="stat-card success">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Pagos Realizados</h6>
+                                    <h3 class="mb-0" id="completedPayments">RD$ 0.00</h3>
+                                </div>
+                                <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="stat-card danger">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Pagos Vencidos</h6>
+                                    <h3 class="mb-0" id="overduePayments">RD$ 0.00</h3>
+                                </div>
+                                <i class="fas fa-exclamation-triangle fa-3x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="stat-card success">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Préstamos Finalizados</h6>
+                                    <h3 class="mb-0" id="finishedLoans">0</h3>
+                                </div>
+                                <i class="fas fa-check-double fa-3x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clients Section -->
+            <div id="clients" class="section">
+                <div class="mb-4">
+                    <h2 class="mb-3">Gestión de Clientes</h2>
+                    <button class="btn btn-primary" onclick="openClientModal()">
+                        <i class="fas fa-user-plus me-2"></i>Nuevo Cliente
+                    </button>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="search-box mb-3">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="clientSearch" placeholder="Buscar cliente..." onkeyup="searchClients()">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Cédula</th>
+                                        <th>Teléfono</th>
+                                        <th class="hide-mobile">Dirección</th>
+                                        <!-- Agregando columnas de ocupación y salario -->
+                                        <th class="hide-mobile">Ocupación</th>
+                                        <th class="hide-mobile">Salario</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clientsTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loans Section -->
+            <div id="loans" class="section">
+                <div class="mb-4">
+                    <h2 class="mb-3">Préstamos Activos</h2>
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <button class="btn btn-success" onclick="window.print()">
+                            <i class="fas fa-list me-2"></i>Imprimir Lista
+                        </button>
+                        <button class="btn btn-primary" onclick="openLoanModal()">
+                            <i class="fas fa-plus me-2"></i>Nuevo Préstamo
+                        </button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="search-box mb-3">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="loanSearch" placeholder="Buscar préstamo..." onkeyup="searchLoans()">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Monto</th>
+                                        <th class="hide-mobile">Tipo</th>
+                                        <th class="hide-mobile">Tasa</th>
+                                        <th class="hide-mobile">Fecha</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="loansTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nueva sección de préstamos finalizados -->
+            <!-- Finished Loans Section -->
+            <div id="finished-loans" class="section">
+                <h2 class="mb-4">Préstamos Finalizados</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="search-box mb-3">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="finishedLoanSearch" placeholder="Buscar préstamo finalizado..." onkeyup="searchFinishedLoans()">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Monto</th>
+                                        <th class="hide-mobile">Tipo</th>
+                                        <th class="hide-mobile">Fecha Creación</th>
+                                        <th>Fecha Finalización</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="finishedLoansTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payments Section -->
+            <div id="payments" class="section">
+                <h2 class="mb-4">Realizar Pago</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="search-box mb-4">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="paymentClientSearch" placeholder="Buscar por ID, nombre, cédula o teléfono..." onkeyup="searchClientForPayment()">
+                        </div>
+                        <div id="paymentClientResults"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nueva sección de pagos vencidos -->
+            <!-- Overdue Payments Section -->
+            <div id="overdue-payments" class="section">
+                <h2 class="mb-4">Pagos Vencidos</h2>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Los siguientes préstamos tienen pagos vencidos que requieren atención inmediata.
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Préstamo</th>
+                                        <th>Pendiente</th>
+                                        <th class="hide-mobile">Días Vencido</th>
+                                        <th class="hide-mobile">Última Cuota</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="overduePaymentsTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment History Section -->
+            <div id="payment-history" class="section">
+                <h2 class="mb-4">Historial de Pagos Realizados</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Préstamo</th>
+                                        <th>Monto</th>
+                                        <th class="hide-mobile">Tipo</th>
+                                        <th>Fecha</th>
+                                        <th class="hide-mobile">Método</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="paymentHistoryTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Payments Section -->
+            <div id="pending-payments" class="section">
+                <h2 class="mb-4">Pagos Pendientes</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Préstamo</th>
+                                        <th>Pendiente</th>
+                                        <th class="hide-mobile">Próximo Pago</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendingPaymentsTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Administration Section -->
+            <div id="administration" class="section">
+                <h2 class="mb-4">Administración</h2>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!-- Company Info Card -->
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Información de la Empresa</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="companyForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">Logo de la Empresa</label>
+                                        <input type="file" class="form-control" id="companyLogoFile" accept="image/png, image/jpeg, image/jpg" onchange="uploadLogo()">
+                                        <small class="text-muted">Formatos: PNG, JPG, JPEG</small>
+                                        <div id="logoPreview" class="mt-2"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Logo (URL - Opcional)</label>
+                                        <input type="text" class="form-control" id="companyLogo" placeholder="URL del logo">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Nombre de la Empresa</label>
+                                        <input type="text" class="form-control" id="companyName" placeholder="Nombre">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Dirección</label>
+                                        <input type="text" class="form-control" id="companyAddress" placeholder="Dirección">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Correo Electrónico</label>
+                                        <input type="email" class="form-control" id="companyEmail" placeholder="correo@empresa.com">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Teléfono</label>
+                                        <input type="tel" class="form-control" id="companyPhone" placeholder="(809) 000-0000">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">RNC</label>
+                                        <input type="text" class="form-control" id="companyRNC" placeholder="000-00000-0">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">Guardar Información</button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Change Password Card -->
+                        <div class="card mt-3">
+                            <div class="card-header bg-warning">
+                                <h5 class="mb-0">Cambiar Contraseña</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="passwordForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nueva Contraseña</label>
+                                        <input type="password" class="form-control" id="newPassword" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Confirmar Contraseña</label>
+                                        <input type="password" class="form-control" id="confirmPassword" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning w-100">Cambiar Contraseña</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <!-- Theme Selection Card -->
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">Personalización</h5>
+                            </div>
+                            <div class="card-body">
+                                <label class="form-label">Tema de Color</label>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary" onclick="changeTheme('theme-blue')">
+                                        <i class="fas fa-circle text-primary me-2"></i>Azul
+                                    </button>
+                                    <button class="btn btn-outline-success" onclick="changeTheme('theme-green')">
+                                        <i class="fas fa-circle text-success me-2"></i>Verde
+                                    </button>
+                                    <button class="btn btn-outline-purple" onclick="changeTheme('theme-purple')">
+                                        <i class="fas fa-circle me-2" style="color: #8b5cf6;"></i>Morado
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="changeTheme('theme-red')">
+                                        <i class="fas fa-circle text-danger me-2"></i>Rojo
+                                    </button>
+                                    <button class="btn btn-outline-warning" onclick="changeTheme('theme-orange')">
+                                        <i class="fas fa-circle text-warning me-2"></i>Naranja
+                                    </button>
+                                    <button class="btn btn-outline-dark" onclick="changeTheme('theme-dark')">
+                                        <i class="fas fa-circle text-dark me-2"></i>Oscuro
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reports Card -->
+                        <div class="card mt-3">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">Reportes</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Agregando reportes diarios y quincenales -->
+                                <button class="btn btn-success w-100 mb-2" onclick="generateDailyReport()">
+                                    <i class="fas fa-calendar-day me-2"></i>Reporte Diario
+                                </button>
+                                <button class="btn btn-success w-100 mb-2" onclick="generateBiweeklyReport()">
+                                    <i class="fas fa-calendar-week me-2"></i>Reporte Quincenal
+                                </button>
+                                <button class="btn btn-success w-100 mb-2" onclick="generateMonthlyReport()">
+                                    <i class="fas fa-file-alt me-2"></i>Reporte Mensual
+                                </button>
+                                <button class="btn btn-outline-success w-100" onclick="exportData()">
+                                    <i class="fas fa-download me-2"></i>Exportar Datos
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Contract Template Card -->
+                        <div class="card mt-3">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Plantilla de Contrato</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="contractForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">Subir Plantilla de Contrato (HTML/TXT)</label>
+                                        <input type="file" class="form-control" id="contractFile" accept=".html,.txt" onchange="uploadContract()">
+                                        <small class="text-muted">Formatos: HTML, TXT</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Editar Plantilla</label>
+                                        <textarea class="form-control" id="contractTemplate" rows="10" placeholder="Escriba o pegue aquí la plantilla del contrato...
+
+Variables disponibles:
+{COMPANY_NAME} - Nombre de la empresa
+{COMPANY_ADDRESS} - Dirección de la empresa
+{COMPANY_PHONE} - Teléfono de la empresa
+{COMPANY_RNC} - RNC de la empresa
+{CLIENT_NAME} - Nombre del cliente
+{CLIENT_CEDULA} - Cédula del cliente
+{CLIENT_ADDRESS} - Dirección del cliente
+{CLIENT_PHONE} - Teléfono del cliente
+{LOAN_AMOUNT} - Monto del préstamo
+{LOAN_INTEREST} - Tasa de interés
+{LOAN_TOTAL} - Total a pagar
+{LOAN_DATE} - Fecha del préstamo
+{LOAN_TERM} - Plazo del préstamo
+{INSTALLMENTS} - Número de cuotas"></textarea>
+                                    </div>
+                                    <button type="button" class="btn btn-primary w-100 mb-2" onclick="saveContractTemplate()">
+                                        <i class="fas fa-save me-2"></i>Guardar Plantilla
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary w-100" onclick="loadDefaultContract()">
+                                        <i class="fas fa-file-alt me-2"></i>Cargar Plantilla por Defecto
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Data Management Card -->
+                        <div class="card mt-3">
+                            <div class="card-header bg-danger text-white">
+                                <h5 class="mb-0">Gestión de Datos</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">Precaución: Estas acciones son irreversibles</p>
+                                <button class="btn btn-danger w-100" onclick="clearAllData()">
+                                    <i class="fas fa-trash me-2"></i>Eliminar Todos los Datos
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Modal -->
+    <div class="modal fade" id="clientModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nuevo Cliente</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="clientForm">
+                        <input type="hidden" id="clientId">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre *</label>
+                            <input type="text" class="form-control" id="clientFirstName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Apellido *</label>
+                            <input type="text" class="form-control" id="clientLastName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Cédula *</label>
+                            <input type="text" class="form-control" id="clientCedula" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Teléfono *</label>
+                            <input type="tel" class="form-control" id="clientPhone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dirección *</label>
+                            <textarea class="form-control" id="clientAddress" required></textarea>
+                        </div>
+                        <!-- Agregando campos de ocupación y salario -->
+                        <div class="mb-3">
+                            <label class="form-label">Ocupación</label>
+                            <input type="text" class="form-control" id="clientOccupation" placeholder="Ej: Comerciante, Empleado, etc.">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Salario/Ingreso Mensual</label>
+                            <input type="number" class="form-control" id="clientSalary" placeholder="0.00" step="0.01" min="0">
+                        </div>
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar Cliente</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de préstamo mejorado con soporte para edición y plazo indefinido -->
+    <!-- Loan Modal -->
+    <div class="modal fade" id="loanModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loanModalTitle">Nuevo Préstamo</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loanForm">
+                        <input type="hidden" id="loanId">
+                        <input type="hidden" id="editMode">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Cliente *</label>
+                                <select class="form-select" id="loanClient" required onchange="updateLoanPreview()">
+                                    <option value="">Seleccionar cliente...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Monto del Préstamo (RD$) *</label>
+                                <input type="number" class="form-control" id="loanAmount" required step="0.01" onchange="updateLoanPreview()">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tipo de Préstamo *</label>
+                                <select class="form-select" id="loanType" required onchange="toggleLoanType()">
+                                    <option value="">Seleccionar tipo...</option>
+                                    <option value="fixed">Plazo Definido</option>
+                                    <option value="indefinite">Plazo Indefinido</option>
+                                    <option value="daily">Préstamo Diario</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tasa de Interés (%) *</label>
+                                <input type="number" class="form-control" id="loanInterestRate" required step="0.01" onchange="updateLoanPreview()">
+                            </div>
+                            <div class="col-md-6 mb-3" id="installmentsGroup" style="display:none;">
+                                <label class="form-label">Número de Cuotas *</label>
+                                <input type="number" class="form-control" id="loanInstallments" onchange="updateLoanPreview()">
+                            </div>
+                            <div class="col-md-6 mb-3" id="frequencyGroup" style="display:none;">
+                                <label class="form-label">Frecuencia de Pago *</label>
+                                <select class="form-select" id="loanFrequency" onchange="updateLoanPreview()">
+                                    <option value="weekly">Semanal</option>
+                                    <option value="biweekly">Quincenal</option>
+                                    <option value="monthly">Mensual</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3" id="indefiniteFrequencyGroup" style="display:none;">
+                                <label class="form-label">Frecuencia de Pago *</label>
+                                <select class="form-select" id="indefiniteFrequency" onchange="updateLoanPreview()">
+                                    <option value="weekly">Semanal</option>
+                                    <option value="biweekly">Quincenal</option>
+                                    <option value="monthly">Mensual</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3" id="dailyDaysGroup" style="display:none;">
+                                <label class="form-label">Número de Días *</label>
+                                <input type="number" class="form-control" id="loanDailyDays" min="1" onchange="updateLoanPreview()">
+                            </div>
+                            <div class="col-md-6 mb-3" id="dailyPaymentGroup" style="display:none;">
+                                <label class="form-label">Pago Diario (RD$)</label>
+                                <input type="number" class="form-control" id="loanDailyPayment" readonly>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Notas</label>
+                                <textarea class="form-control" id="loanNotes" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div id="loanPreview" class="alert alert-info" style="display:none;"></div>
+                        <div class="d-flex gap-2 justify-content-end flex-wrap">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">
+                                <span id="loanSubmitText">Crear Préstamo</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registrar Pago</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="paymentForm">
+                        <input type="hidden" id="paymentLoanId">
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Pago *</label>
+                            <select class="form-select" id="paymentType" onchange="updatePaymentAmount()">
+                                <option value="installment">Pago de Cuota</option>
+                                <option value="interest">Solo Interés</option>
+                                <option value="capital">Abono a Capital</option>
+                                <option value="payoff">Liquidación Total</option>
+                            </select>
+                            <small id="paymentTypeHelp" class="form-text text-muted"></small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Monto (RD$) *</label>
+                            <input type="number" class="form-control" id="paymentAmount" required step="0.01">
+                            <small id="paymentAmountHelp" class="form-text text-muted"></small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Método de Pago *</label>
+                            <select class="form-select" id="paymentMethod" required>
+                                <option value="cash">Efectivo</option>
+                                <option value="transfer">Transferencia</option>
+                                <option value="check">Cheque</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notas</label>
+                            <textarea class="form-control" id="paymentNotes" rows="2"></textarea>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-end flex-wrap">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Registrar Pago</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Modal -->
+    <div class="modal fade" id="invoiceModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Factura</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="invoiceContent"></div>
+                <div class="modal-footer no-print">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button class="btn btn-success" onclick="printThermal()">
+                        <i class="fas fa-receipt me-2"></i>Imprimir Térmica
+                    </button>
+                    <button class="btn btn-primary" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i>Imprimir Normal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contract Modal -->
+    <div class="modal fade" id="contractModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Contrato de Préstamo</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="contractContent" style="white-space: pre-wrap; font-family: 'Times New Roman', serif;"></div>
+                <div class="modal-footer no-print">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button class="btn btn-primary" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i>Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div class="modal fade" id="reportModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reporte</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="reportContent"></div>
+                <div class="modal-footer no-print">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button class="btn btn-primary" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i>Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nuevo modal para carta de saldo -->
+    <!-- Clearance Letter Modal -->
+    <div class="modal fade" id="clearanceLetterModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Carta de Saldo</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="clearanceLetterContent"></div>
+                <div class="modal-footer no-print">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button class="btn btn-primary" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i>Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+// Global Variables
+var clients = []
+var loans = []
+var payments = []
+var companyInfo = {}
+var contractTemplate = "" // Added to store contract template
+var currentTheme = "theme-blue"
+var isAuthenticated = false
+var adminCredentials = {
+  username: "admin",
+  password: "admin123",
+}
+
+// Mobile Menu Functions
+function toggleMobileMenu() {
+  var sidebar = document.getElementById("sidebar")
+  var overlay = document.querySelector(".sidebar-overlay")
+  sidebar.classList.toggle("active")
+  overlay.classList.toggle("active")
+}
+
+function closeMobileMenu() {
+  var sidebar = document.getElementById("sidebar")
+  var overlay = document.querySelector(".sidebar-overlay")
+  sidebar.classList.remove("active")
+  overlay.classList.remove("active")
+}
+
+// Data Management Functions
+function loadData() {
+  try {
+    var clientsData = localStorage.getItem("clients")
+    clients = clientsData ? JSON.parse(clientsData) : []
+  } catch (e) {
+    console.error("Error loading clients:", e)
+    clients = []
+  }
+
+  try {
+    var loansData = localStorage.getItem("loans")
+    loans = loansData ? JSON.parse(loansData) : []
+  } catch (e) {
+    console.error("Error loading loans:", e)
+    loans = []
+  }
+
+  try {
+    var paymentsData = localStorage.getItem("payments")
+    payments = paymentsData ? JSON.parse(paymentsData) : []
+  } catch (e) {
+    console.error("Error loading payments:", e)
+    payments = []
+  }
+
+  try {
+    var companyData = localStorage.getItem("companyInfo")
+    companyInfo = companyData ? JSON.parse(companyData) : {}
+  } catch (e) {
+    console.error("Error loading company info:", e)
+    companyInfo = {}
+  }
+  
+  // Load contract template from localStorage
+  try {
+    var contractData = localStorage.getItem("contractTemplate")
+    contractTemplate = contractData || ""
+    if (contractTemplate) {
+      document.getElementById("contractTemplate").value = contractTemplate
+    }
+  } catch (e) {
+    console.error("Error loading contract template:", e)
+    contractTemplate = ""
+  }
+
+  try {
+    currentTheme = localStorage.getItem("theme") || "theme-blue"
+    document.body.className = currentTheme
+  } catch (e) {
+    console.error("Error loading theme:", e)
+  }
+
+  try {
+    var creds = localStorage.getItem("adminCredentials")
+    if (creds) {
+      adminCredentials = JSON.parse(creds)
+    }
+  } catch (e) {
+    console.error("Error loading credentials:", e)
+  }
+}
+
+function saveClients() {
+  localStorage.setItem("clients", JSON.stringify(clients))
+}
+
+function saveLoans() {
+  localStorage.setItem("loans", JSON.stringify(loans))
+}
+
+function savePayments() {
+  localStorage.setItem("payments", JSON.stringify(payments))
+}
+
+// Login Functions
+function login(e) {
+  e.preventDefault()
+  
+  var username = document.getElementById("loginUsername").value
+  var password = document.getElementById("loginPassword").value
+  
+  if (username === adminCredentials.username && password === adminCredentials.password) {
+    isAuthenticated = true
+    document.getElementById("loginScreen").style.display = "none"
+    document.getElementById("appContainer").classList.add("active")
+    loadData()
+    renderClients()
+    renderLoans()
+    renderPaymentHistory()
+    renderPendingPayments()
+    renderOverduePayments()
+    renderFinishedLoans()
+    updateDashboard()
+    loadCompanyInfo()
+  } else {
+    document.getElementById("loginError").textContent = "Usuario o contraseña incorrectos"
+    document.getElementById("loginError").style.display = "block"
+  }
+}
+
+function logout() {
+  isAuthenticated = false
+  document.getElementById("loginScreen").style.display = "flex"
+  document.getElementById("appContainer").classList.remove("active")
+  document.getElementById("loginUsername").value = ""
+  document.getElementById("loginPassword").value = ""
+  document.getElementById("loginError").style.display = "none"
+}
+
+// Navigation Functions
+function showSection(sectionId) {
+  var sections = document.querySelectorAll(".section")
+  sections.forEach((section) => {
+    section.classList.remove("active")
+  })
+  
+  var navLinks = document.querySelectorAll(".sidebar .nav-link")
+  navLinks.forEach((link) => {
+    link.classList.remove("active")
+  })
+  
+  document.getElementById(sectionId).classList.add("active")
+  event.target.classList.add("active")
+
+  // Actualizar datos cuando se muestra una sección
+  if (sectionId === 'overdue-payments') {
+    renderOverduePayments()
+  } else if (sectionId === 'finished-loans') {
+    renderFinishedLoans()
+  }
+}
+
+// Dashboard Functions
+function updateDashboard() {
+  document.getElementById("totalClients").textContent = clients.length
+  
+  var activeLoansCount = loans.filter((l) => l.status === "active").length
+  document.getElementById("activeLoans").textContent = activeLoansCount
+  
+  var finishedLoansCount = loans.filter((l) => l.status === "paid").length
+  document.getElementById("finishedLoans").textContent = finishedLoansCount
+  
+  var totalPending = loans
+    .filter((l) => l.status === "active")
+    .reduce((sum, l) => sum + l.remainingAmount, 0)
+  document.getElementById("pendingPayments").textContent = "RD$ " + formatMoney(totalPending)
+  
+  var totalCompleted = payments.reduce((sum, p) => sum + p.amount, 0)
+  document.getElementById("completedPayments").textContent = "RD$ " + formatMoney(totalCompleted)
+
+  var overdueAmount = 0
+  var today = new Date()
+  loans.filter(l => l.status === 'active').forEach(loan => {
+    var nextPayment = calculateNextPaymentDate(loan)
+    if (new Date(nextPayment) < today && loan.remainingAmount > 0) {
+      overdueAmount += loan.remainingAmount
+    }
+  })
+  document.getElementById("overduePayments").textContent = "RD$ " + formatMoney(overdueAmount)
+}
+
+// Client Functions
+function openClientModal(clientId = null) {
+  var modal = new bootstrap.Modal(document.getElementById("clientModal"))
+  document.getElementById("clientForm").reset()
+  
+  if (clientId) {
+    var client = clients.find((c) => c.id === clientId)
+    if (client) {
+      document.getElementById("clientId").value = client.id
+      document.getElementById("clientFirstName").value = client.firstName
+      document.getElementById("clientLastName").value = client.lastName
+      document.getElementById("clientCedula").value = client.cedula
+      document.getElementById("clientPhone").value = client.phone
+      document.getElementById("clientAddress").value = client.address
+      // Agregando campos de ocupación y salario al modal
+      document.getElementById("clientOccupation").value = client.occupation || ""
+      document.getElementById("clientSalary").value = client.salary || 0
+      document.querySelector("#clientModal .modal-title").textContent = "Editar Cliente"
+    }
+  } else {
+    document.querySelector("#clientModal .modal-title").textContent = "Nuevo Cliente"
+  }
+  
+  modal.show()
+}
+
+// Modificando editClient para que llame a openClientModal
+function editClient(clientId) {
+  openClientModal(clientId)
+}
+
+function saveClient(e) {
+  e.preventDefault()
+  
+  console.log("[v0] Guardando cliente...")
+  
+  var clientId = document.getElementById("clientId").value
+  
+  var clientData = {
+    id: clientId || "CLI-" + Date.now(),
+    firstName: document.getElementById("clientFirstName").value,
+    lastName: document.getElementById("clientLastName").value,
+    cedula: document.getElementById("clientCedula").value,
+    phone: document.getElementById("clientPhone").value,
+    address: document.getElementById("clientAddress").value,
+    occupation: document.getElementById("clientOccupation").value || "",
+    salary: parseFloat(document.getElementById("clientSalary").value) || 0,
+    createdAt: clientId ? (clients.find(c => c.id === clientId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+  }
+  
+  console.log("[v0] Datos del cliente:", clientData)
+  
+  if (clientId) {
+    var index = clients.findIndex((c) => c.id === clientId)
+    if (index !== -1) {
+      clients[index] = { ...clients[index], ...clientData }
+      console.log("[v0] Cliente actualizado en índice:", index)
+    }
+  } else {
+    clients.push(clientData)
+    console.log("[v0] Nuevo cliente agregado. Total clientes:", clients.length)
+  }
+  
+  saveClients()
+  console.log("[v0] Clientes guardados en localStorage")
+  
+  bootstrap.Modal.getInstance(document.getElementById("clientModal")).hide()
+  renderClients()
+  updateDashboard()
+  
+  // Limpiar formulario
+  document.getElementById("clientForm").reset()
+  document.getElementById("clientId").value = ""
+}
+
+function renderClients() {
+  var tbody = document.getElementById("clientsTable")
+  if (!tbody) return
+  
+  tbody.innerHTML = ""
+  
+  clients.forEach((client) => {
+    var row = tbody.insertRow()
+    row.innerHTML =
+      "<td>" +
+      client.id +
+      "</td><td>" +
+      client.firstName +
+      " " +
+      client.lastName +
+      "</td><td>" +
+      client.cedula +
+      "</td><td>" +
+      client.phone +
+      '</td><td class="hide-mobile">' +
+      client.address +
+      '</td><td class="hide-mobile">' +
+      (client.occupation || "N/A") +
+      '</td><td class="hide-mobile">RD$ ' +
+      formatMoney(client.salary || 0) +
+      "</td><td>" +
+      '<button class="btn btn-sm btn-primary me-1" onclick="editClient(\'' +
+      client.id +
+      '\')"><i class="fas fa-edit"></i></button>' +
+      '<button class="btn btn-sm btn-danger" onclick="deleteClient(\'' +
+      client.id +
+      '\')"><i class="fas fa-trash"></i></button>' +
+      "</td>"
+  })
+}
+
+function searchClients() {
+  var searchTerm = document.getElementById("clientSearch").value.toLowerCase()
+  var rows = document.querySelectorAll("#clientsTable tr")
+  
+  rows.forEach((row) => {
+    var text = row.textContent.toLowerCase()
+    row.style.display = text.includes(searchTerm) ? "" : "none"
+  })
+}
+
+function deleteClient(clientId) {
+  if (confirm("¿Está seguro de eliminar este cliente?")) {
+    clients = clients.filter((c) => c.id !== clientId)
+    saveClients()
+    renderClients()
+    updateDashboard()
+  }
+}
+
+// Loan Functions
+function openLoanModal(loanId = null) {
+  var modal = new bootstrap.Modal(document.getElementById("loanModal"))
+  document.getElementById("loanForm").reset()
+  document.getElementById("editMode").value = loanId ? "true" : "false"
+
+  var clientSelect = document.getElementById("loanClient")
+  clientSelect.innerHTML = '<option value="">Seleccionar cliente...</option>'
+
+  clients.forEach((client) => {
+    var option = document.createElement("option")
+    option.value = client.id
+    option.textContent = client.firstName + " " + client.lastName + " (" + client.id + ")"
+    clientSelect.appendChild(option)
+  })
+
+  if (loanId) {
+    var loan = loans.find((l) => l.id === loanId)
+    if (loan) {
+      document.getElementById("loanId").value = loan.id
+      document.getElementById("loanClient").value = loan.clientId
+      document.getElementById("loanAmount").value = loan.amount
+      document.getElementById("loanType").value = loan.type
+      document.getElementById("loanInterestRate").value = loan.interestRate
+      document.getElementById("loanNotes").value = loan.notes || ""
+      
+      toggleLoanType()
+      
+      if (loan.type === "fixed") {
+        document.getElementById("loanInstallments").value = loan.installments
+        document.getElementById("loanFrequency").value = loan.frequency
+      } else if (loan.type === "indefinite") {
+        document.getElementById("indefiniteFrequency").value = loan.frequency
+      } else if (loan.type === "daily") {
+        document.getElementById("loanDailyDays").value = loan.days
+        document.getElementById("loanDailyPayment").value = loan.dailyPayment
+      }
+      
+      document.querySelector("#loanModal .modal-title").textContent = "Editar Préstamo"
+      document.getElementById("loanSubmitText").textContent = "Actualizar Préstamo"
+      updateLoanPreview()
+    }
+  } else {
+    document.querySelector("#loanModal .modal-title").textContent = "Nuevo Préstamo"
+    document.getElementById("loanSubmitText").textContent = "Crear Préstamo"
+  }
+
+  modal.show()
+}
+
+function toggleLoanType() {
+  var type = document.getElementById("loanType").value
+  var installmentsGroup = document.getElementById("installmentsGroup")
+  var frequencyGroup = document.getElementById("frequencyGroup")
+  var indefiniteFrequencyGroup = document.getElementById("indefiniteFrequencyGroup")
+  var dailyDaysGroup = document.getElementById("dailyDaysGroup")
+  var dailyPaymentGroup = document.getElementById("dailyPaymentGroup")
+
+  installmentsGroup.style.display = "none"
+  frequencyGroup.style.display = "none"
+  indefiniteFrequencyGroup.style.display = "none"
+  dailyDaysGroup.style.display = "none"
+  dailyPaymentGroup.style.display = "none"
+
+  if (type === "fixed") {
+    installmentsGroup.style.display = "block"
+    frequencyGroup.style.display = "block"
+  } else if (type === "indefinite") {
+    indefiniteFrequencyGroup.style.display = "block"
+  } else if (type === "daily") {
+    dailyDaysGroup.style.display = "block"
+    dailyPaymentGroup.style.display = "block"
+  }
+
+  updateLoanPreview()
+}
+
+function updateLoanPreview() {
+  var amount = Number.parseFloat(document.getElementById("loanAmount").value) || 0
+  var rate = Number.parseFloat(document.getElementById("loanInterestRate").value) || 0
+  var type = document.getElementById("loanType").value
+
+  if (amount === 0 || rate === 0 || !type) {
+    document.getElementById("loanPreview").style.display = "none"
+    return
+  }
+
+  var totalInterest = amount * (rate / 100)
+  var totalAmount = amount + totalInterest
+  var preview = "<strong>Vista Previa:</strong><br>"
+  preview += "Capital: RD$ " + formatMoney(amount) + "<br>"
+  preview += "Interés Total: RD$ " + formatMoney(totalInterest) + "<br>"
+  preview += "Monto Total a Pagar: RD$ " + formatMoney(totalAmount) + "<br>"
+
+  if (type === "fixed") {
+    var installments = Number.parseInt(document.getElementById("loanInstallments").value) || 0
+    if (installments > 0) {
+      var installmentAmount = totalAmount / installments
+      preview += "Cuota: RD$ " + formatMoney(installmentAmount) + "<br>"
+      preview += "Número de Cuotas: " + installments
+    }
+  } else if (type === "indefinite") {
+    var frequency = document.getElementById("indefiniteFrequency").value
+    preview += "Frecuencia: " + getFrequencyLabel(frequency) + "<br>"
+    preview += "Se pagarán cuotas hasta saldar el monto total"
+  } else if (type === "daily") {
+    var days = Number.parseInt(document.getElementById("loanDailyDays").value) || 0
+    if (days > 0) {
+      var dailyPayment = totalAmount / days
+      document.getElementById("loanDailyPayment").value = dailyPayment.toFixed(2)
+      preview += "Pago Diario: RD$ " + formatMoney(dailyPayment) + "<br>"
+      preview += "Número de Días: " + days
+    }
+  }
+
+  document.getElementById("loanPreview").innerHTML = preview
+  document.getElementById("loanPreview").style.display = "block"
+}
+
+function saveLoan(e) {
+  e.preventDefault()
+
+  var loanId = document.getElementById("loanId").value
+  var editMode = document.getElementById("editMode").value === "true"
+  
+  var loanData = {
+    id: loanId || "LOAN-" + Date.now(),
+    clientId: document.getElementById("loanClient").value,
+    amount: Number.parseFloat(document.getElementById("loanAmount").value),
+    type: document.getElementById("loanType").value,
+    interestRate: Number.parseFloat(document.getElementById("loanInterestRate").value),
+    notes: document.getElementById("loanNotes").value,
+    createdAt: new Date().toISOString(), // Default to new date if not editing
+    status: "active",
+  }
+
+  var totalInterest = loanData.amount * (loanData.interestRate / 100)
+  loanData.totalAmount = loanData.amount + totalInterest
+
+  if (editMode) {
+    var existingLoan = loans.find(l => l.id === loanId)
+    if (existingLoan) {
+      loanData.totalPaid = existingLoan.totalPaid || 0
+      loanData.remainingAmount = loanData.totalAmount - loanData.totalPaid
+      loanData.createdAt = existingLoan.createdAt // Preserve original creation date
+      loanData.status = existingLoan.status
+      loanData.startDate = existingLoan.startDate // Preserve original start date
+      loanData.paidOffDate = existingLoan.paidOffDate // Preserve original paid off date
+    }
+  } else {
+    loanData.totalPaid = 0
+    loanData.remainingAmount = loanData.totalAmount
+    loanData.startDate = new Date().toISOString() // Set start date for new loans
+  }
+
+  if (loanData.type === "fixed") {
+    loanData.installments = Number.parseInt(document.getElementById("loanInstallments").value)
+    loanData.frequency = document.getElementById("loanFrequency").value
+    loanData.installmentAmount = loanData.totalAmount / loanData.installments
+    loanData.paidInstallments = editMode && loans.find(l => l.id === loanId) ? loans.find(l => l.id === loanId).paidInstallments : 0
+  } else if (loanData.type === "indefinite") {
+    loanData.frequency = document.getElementById("indefiniteFrequency").value
+    loanData.installmentAmount = 0 // Se define con cada pago
+    loanData.paidInstallments = editMode && loans.find(l => l.id === loanId) ? loans.find(l => l.id === loanId).paidInstallments : 0
+  } else if (loanData.type === "daily") {
+    loanData.days = Number.parseInt(document.getElementById("loanDailyDays").value)
+    loanData.dailyPayment = loanData.totalAmount / loanData.days
+    loanData.paidDays = editMode && loans.find(l => l.id === loanId) ? loans.find(l => l.id === loanId).paidDays : 0
+  }
+
+  // Calculate next payment date after potential loan modification
+  if (loanData.status === 'active') {
+      loanData.nextPaymentDate = calculateNextPaymentDate(loanData)
+  }
+
+  if (editMode) {
+    var index = loans.findIndex(l => l.id === loanId)
+    if (index !== -1) {
+      loans[index] = loanData
+    }
+  } else {
+    loans.push(loanData)
+  }
+  
+  saveLoans()
+  bootstrap.Modal.getInstance(document.getElementById("loanModal")).hide()
+  renderLoans()
+  renderFinishedLoans()
+  updateDashboard()
+
+  if (!editMode && confirm("¿Desea generar el contrato para este préstamo?")) {
+    generateContract(loanData.id)
+  }
+}
+
+function deleteLoan(loanId) {
+  if (confirm("¿Está seguro de eliminar este préstamo? Esta acción no se puede deshacer.")) {
+    loans = loans.filter(l => l.id !== loanId)
+    payments = payments.filter(p => p.loanId !== loanId)
+    saveLoans()
+    savePayments()
+    renderLoans()
+    renderFinishedLoans()
+    renderPaymentHistory()
+    renderPendingPayments()
+    renderOverduePayments()
+    updateDashboard()
+    alert("Préstamo eliminado exitosamente")
+  }
+}
+
+function renderLoans() {
+  var tbody = document.getElementById("loansTable")
+  if (!tbody) return
+
+  tbody.innerHTML = ""
+
+  var activeLoans = loans.filter(l => l.status === "active")
+
+  if (activeLoans.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay préstamos activos</td></tr>'
+    return
+  }
+
+  activeLoans.forEach((loan) => {
+    var client = clients.find((c) => c.id === loan.clientId)
+    var clientName = client ? client.firstName + " " + client.lastName : "Cliente Eliminado"
+
+    var statusBadge = '<span class="badge bg-success">Activo</span>'
+
+    var row =
+      "<tr>" +
+      "<td>" +
+      loan.id +
+      "</td>" +
+      "<td>" +
+      clientName +
+      "</td>" +
+      "<td>RD$ " +
+      formatMoney(loan.amount) +
+      "</td>" +
+      '<td class="hide-mobile">' +
+      getLoanTypeLabel(loan.type) +
+      "</td>" +
+      '<td class="hide-mobile">' +
+      loan.interestRate +
+      "%</td>" +
+      '<td class="hide-mobile">' +
+      formatDate(loan.createdAt) +
+      "</td>" +
+      "<td>" +
+      statusBadge +
+      "</td>" +
+      '<td style="white-space: nowrap;">' +
+      '<button class="btn btn-sm btn-info me-1" onclick="viewLoanDetails(\'' +
+      loan.id +
+      '\')"><i class="fas fa-eye"></i></button>' +
+      '<button class="btn btn-sm btn-warning me-1" onclick="openLoanModal(\'' +
+      loan.id +
+      '\')"><i class="fas fa-edit"></i></button>' +
+      '<button class="btn btn-sm btn-primary me-1" onclick="generateContract(\'' +
+      loan.id +
+      '\')"><i class="fas fa-file-contract"></i></button>' +
+      '<button class="btn btn-sm btn-success me-1" onclick="openPaymentModal(\'' +
+      loan.id +
+      '\')"><i class="fas fa-dollar-sign"></i></button>' +
+      '<button class="btn btn-sm btn-danger" onclick="deleteLoan(\'' +
+      loan.id +
+      '\')"><i class="fas fa-trash"></i></button>' +
+      "</td>" +
+      "</tr>"
+    tbody.innerHTML += row
+  })
+}
+
+function renderFinishedLoans() {
+  var tbody = document.getElementById("finishedLoansTable")
+  if (!tbody) return
+
+  tbody.innerHTML = ""
+
+  var finishedLoans = loans.filter(l => l.status === "paid")
+
+  if (finishedLoans.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay préstamos finalizados</td></tr>'
+    return
+  }
+
+  finishedLoans.forEach((loan) => {
+    var client = clients.find((c) => c.id === loan.clientId)
+    var clientName = client ? client.firstName + " " + client.lastName : "Cliente Eliminado"
+
+    var row =
+      "<tr>" +
+      "<td>" +
+      loan.id +
+      "</td>" +
+      "<td>" +
+      clientName +
+      "</td>" +
+      "<td>RD$ " +
+      formatMoney(loan.totalAmount) +
+      "</td>" +
+      '<td class="hide-mobile">' +
+      getLoanTypeLabel(loan.type) +
+      "</td>" +
+      '<td class="hide-mobile">' +
+      formatDate(loan.createdAt) +
+      "</td>" +
+      "<td>" +
+      (loan.finishedAt ? formatDate(loan.finishedAt) : "N/A") +
+      "</td>" +
+      '<td style="white-space: nowrap;">' +
+      '<button class="btn btn-sm btn-info me-1" onclick="viewFinishedLoanDetails(\'' +
+      loan.id +
+      '\')"><i class="fas fa-eye"></i></button>' +
+      '<button class="btn btn-sm btn-success me-1" onclick="generateClearanceLetter(\'' +
+      loan.id +
+      '\')"><i class="fas fa-file-alt"></i> Carta de Saldo</button>' +
+      '<button class="btn btn-sm btn-danger" onclick="deleteLoan(\'' +
+      loan.id +
+      '\')"><i class="fas fa-trash"></i></button>' +
+      "</td>" +
+      "</tr>"
+    tbody.innerHTML += row
+  })
+}
+
+function searchFinishedLoans() {
+  var searchTerm = document.getElementById("finishedLoanSearch").value.toLowerCase()
+  var rows = document.querySelectorAll("#finishedLoansTable tr")
+
+  rows.forEach((row) => {
+    var text = row.textContent.toLowerCase()
+    row.style.display = text.includes(searchTerm) ? "" : "none"
+  })
+}
+
+function viewLoanDetails(loanId) {
+  var loan = loans.find((l) => l.id === loanId)
+  if (!loan) return
+
+  var client = clients.find((c) => c.id === loan.clientId)
+  var loanPayments = payments.filter((p) => p.loanId === loanId)
+
+  var details = "=== DETALLES DEL PRÉSTAMO ===\n\n"
+  details += "ID: " + loan.id + "\n"
+  details += "Cliente: " + (client ? client.firstName + " " + client.lastName : "N/A") + "\n"
+  details += "Monto Inicial: RD$ " + formatMoney(loan.amount) + "\n"
+  details += "Interés: " + loan.interestRate + "%\n"
+  details += "Monto Total: RD$ " + formatMoney(loan.totalAmount) + "\n"
+  details += "Monto Pagado: RD$ " + formatMoney(loan.totalPaid) + "\n"
+  details += "Saldo Restante: RD$ " + formatMoney(loan.remainingAmount) + "\n"
+
+  if (loan.type === "fixed") {
+    details += "\nTipo: Plazo Definido\n"
+    details += "Cuotas: " + loan.paidInstallments + " de " + loan.installments + "\n"
+    details += "Frecuencia: " + getFrequencyLabel(loan.frequency) + "\n"
+  } else if (loan.type === "indefinite") {
+    details += "\nTipo: Plazo Indefinido\n"
+    details += "Frecuencia: " + getFrequencyLabel(loan.frequency) + "\n"
+    details += "Pagos realizados: " + loanPayments.length + "\n"
+  } else if (loan.type === "daily") {
+    details += "\nTipo: Préstamo Diario\n"
+    details += "Días pagados: " + loan.paidDays + " de " + loan.days + "\n"
+  }
+
+  details += "\n=== HISTORIAL DE PAGOS ===\n"
+  
+  if (loanPayments.length === 0) {
+    details += "No hay pagos registrados"
+  } else {
+    loanPayments.forEach((payment, index) => {
+      details += "\n" + (index + 1) + ". " + formatDate(payment.date) + " - RD$ " + formatMoney(payment.amount)
+    })
+  }
+
+  alert(details)
+}
+
+function searchLoans() {
+  var searchTerm = document.getElementById("loanSearch").value.toLowerCase()
+  var rows = document.querySelectorAll("#loansTable tr")
+
+  rows.forEach((row) => {
+    var text = row.textContent.toLowerCase()
+    row.style.display = text.includes(searchTerm) ? "" : "none"
+  })
+}
+
+function viewFinishedLoanDetails(loanId) {
+  var loan = loans.find((l) => l.id === loanId)
+  if (!loan) return
+
+  var client = clients.find((c) => c.id === loan.clientId)
+  var loanPayments = payments.filter((p) => p.loanId === loanId)
+
+  var details = "=== DETALLES DEL PRÉSTAMO FINALIZADO ===\n\n"
+  details += "ID: " + loan.id + "\n"
+  details += "Cliente: " + (client ? client.firstName + " " + client.lastName : "N/A") + "\n"
+  details += "Monto: RD$ " + formatMoney(loan.amount) + "\n"
+  details += "Interés: " + loan.interestRate + "%\n"
+  details += "Monto Total Pagado: RD$ " + formatMoney(loan.totalAmount) + "\n"
+  details += "Fecha de Creación: " + formatDate(loan.createdAt) + "\n"
+  details += "Fecha de Finalización: " + (loan.finishedAt ? formatDate(loan.finishedAt) : "N/A") + "\n\n"
+  details += "=== HISTORIAL DE PAGOS ===\n"
+  
+  loanPayments.forEach((payment, index) => {
+    details += "\n" + (index + 1) + ". " + formatDate(payment.date) + "\n"
+    details += "   Monto: RD$ " + formatMoney(payment.amount) + "\n"
+    details += "   Tipo: " + getPaymentTypeLabel(payment.type) + "\n"
+    details += "   Método: " + getPaymentMethodLabel(payment.method) + "\n"
+    if (payment.notes) {
+      details += "   Notas: " + payment.notes + "\n"
+    }
+  })
+
+  alert(details)
+}
+
+// Payment Functions
+function openPaymentModal(loanId) {
+  var loan = loans.find((l) => l.id === loanId)
+  if (!loan) return
+
+  if (loan.status === "paid") {
+    alert("Este préstamo ya ha sido saldado en su totalidad. No se pueden registrar más pagos.")
+    return
+  }
+
+  var modal = new bootstrap.Modal(document.getElementById("paymentModal"))
+  document.getElementById("paymentForm").reset()
+  document.getElementById("paymentLoanId").value = loanId
+  
+  updatePaymentAmount()
+  modal.show()
+}
+
+function updatePaymentAmount() {
+  var loanId = document.getElementById("paymentLoanId").value
+  var loan = loans.find((l) => l.id === loanId)
+  if (!loan) return
+
+  var paymentType = document.getElementById("paymentType").value
+  var amountInput = document.getElementById("paymentAmount")
+  var typeHelp = document.getElementById("paymentTypeHelp")
+  var amountHelp = document.getElementById("paymentAmountHelp")
+
+  var suggestedAmount = 0
+
+  switch (paymentType) {
+    case "installment":
+      if (loan.type === "fixed" || loan.type === "indefinite") {
+        suggestedAmount = loan.installmentAmount || (loan.totalAmount / (loan.installments || 1))
+      } else if (loan.type === "daily") {
+        suggestedAmount = loan.dailyPayment
+      }
+      typeHelp.textContent = "Pago regular según el plan del préstamo"
+      break
+    case "interest":
+      suggestedAmount = loan.amount * (loan.interestRate / 100)
+      typeHelp.textContent = "Solo paga el interés, el capital permanece igual"
+      break
+    case "capital":
+      suggestedAmount = 0
+      typeHelp.textContent = "Abono directo al capital del préstamo"
+      break
+    case "payoff":
+      suggestedAmount = loan.remainingAmount
+      typeHelp.textContent = "Paga el saldo total restante"
+      break
+  }
+
+  amountInput.value = suggestedAmount.toFixed(2)
+  amountHelp.textContent = "Saldo restante: RD$ " + formatMoney(loan.remainingAmount)
+}
+
+function savePayment(e) {
+  e.preventDefault()
+
+  var loanId = document.getElementById("paymentLoanId").value
+  var loan = loans.find((l) => l.id === loanId)
+  if (!loan) return
+
+  if (loan.status === "paid") {
+    alert("Este préstamo ya ha sido saldado. No se pueden registrar más pagos.")
+    return
+  }
+
+  var paymentData = {
+    id: "PAY-" + Date.now(),
+    loanId: loanId,
+    clientId: loan.clientId,
+    amount: Number.parseFloat(document.getElementById("paymentAmount").value),
+    type: document.getElementById("paymentType").value,
+    method: document.getElementById("paymentMethod").value,
+    notes: document.getElementById("paymentNotes").value,
+    date: new Date().toISOString(),
+  }
+
+  // Actualizar campos del préstamo
+  loan.totalPaid += paymentData.amount
+  loan.remainingAmount -= paymentData.amount
+
+  if (loan.type === "fixed") {
+    loan.paidInstallments++;
+  } else if (loan.type === "indefinite") {
+    loan.paidInstallments = (loan.paidInstallments || 0) + 1;
+  } else if (loan.type === "daily") {
+    loan.paidDays++;
+  }
+
+  var wasOverdue = false
+  var nextPaymentDateCalc = calculateNextPaymentDate(loan) // Calculate based on current loan data
+  if (loan.status === 'active') {
+      if (new Date(nextPaymentDateCalc) < new Date()) {
+          wasOverdue = true
+      }
+  }
+
+  if (loan.remainingAmount <= 0.01) { // Pequeño margen para errores de redondeo
+    loan.status = "paid"
+    loan.remainingAmount = 0
+    loan.finishedAt = new Date().toISOString()
+    loan.paidOffDate = new Date().toISOString() // Set paidOffDate for reporting
+    
+    payments.push(paymentData)
+    savePayments()
+    saveLoans()
+
+    bootstrap.Modal.getInstance(document.getElementById("paymentModal")).hide()
+    
+    alert("¡Préstamo saldado completamente! Se generará una carta de saldo.")
+    
+    renderLoans()
+    renderFinishedLoans()
+    renderPaymentHistory()
+    renderPendingPayments()
+    renderOverduePayments()
+    updateDashboard()
+
+    if (confirm("¿Desea generar un recibo para este pago?")) {
+      generateInvoice(paymentData.id)
+    }
+    
+    // Generar carta de saldo
+    setTimeout(() => {
+      generateClearanceLetter(loanId)
+    }, 500)
+    
+    return
+  }
+
+  payments.push(paymentData)
+  savePayments()
+  saveLoans()
+
+  bootstrap.Modal.getInstance(document.getElementById("paymentModal")).hide()
+  
+  if (wasOverdue) {
+    alert("Pago registrado exitosamente. El préstamo ha sido puesto al día.")
+  }
+  
+  renderLoans()
+  renderPaymentHistory()
+  renderPendingPayments()
+  renderOverduePayments()
+  updateDashboard()
+
+  if (confirm("¿Desea generar un recibo para este pago?")) {
+    generateInvoice(paymentData.id)
+  }
+}
+
+function renderPaymentHistory() {
+  var tbody = document.getElementById("paymentHistoryTable")
+  if (!tbody) return
+
+  tbody.innerHTML = ""
+
+  if (payments.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay pagos registrados</td></tr>'
+    return
+  }
+
+  var sortedPayments = [...payments].sort((a, b) => new Date(b.date) - new Date(a.date))
+
+  sortedPayments.forEach((payment) => {
+    var loan = loans.find((l) => l.id === payment.loanId)
+    var client = clients.find((c) => c.id === payment.clientId)
+
+    var row =
+      "<tr>" +
+      "<td>" +
+      payment.id +
+      "</td>" +
+      "<td>" +
+      (client ? client.firstName + " " + client.lastName : "N/A") +
+      "</td>" +
+      "<td>" +
+      payment.loanId +
+      "</td>" +
+      "<td>RD$ " +
+      formatMoney(payment.amount) +
+      "</td>" +
+      '<td class="hide-mobile">' +
+      getPaymentTypeLabel(payment.type) +
+      "</td>" +
+      "<td>" +
+      formatDate(payment.date) +
+      "</td>" +
+      '<td class="hide-mobile">' +
+      getPaymentMethodLabel(payment.method) +
+      "</td>" +
+      "<td>" +
+      '<button class="btn btn-sm btn-primary" onclick="generateInvoice(\'' +
+      payment.id +
+      '\')"><i class="fas fa-receipt"></i></button>' +
+      "</td>" +
+      "</tr>"
+    tbody.innerHTML += row
+  })
+}
+
+function renderOverduePayments() {
+  var tbody = document.getElementById("overduePaymentsTable")
+  if (!tbody) return
+
+  tbody.innerHTML = ""
+
+  var overdueLoans = []
+  var today = new Date()
+
+  loans.filter(l => l.status === 'active').forEach(loan => {
+    // Ensure nextPaymentDate exists and is a valid date
+    if (!loan.nextPaymentDate || isNaN(new Date(loan.nextPaymentDate).getTime())) {
+        loan.nextPaymentDate = calculateNextPaymentDate(loan) // Recalculate if missing or invalid
+    }
+    
+    if (new Date(loan.nextPaymentDate) < today && loan.remainingAmount > 0) {
+      var daysOverdue = Math.floor((today - new Date(loan.nextPaymentDate)) / (1000 * 60 * 60 * 24))
+      overdueLoans.push({
+        loan: loan,
+        daysOverdue: daysOverdue,
+        nextPaymentDate: loan.nextPaymentDate
+      })
+    }
+  })
+
+  if (overdueLoans.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay pagos vencidos</td></tr>'
+    return
+  }
+
+  // Ordenar por días vencidos (más vencidos primero)
+  overdueLoans.sort((a, b) => b.daysOverdue - a.daysOverdue)
+
+  overdueLoans.forEach(item => {
+    var loan = item.loan
+    var client = clients.find(c => c.id === loan.clientId)
+    var clientName = client ? client.firstName + " " + client.lastName : "N/A"
+
+    var row =
+      "<tr class='table-danger'>" +
+      "<td>" +
+      clientName +
+      "</td>" +
+      "<td>" +
+      loan.id +
+      "</td>" +
+      "<td>RD$ " +
+      formatMoney(loan.remainingAmount) +
+      "</td>" +
+      '<td class="hide-mobile">' +
+      item.daysOverdue +
+      " días</td>" +
+      '<td class="hide-mobile">' +
+      formatDate(item.nextPaymentDate) +
+      "</td>" +
+      "<td>" +
+      '<button class="btn btn-sm btn-danger" onclick="openPaymentModal(\'' +
+      loan.id +
+      '\')"><i class="fas fa-dollar-sign"></i> Pagar Ahora</button>' +
+      "</td>" +
+      "</tr>"
+    tbody.innerHTML += row
+  })
+}
+
+function renderPendingPayments() {
+  var tbody = document.getElementById("pendingPaymentsTable")
+  if (!tbody) return
+
+  tbody.innerHTML = ""
+
+  var activeLoans = loans.filter((l) => l.status === "active")
+
+  if (activeLoans.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay pagos pendientes</td></tr>'
+    return
+  }
+
+  activeLoans.forEach((loan) => {
+    var client = clients.find((c) => c.id === loan.clientId)
+    var clientName = client ? client.firstName + " " + client.lastName : "N/A"
+
+    // Ensure nextPaymentDate is calculated
+    if (!loan.nextPaymentDate || isNaN(new Date(loan.nextPaymentDate).getTime())) {
+        loan.nextPaymentDate = calculateNextPaymentDate(loan)
+    }
+
+    var nextPaymentDate = loan.nextPaymentDate
+    var isOverdue = new Date(nextPaymentDate) < new Date()
+    var statusBadge = isOverdue
+      ? '<span class="badge badge-overdue">Vencido</span>'
+      : '<span class="badge badge-pending">Pendiente</span>'
+
+    var row =
+      "<tr>" +
+      "<td>" +
+      clientName +
+      "</td>" +
+      "<td>" +
+      loan.id +
+      "</td>" +
+      "<td>RD$ " +
+      formatMoney(loan.remainingAmount) +
+      "</td>" +
+      '<td class="hide-mobile">' +
+      formatDate(nextPaymentDate) +
+      "</td>" +
+      "<td>" +
+      statusBadge +
+      "</td>" +
+      "<td>" +
+      '<button class="btn btn-sm btn-success" onclick="openPaymentModal(\'' +
+      loan.id +
+      '\')"><i class="fas fa-dollar-sign"></i> Pagar</button>' +
+      "</td>" +
+      "</tr>"
+    tbody.innerHTML += row
+  })
+}
+
+function searchClientForPayment() {
+  var searchTerm = document.getElementById("paymentClientSearch").value.toLowerCase()
+  var resultsDiv = document.getElementById("paymentClientResults")
+
+  if (searchTerm.length < 2) {
+    resultsDiv.innerHTML = ""
+    return
+  }
+
+  var matchedClients = clients.filter((client) => {
+    var fullName = (client.firstName + " " + client.lastName).toLowerCase()
+    var cedula = client.cedula.toLowerCase()
+    var phone = client.phone.toLowerCase()
+    
+    return fullName.includes(searchTerm) || 
+           client.id.toLowerCase().includes(searchTerm) ||
+           cedula.includes(searchTerm) ||
+           phone.includes(searchTerm)
+  })
+
+  if (matchedClients.length === 0) {
+    resultsDiv.innerHTML = '<p class="text-muted">No se encontraron clientes</p>'
+    return
+  }
+
+  var html = ""
+  matchedClients.forEach((client) => {
+    var clientLoans = loans.filter((l) => l.clientId === client.id && l.status === "active")
+
+    html +=
+      '<div class="card mb-3">' +
+      '<div class="card-body">' +
+      "<h5>" +
+      client.firstName +
+      " " +
+      client.lastName +
+      "</h5>" +
+      "<p>ID: " +
+      client.id +
+      " | Cédula: " +
+      client.cedula +
+      " | Tel: " +
+      client.phone +
+      "</p>"
+
+    if (clientLoans.length === 0) {
+      html += '<p class="text-muted">No tiene préstamos activos</p>'
+    } else {
+      html += '<h6>Préstamos Activos:</h6><ul class="list-group">'
+      clientLoans.forEach((loan) => {
+        html +=
+          '<li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">' +
+          "<div>" +
+          "<strong>" +
+          loan.id +
+          "</strong>" +
+          " - Saldo: RD$ " +
+          formatMoney(loan.remainingAmount) +
+          "</div>" +
+          '<button class="btn btn-sm btn-success mt-2 mt-md-0" onclick="openPaymentModal(\'' +
+          loan.id +
+          '\')"><i class="fas fa-dollar-sign me-1"></i>Pagar</button>' +
+          "</li>"
+      })
+      html += "</ul>"
+    }
+
+    html += "</div></div>"
+  })
+
+  resultsDiv.innerHTML = html
+}
+
+function calculateNextPaymentDate(loan) {
+  var lastPayment = payments
+    .filter((p) => p.loanId === loan.id)
+    .sort((a, b) => new Date(b.date) - new Date(a.date))[0]
+
+  // Use loan.startDate if no payments exist, otherwise use the date of the last payment.
+  var baseDate = lastPayment ? new Date(lastPayment.date) : new Date(loan.startDate || loan.createdAt)
+  var nextDate = new Date(baseDate)
+
+  var frequency = loan.frequency || "monthly" // Default to monthly if not specified
+
+  switch (frequency) {
+    case "weekly":
+      nextDate.setDate(nextDate.getDate() + 7)
+      break
+    case "biweekly":
+      nextDate.setDate(nextDate.getDate() + 14)
+      break
+    case "monthly":
+      nextDate.setMonth(nextDate.getMonth() + 1)
+      break
+    case "daily":
+      nextDate.setDate(nextDate.getDate() + 1)
+      break
+  }
+
+  // If the loan type is 'fixed', ensure the calculated date aligns with the installments logic.
+  // For example, if the loan has a specific number of installments, the date calculation might need adjustments.
+  // However, for basic functionality, adding the frequency interval is generally sufficient.
+
+  // Ensure the date is returned in a consistent format, like ISO string, for comparison.
+  return nextDate.toISOString()
+}
+
+
+function generateClearanceLetter(loanId) {
+  var loan = loans.find(l => l.id === loanId)
+  if (!loan || loan.status !== "paid") {
+    alert("Este préstamo no ha sido saldado completamente")
+    return
+  }
+
+  var client = clients.find(c => c.id === loan.clientId)
+  if (!client) {
+    alert("No se encontró información del cliente")
+    return
+  }
+
+  var today = new Date()
+  var finishDate = loan.finishedAt ? new Date(loan.finishedAt) : today
+
+  var html = '<div style="padding: 40px; max-width: 800px; margin: 0 auto;">'
+  
+  if (companyInfo.logoBase64) {
+    html += '<div style="text-align: center; margin-bottom: 30px;">'
+    html += '<img src="' + companyInfo.logoBase64 + '" style="max-width: 200px; max-height: 100px;">'
+    html += '</div>'
+  }
+  
+  html += '<div style="text-align: center; margin-bottom: 40px;">'
+  html += '<h2 style="color: #2563eb; margin-bottom: 10px;">' + (companyInfo.name || "Sistema de Préstamos") + '</h2>'
+  html += '<p style="margin: 5px 0;">' + (companyInfo.address || "") + '</p>'
+  html += '<p style="margin: 5px 0;">Tel: ' + (companyInfo.phone || "") + ' | RNC: ' + (companyInfo.rnc || "") + '</p>'
+  html += '<p style="margin: 5px 0;">Email: ' + (companyInfo.email || "") + '</p>'
+  html += '</div>'
+
+  html += '<div style="text-align: center; margin: 40px 0;">'
+  html += '<h3 style="color: #10b981; text-decoration: underline;">CARTA DE SALDO</h3>'
+  html += '</div>'
+
+  html += '<div style="margin: 30px 0; text-align: right;">'
+  html += '<p><strong>Fecha:</strong> ' + formatDate(today.toISOString()) + '</p>'
+  html += '</div>'
+
+  html += '<div style="margin: 30px 0; line-height: 1.8; text-align: justify;">'
+  html += '<p>Por medio de la presente, hacemos constar que el(la) Sr(a). <strong>' + client.firstName + ' ' + client.lastName + '</strong>, '
+  html += 'portador(a) de la cédula de identidad No. <strong>' + client.cedula + '</strong>, '
+  html += 'ha cumplido satisfactoriamente con el pago total del préstamo No. <strong>' + loan.id + '</strong>.</p>'
+  
+  html += '<br>'
+  html += '<p><strong>DETALLES DEL PRÉSTAMO:</strong></p>'
+  html += '<ul style="list-style: none; padding-left: 20px;">'
+  html += '<li>• Monto del Préstamo: <strong>RD$ ' + formatMoney(loan.amount) + '</strong></li>'
+  html += '<li>• Tasa de Interés: <strong>' + loan.interestRate + '%</strong></li>'
+  html += '<li>• Monto Total Pagado: <strong>RD$ ' + formatMoney(loan.totalAmount) + '</strong></li>'
+  html += '<li>• Fecha de Otorgamiento: <strong>' + formatDate(loan.createdAt) + '</strong></li>'
+  html += '<li>• Fecha de Liquidación: <strong>' + formatDate(finishDate.toISOString()) + '</strong></li>'
+  html += '<li>• Tipo de Préstamo: <strong>' + getLoanTypeLabel(loan.type) + '</strong></li>'
+  html += '</ul>'
+  
+  html += '<br>'
+  html += '<p>El cliente ha cumplido con todas sus obligaciones financieras relacionadas con este préstamo, '
+  html += 'quedando sin ningún tipo de deuda pendiente con nuestra institución respecto al mismo.</p>'
+  
+  html += '<br>'
+  html += '<p>Se<bos>{COMPANY_NAME}rtilla la presente para los fines que el(la) interesado(a) estime conveniente.</p>'
+  html += '</div>'
+
+  html += '<div style="margin-top: 80px;">'
+  html += '<div style="text-align: center;">'
+  html += '<div style="border-top: 2px solid #000; width: 300px; margin: 0 auto;"></div>'
+  html += '<p style="margin-top: 10px;"><strong>' + (companyInfo.name || "Firma Autorizada") + '</strong></p>'
+  html += '<p>Firma y Sello</p>'
+  html += '</div>'
+  html += '</div>'
+
+  html += '<div style="margin-top: 60px; padding-top: 20px; border-top: 1px solid #ccc; text-align: center; font-size: 12px; color: #666;">'
+  html += '<p>Esta carta es un documento oficial que certifica la liquidación total del préstamo mencionado.</p>'
+  html += '</div>'
+
+  html += '</div>'
+
+  document.getElementById("clearanceLetterContent").innerHTML = html
+  var modal = new bootstrap.Modal(document.getElementById("clearanceLetterModal"))
+  modal.show()
+}
+
+// Company Info Functions
+function loadCompanyInfo() {
+  document.getElementById("companyLogo").value = companyInfo.logo || ""
+  document.getElementById("companyName").value = companyInfo.name || ""
+  document.getElementById("companyAddress").value = companyInfo.address || ""
+  document.getElementById("companyEmail").value = companyInfo.email || ""
+  document.getElementById("companyPhone").value = companyInfo.phone || ""
+  document.getElementById("companyRNC").value = companyInfo.rnc || ""
+
+  if (companyInfo.logoBase64) {
+    document.getElementById("logoPreview").innerHTML = 
+      '<img src="' + companyInfo.logoBase64 + '" style="max-width: 200px; max-height: 100px;" class="img-thumbnail">'
+  }
+
+  if (companyInfo.name) {
+    document.getElementById("companyNameSidebar").textContent = companyInfo.name
+  }
+}
+
+function uploadLogo() {
+  var fileInput = document.getElementById("companyLogoFile")
+  var file = fileInput.files[0]
+  
+  if (!file) return
+  
+  var reader = new FileReader()
+  reader.onload = function(e) {
+    var base64Image = e.target.result
+    companyInfo.logoBase64 = base64Image
+    localStorage.setItem("companyInfo", JSON.stringify(companyInfo))
+    
+    document.getElementById("logoPreview").innerHTML = 
+      '<img src="' + base64Image + '" style="max-width: 200px; max-height: 100px;" class="img-thumbnail">'
+    
+    alert("Logo cargado exitosamente")
+  }
+  reader.readAsDataURL(file)
+}
+
+function saveCompanyInfo(e) {
+  e.preventDefault()
+  
+  companyInfo.logo = document.getElementById("companyLogo").value
+  companyInfo.name = document.getElementById("companyName").value
+  companyInfo.address = document.getElementById("companyAddress").value
+  companyInfo.email = document.getElementById("companyEmail").value
+  companyInfo.phone = document.getElementById("companyPhone").value
+  companyInfo.rnc = document.getElementById("companyRNC").value
+  
+  localStorage.setItem("companyInfo", JSON.stringify(companyInfo))
+  
+  if (companyInfo.name) {
+    document.getElementById("companyNameSidebar").textContent = companyInfo.name
+  }
+  
+  alert("Información guardada exitosamente")
+}
+
+// Contract Functions
+function saveContractTemplate() {
+  contractTemplate = document.getElementById("contractTemplate").value
+  localStorage.setItem("contractTemplate", contractTemplate)
+  alert("Plantilla de contrato guardada exitosamente")
+}
+
+function uploadContract() {
+  var fileInput = document.getElementById("contractFile")
+  var file = fileInput.files[0]
+  
+  if (!file) return
+  
+  var reader = new FileReader()
+  reader.onload = function(e) {
+    var content = e.target.result
+    document.getElementById("contractTemplate").value = content
+    contractTemplate = content
+    localStorage.setItem("contractTemplate", contractTemplate)
+    alert("Plantilla cargada exitosamente")
+  }
+  reader.readAsText(file)
+}
+
+function loadDefaultContract() {
+  var defaultTemplate = `CONTRATO DE PRÉSTAMO
+
+Entre {COMPANY_NAME}, RNC: {COMPANY_RNC}, con domicilio en {COMPANY_ADDRESS}, teléfono {COMPANY_PHONE}, en adelante "EL PRESTAMISTA", y {CLIENT_NAME}, con cédula de identidad {CLIENT_CEDULA}, domiciliado en {CLIENT_ADDRESS}, teléfono {CLIENT_PHONE}, en adelante "EL PRESTATARIO", se celebra el presente contrato de préstamo bajo las siguientes cláusulas:
+
+PRIMERA: EL PRESTAMISTA otorga a EL PRESTATARIO un préstamo por la suma de {LOAN_AMOUNT} pesos dominicanos.
+
+SEGUNDA: El préstamo devengará un interés del {LOAN_INTEREST}% sobre el capital prestado.
+
+TERCERA: El monto total a pagar será de {LOAN_TOTAL} pesos dominicanos.
+
+CUARTA: El plazo para el pago del préstamo es de {LOAN_TERM}, a realizarse en {INSTALLMENTS} cuotas.
+
+QUINTA: La fecha de otorgamiento del préstamo es {LOAN_DATE}.
+
+SEXTA: En caso de mora, EL PRESTATARIO se compromete a pagar los intereses moratorios correspondientes.
+
+SÉPTIMA: Ambas partes aceptan los términos y condiciones establecidos en el presente contrato.
+
+
+_______________________                    _______________________
+Firma del Prestamista                      Firma del Prestatario
+{COMPANY_NAME}                             {CLIENT_NAME}
+Fecha: {LOAN_DATE}                         Cédula: {CLIENT_CEDULA}`
+
+  document.getElementById("contractTemplate").value = defaultTemplate
+  contractTemplate = defaultTemplate
+  localStorage.setItem("contractTemplate", contractTemplate)
+  alert("Plantilla por defecto cargada")
+}
+
+function generateContract(loanId) {
+  var loan = loans.find((l) => l.id === loanId)
+  if (!loan) return
+
+  var client = clients.find((c) => c.id === loan.clientId)
+  if (!client) return
+
+  if (!contractTemplate) {
+    alert("No hay plantilla de contrato configurada. Por favor, configure una plantilla en Administración.")
+    return
+  }
+
+  var contract = contractTemplate
+  contract = contract.replace(/\{COMPANY_NAME\}/g, companyInfo.name || "[NOMBRE DE LA EMPRESA]")
+  contract = contract.replace(/\{COMPANY_ADDRESS\}/g, companyInfo.address || "[DIRECCIÓN]")
+  contract = contract.replace(/\{COMPANY_PHONE\}/g, companyInfo.phone || "[TELÉFONO]")
+  contract = contract.replace(/\{COMPANY_RNC\}/g, companyInfo.rnc || "[RNC]")
+  contract = contract.replace(/\{CLIENT_NAME\}/g, client.firstName + " " + client.lastName)
+  contract = contract.replace(/\{CLIENT_CEDULA\}/g, client.cedula)
+  contract = contract.replace(/\{CLIENT_ADDRESS\}/g, client.address)
+  contract = contract.replace(/\{CLIENT_PHONE\}/g, client.phone)
+  contract = contract.replace(/\{LOAN_AMOUNT\}/g, loan.amount.toLocaleString("es-DO", { style: "currency", currency: "DOP" }))
+  contract = contract.replace(/\{LOAN_INTEREST\}/g, loan.interestRate) // Corrected placeholder to LOAN_INTEREST
+  contract = contract.replace(/\{LOAN_TOTAL\}/g, loan.totalAmount.toLocaleString("es-DO", { style: "currency", currency: "DOP" }))
+  contract = contract.replace(/\{LOAN_DATE\}/g, formatDate(loan.createdAt)) // Use a consistent date format
+  contract = contract.replace(/\{LOAN_TERM\}/g, loan.type === "fixed" ? loan.installments : (loan.type === "daily" ? loan.days : "Indefinido")) // More dynamic term based on loan type
+  contract = contract.replace(/\{INSTALLMENTS\}/g, loan.type === "fixed" ? loan.installments : (loan.type === "daily" ? loan.days : "N/A")) // More dynamic installments
+
+
+  var printWindow = window.open("", "_blank")
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Contrato de Préstamo</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          padding: 40px;
+          line-height: 1.6;
+        }
+        pre {
+          white-space: pre-wrap;
+          font-family: Arial, sans-serif;
+        }
+      </style>
+    </head>
+    <body>
+      <pre>${contract}</pre>
+    </body>
+    </html>
+  `)
+  printWindow.document.close()
+  printWindow.print()
+}
+
+function generateInvoice(paymentId) {
+  var payment = payments.find((p) => p.id === paymentId)
+  if (!payment) return
+
+  var loan = loans.find((l) => l.id === payment.loanId)
+  var client = clients.find((c) => c.id === payment.clientId)
+
+  var companyName = companyInfo.name || "Sistema de Préstamos"
+  var address = companyInfo.address || ""
+  var phone = companyInfo.phone || ""
+  var rnc = companyInfo.rnc || ""
+  
+  var html = '<div class="text-center mb-4">'
+  
+  if (companyInfo.logoBase64) {
+    html += '<img src="' + companyInfo.logoBase64 + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">'
+  } else if (companyInfo.logo) {
+    html += '<img src="' + companyInfo.logo + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">'
+  }
+  
+  html +=
+    "<h3>" +
+    companyName +
+    "</h3>" +
+    "<p>" +
+    address +
+    "</p>" +
+    "<p>Tel: " +
+    phone +
+    " | RNC: " +
+    rnc +
+    "</p>" +
+    "</div>" +
+    '<h4 class="text-center mb-4">RECIBO DE PAGO</h4>' +
+    '<table class="table">' +
+    "<tr><th>Recibo No:</th><td>" +
+    payment.id +
+    "</td></tr>" +
+    "<tr><th>Fecha:</th><td>" +
+    formatDate(payment.date) +
+    "</td></tr>" +
+    "<tr><th>Cliente:</th><td>" +
+    (client ? client.firstName + " " + client.lastName : "N/A") +
+    "</td></tr>" +
+    "<tr><th>Cédula:</th><td>" +
+    (client ? client.cedula : "N/A") +
+    "</td></tr>" +
+    "<tr><th>Préstamo:</th><td>" +
+    payment.loanId +
+    "</td></tr>" +
+    "<tr><th>Tipo de Pago:</th><td>" +
+    getPaymentTypeLabel(payment.type) +
+    "</td></tr>" +
+    "<tr><th>Método:</th><td>" +
+    getPaymentMethodLabel(payment.method) +
+    "</td></tr>" +
+    '<tr><th class="text-end">Monto Pagado:</th><td class="text-end"><strong>RD$ ' +
+    formatMoney(payment.amount) +
+    "</strong></td></tr>"
+
+  if (loan) {
+    html +=
+      '<tr><th class="text-end">Saldo Restante:</th><td class="text-end">RD$ ' +
+      formatMoney(loan.remainingAmount) +
+      "</td></tr>"
+  }
+
+  html += "</table>"
+
+  if (payment.notes) {
+    html += "<p><strong>Notas:</strong> " + payment.notes + "</p>"
+  }
+
+  document.getElementById("invoiceContent").innerHTML = html
+  var modal = new bootstrap.Modal(document.getElementById("invoiceModal"))
+  modal.show()
+}
+
+// Report Functions
+function generateDailyReport() {
+  var now = new Date()
+  var today = now.toISOString().split('T')[0] // Format date as YYYY-MM-DD
+
+  var dailyPayments = payments.filter((p) => {
+    var paymentDate = new Date(p.date).toISOString().split('T')[0]
+    return paymentDate === today
+  })
+
+  var totalCollected = dailyPayments.reduce((sum, p) => sum + p.amount, 0)
+  var activeLoansCount = loans.filter((l) => l.status === "active").length
+  
+  // Calculate overdue loans based on nextPaymentDate
+  var overdueLoansCount = 0
+  loans.filter(l => l.status === 'active').forEach(loan => {
+      if (!loan.nextPaymentDate || isNaN(new Date(loan.nextPaymentDate).getTime())) {
+          loan.nextPaymentDate = calculateNextPaymentDate(loan) // Recalculate if missing or invalid
+      }
+      if (new Date(loan.nextPaymentDate) < new Date()) {
+          overdueLoansCount++;
+      }
+  });
+
+  var html = '<div class="container">'
+  html += '<div class="text-center mb-4">'
+  
+  if (companyInfo.logoBase64) {
+    html += '<img src="' + companyInfo.logoBase64 + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">'
+  }
+  
+  html +=
+    "<h2>" +
+    (companyInfo.name || "Sistema de Préstamos") +
+    "</h2>" +
+    "<h4>Reporte Diario - " +
+    formatDate(today) +
+    "</h4>" +
+    "</div>"
+
+  html += '<div class="row mb-4">'
+  html +=
+    '<div class="col-md-4 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Total Recaudado Hoy</h6><h3 class="text-success">RD$ ' +
+    formatMoney(totalCollected) +
+    "</h3></div></div></div>"
+  html +=
+    '<div class="col-md-4 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Préstamos Activos</h6><h3 class="text-primary">' +
+    activeLoansCount +
+    "</h3></div></div></div>"
+  html +=
+    '<div class="col-md-4 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Pagos Vencidos</h6><h3 class="text-danger">' +
+    overdueLoansCount +
+    "</h3></div></div></div>"
+  html += "</div>"
+
+  html += '<div class="card mb-3"><div class="card-header bg-primary text-white"><h5>Pagos de Hoy</h5></div><div class="card-body">'
+  html += '<table class="table table-striped"><thead><tr><th>Hora</th><th>Cliente</th><th>Préstamo ID</th><th>Tasa</th><th>Monto</th></tr></thead><tbody>'
+
+  if (dailyPayments.length === 0) {
+    html += '<tr><td colspan="5" class="text-center">No hay pagos registrados hoy</td></tr>'
+  } else {
+    dailyPayments.forEach((payment) => {
+      var client = clients.find((c) => c.id === payment.clientId)
+      var loan = loans.find((l) => l.id === payment.loanId)
+      var paymentTime = new Date(payment.date).toLocaleTimeString('es-DO', {hour: '2-digit', minute: '2-digit'})
+      
+      html +=
+        "<tr><td>" +
+        paymentTime +
+        "</td><td>" +
+        (client ? client.firstName + " " + client.lastName : "N/A") +
+        "</td><td>" +
+        payment.loanId +
+        "</td><td>" +
+        (loan ? loan.interestRate + "%" : "N/A") +
+        "</td><td>RD$ " +
+        formatMoney(payment.amount) +
+        "</td></tr>"
+    })
+  }
+
+  html += "</tbody></table></div></div>"
+  
+  // Préstamos activos del día
+  html += '<div class="card mb-3"><div class="card-header bg-info text-white"><h5>Préstamos Activos</h5></div><div class="card-body">'
+  html += '<table class="table table-striped"><thead><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Fecha Entrega</th><th>Próximo Pago</th></tr></thead><tbody>'
+  
+  var activeLoans = loans.filter((l) => l.status === "active")
+  
+  if (activeLoans.length === 0) {
+    html += '<tr><td colspan="6" class="text-center">No hay préstamos activos</td></tr>'
+  } else {
+    activeLoans.forEach((loan) => {
+      var client = clients.find((c) => c.id === loan.clientId)
+      // Ensure nextPaymentDate is available for display
+      var nextPaymentDisplay = loan.nextPaymentDate ? formatDate(loan.nextPaymentDate) : "N/A";
+      if (!nextPaymentDisplay || nextPaymentDisplay === "NaN/aN/NaN") {
+          nextPaymentDisplay = formatDate(calculateNextPaymentDate(loan));
+      }
+
+      html +=
+        "<tr><td>" +
+        loan.id +
+        "</td><td>" +
+        (client ? client.firstName + " " + client.lastName : "N/A") +
+        "</td><td>RD$ " +
+        formatMoney(loan.amount) +
+        "</td><td>" +
+        loan.interestRate +
+        "%</td><td>" +
+        formatDate(loan.startDate) + // Assuming startDate is set when loan is created
+        "</td><td>" +
+        nextPaymentDisplay +
+        "</td></tr>"
+    })
+  }
+  
+  html += "</tbody></table></div></div></div>"
+
+  document.getElementById("reportContent").innerHTML = html
+  var modal = new bootstrap.Modal(document.getElementById("reportModal"))
+  modal.show()
+}
+
+function generateBiweeklyReport() {
+  var now = new Date()
+  var twoWeeksAgo = new Date(now.getTime() - (14 * 24 * 60 * 60 * 1000))
+
+  var biweeklyPayments = payments.filter((p) => {
+    var paymentDate = new Date(p.date)
+    return paymentDate >= twoWeeksAgo && paymentDate <= now
+  })
+
+  var totalCollected = biweeklyPayments.reduce((sum, p) => sum + p.amount, 0)
+  var activeLoansCount = loans.filter((l) => l.status === "active").length
+  
+  // Count loans that finished in the last two weeks
+  var finishedLoansInPeriod = loans.filter((l) => {
+    if (l.status !== "paid" || !l.paidOffDate) return false
+    var paidDate = new Date(l.paidOffDate)
+    return paidDate >= twoWeeksAgo && paidDate <= now
+  }).length
+
+  var html = '<div class="container">'
+  html += '<div class="text-center mb-4">'
+  
+  if (companyInfo.logoBase64) {
+    html += '<img src="' + companyInfo.logoBase64 + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">'
+  }
+  
+  html +=
+    "<h2>" +
+    (companyInfo.name || "Sistema de Préstamos") +
+    "</h2>" +
+    "<h4>Reporte Quincenal</h4>" +
+    "<p>" + formatDate(twoWeeksAgo) + " - " + formatDate(now) + "</p>" +
+    "</div>"
+
+  html += '<div class="row mb-4">'
+  html +=
+    '<div class="col-md-4 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Total Recaudado</h6><h3 class="text-success">RD$ ' +
+    formatMoney(totalCollected) +
+    "</h3></div></div></div>"
+  html +=
+    '<div class="col-md-4 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Préstamos Finalizados</h6><h3 class="text-info">' +
+    finishedLoansInPeriod +
+    "</h3></div></div></div>"
+  html +=
+    '<div class="col-md-4 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Préstamos Activos</h6><h3 class="text-primary">' +
+    activeLoansCount +
+    "</h3></div></div></div>"
+  html += "</div>"
+
+  html += '<div class="card mb-3"><div class="card-header bg-primary text-white"><h5>Pagos de las Últimas 2 Semanas</h5></div><div class="card-body">'
+  html += '<table class="table table-striped"><thead><tr><th>Fecha</th><th>Cliente</th><th>Préstamo ID</th><th>Tasa</th><th>Monto</th></tr></thead><tbody>'
+
+  if (biweeklyPayments.length === 0) {
+    html += '<tr><td colspan="5" class="text-center">No hay pagos registrados en este período</td></tr>'
+  } else {
+    biweeklyPayments.forEach((payment) => {
+      var client = clients.find((c) => c.id === payment.clientId)
+      var loan = loans.find((l) => l.id === payment.loanId)
+      
+      html +=
+        "<tr><td>" +
+        formatDate(payment.date) +
+        "</td><td>" +
+        (client ? client.firstName + " " + client.lastName : "N/A") +
+        "</td><td>" +
+        payment.loanId +
+        "</td><td>" +
+        (loan ? loan.interestRate + "%" : "N/A") +
+        "</td><td>RD$ " +
+        formatMoney(payment.amount) +
+        "</td></tr>"
+    })
+  }
+
+  html += "</tbody></table></div></div>"
+  
+  // Préstamos finalizados en el período
+  if (finishedLoansInPeriod > 0) {
+    html += '<div class="card mb-3"><div class="card-header bg-success text-white"><h5>Préstamos Finalizados en el Período</h5></div><div class="card-body">'
+    html += '<table class="table table-striped"><thead><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Fecha Entrega</th><th>Fecha Finalización</th></tr></thead><tbody>'
+    
+    var finishedLoans = loans.filter((l) => {
+      if (l.status !== "paid" || !l.paidOffDate) return false
+      var paidDate = new Date(l.paidOffDate)
+      return paidDate >= twoWeeksAgo && paidDate <= now
+    })
+    
+    finishedLoans.forEach((loan) => {
+      var client = clients.find((c) => c.id === loan.clientId)
+      html +=
+        "<tr><td>" +
+        loan.id +
+        "</td><td>" +
+        (client ? client.firstName + " " + client.lastName : "N/A") +
+        "</td><td>RD$ " +
+        formatMoney(loan.amount) +
+        "</td><td>" +
+        loan.interestRate +
+        "%</td><td>" +
+        formatDate(loan.startDate) +
+        "</td><td>" +
+        formatDate(loan.paidOffDate) +
+        "</td></tr>"
+    })
+    
+    html += "</tbody></table></div></div>"
+  }
+  
+  html += "</div>"
+
+  document.getElementById("reportContent").innerHTML = html
+  var modal = new bootstrap.Modal(document.getElementById("reportModal"))
+  modal.show()
+}
+
+function generateMonthlyReport() {
+  var now = new Date()
+  var currentMonth = now.getMonth()
+  var currentYear = now.getFullYear()
+
+  var monthlyPayments = payments.filter((p) => {
+    var paymentDate = new Date(p.date)
+    return paymentDate.getMonth() === currentMonth && paymentDate.getFullYear() === currentYear
+  })
+
+  var totalCollected = monthlyPayments.reduce((sum, p) => sum + p.amount, 0)
+  var activeLoansCount = loans.filter((l) => l.status === "active").length
+  
+  var finishedLoansCount = loans.filter((l) => {
+    if (l.status !== "paid" || !l.paidOffDate) return false
+    var paidDate = new Date(l.paidOffDate)
+    return paidDate.getMonth() === currentMonth && paidDate.getFullYear() === currentYear
+  }).length
+
+  var totalPending = loans
+    .filter((l) => l.status === "active")
+    .reduce((sum, l) => sum + l.remainingAmount, 0)
+
+  var html = '<div class="container">'
+  html += '<div class="text-center mb-4">'
+  
+  if (companyInfo.logoBase64) {
+    html += '<img src="' + companyInfo.logoBase64 + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">'
+  }
+  
+  html +=
+    "<h2>" +
+    (companyInfo.name || "Sistema de Préstamos") +
+    "</h2>" +
+    "<h4>Reporte Mensual - " +
+    getMonthName(currentMonth) +
+    " " +
+    currentYear +
+    "</h4>" +
+    "</div>"
+
+  html += '<div class="row mb-4">'
+  html +=
+    '<div class="col-md-3 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Total Recaudado</h6><h3 class="text-success">RD$ ' +
+    formatMoney(totalCollected) +
+    "</h3></div></div></div>"
+  html +=
+    '<div class="col-md-3 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Préstamos Activos</h6><h3 class="text-primary">' +
+    activeLoansCount +
+    "</h3></div></div></div>"
+  html +=
+    '<div class="col-md-3 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Préstamos Finalizados</h6><h3 class="text-info">' +
+    finishedLoansCount +
+    "</h3></div></div></div>"
+  html +=
+    '<div class="col-md-3 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Saldo Pendiente</h6><h3 class="text-warning">RD$ ' +
+    formatMoney(totalPending) +
+    "</h3></div></div></div>"
+  html += "</div>"
+
+  html += '<div class="card mb-3"><div class="card-header bg-primary text-white"><h5>Pagos del Mes</h5></div><div class="card-body">'
+  html += '<table class="table table-striped"><thead><tr><th>Fecha</th><th>Cliente</th><th>Préstamo ID</th><th>Tasa</th><th>Monto</th></tr></thead><tbody>'
+
+  if (monthlyPayments.length === 0) {
+    html += '<tr><td colspan="5" class="text-center">No hay pagos registrados este mes</td></tr>'
+  } else {
+    monthlyPayments.forEach((payment) => {
+      var client = clients.find((c) => c.id === payment.clientId)
+      var loan = loans.find((l) => l.id === payment.loanId)
+      html +=
+        "<tr><td>" +
+        formatDate(payment.date) +
+        "</td><td>" +
+        (client ? client.firstName + " " + client.lastName : "N/A") +
+        "</td><td>" +
+        payment.loanId +
+        "</td><td>" +
+        (loan ? loan.interestRate + "%" : "N/A") +
+        "</td><td>RD$ " +
+        formatMoney(payment.amount) +
+        "</td></tr>"
+    })
+  }
+
+  html += "</tbody></table></div></div>"
+  
+  // Préstamos finalizados del mes
+  if (finishedLoansCount > 0) {
+    html += '<div class="card mb-3"><div class="card-header bg-success text-white"><h5>Préstamos Finalizados del Mes</h5></div><div class="card-body">'
+    html += '<table class="table table-striped"><thead><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Fecha Entrega</th><th>Fecha Finalización</th></tr></thead><tbody>'
+    
+    var finishedLoans = loans.filter((l) => {
+      if (l.status !== "paid" || !l.paidOffDate) return false
+      var paidDate = new Date(l.paidOffDate)
+      return paidDate.getMonth() === currentMonth && paidDate.getFullYear() === currentYear
+    })
+    
+    finishedLoans.forEach((loan) => {
+      var client = clients.find((c) => c.id === loan.clientId)
+      html +=
+        "<tr><td>" +
+        loan.id +
+        "</td><td>" +
+        (client ? client.firstName + " " + client.lastName : "N/A") +
+        "</td><td>RD$ " +
+        formatMoney(loan.amount) +
+        "</td><td>" +
+        loan.interestRate +
+        "%</td><td>" +
+        formatDate(loan.startDate) +
+        "</td><td>" +
+        formatDate(loan.paidOffDate) +
+        "</td></tr>"
+    })
+    
+    html += "</tbody></table></div></div>"
+  }
+  
+  html += "</div>"
+
+  document.getElementById("reportContent").innerHTML = html
+  var modal = new bootstrap.Modal(document.getElementById("reportModal"))
+  modal.show()
+}
+
+function exportData() {
+  var data = {
+    clients: clients,
+    loans: loans,
+    payments: payments,
+    companyInfo: companyInfo,
+    exportDate: new Date().toISOString(),
+  }
+
+  var dataStr = JSON.stringify(data, null, 2)
+  var dataBlob = new Blob([dataStr], { type: "application/json" })
+  var url = URL.createObjectURL(dataBlob)
+  var link = document.createElement("a")
+  link.href = url
+  link.download = "sistema-prestamos-backup-" + Date.now() + ".json"
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+// Theme Functions
+function changeTheme(theme) {
+  currentTheme = theme
+  document.body.className = theme
+  localStorage.setItem("theme", theme)
+}
+
+// Password Functions
+function changePassword(e) {
+  e.preventDefault()
+  
+  var newPassword = document.getElementById("newPassword").value
+  var confirmPassword = document.getElementById("confirmPassword").value
+  
+  if (newPassword !== confirmPassword) {
+    alert("Las contraseñas no coinciden")
+    return
+  }
+  
+  if (newPassword.length < 6) {
+    alert("La contraseña debe tener al menos 6 caracteres")
+    return
+  }
+  
+  adminCredentials.password = newPassword
+  localStorage.setItem("adminCredentials", JSON.stringify(adminCredentials))
+  document.getElementById("passwordForm").reset()
+  alert("Contraseña cambiada exitosamente")
+}
+
+// Utility Functions
+function formatMoney(amount) {
+  return Number.parseFloat(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "N/A"
+  var date = new Date(dateString)
+  var day = String(date.getDate()).padStart(2, "0")
+  var month = String(date.getMonth() + 1).padStart(2, "0")
+  var year = date.getFullYear()
+  return day + "/" + month + "/" + year
+}
+
+function getLoanTypeLabel(type) {
+  var labels = {
+    fixed: "Plazo Definido",
+    indefinite: "Plazo Indefinido",
+    daily: "Préstamo Diario",
+  }
+  return labels[type] || type
+}
+
+function getPaymentTypeLabel(type) {
+  var labels = {
+    installment: "Pago de Cuota",
+    interest: "Solo Interés",
+    capital: "Abono a Capital",
+    payoff: "Liquidación Total",
+  }
+  return labels[type] || type
+}
+
+function getPaymentMethodLabel(method) {
+  var labels = {
+    cash: "Efectivo",
+    transfer: "Transferencia",
+    check: "Cheque",
+  }
+  return labels[method] || method
+}
+
+function getFrequencyLabel(frequency) {
+  var labels = {
+    weekly: "Semanal",
+    biweekly: "Quincenal",
+    monthly: "Mensual",
+  }
+  return labels[frequency] || frequency
+}
+
+function getMonthName(month) {
+  var months = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ]
+  return months[month]
+}
+
+function clearAllData() {
+  if (
+    confirm(
+      "¿Está seguro de eliminar TODOS los datos? Esta acción no se puede deshacer.\n\nEsto eliminará:\n- Todos los clientes\n- Todos los préstamos\n- Todos los pagos\n- Información de la empresa\n\n¿Desea continuar?"
+    )
+  ) {
+    if (confirm("ÚLTIMA ADVERTENCIA: ¿Realmente desea eliminar todos los datos?")) {
+      localStorage.clear()
+      clients = []
+      loans = []
+      payments = []
+      companyInfo = {}
+      renderClients()
+      renderLoans()
+      renderFinishedLoans()
+      renderPaymentHistory()
+      renderPendingPayments()
+      renderOverduePayments()
+      updateDashboard()
+      loadCompanyInfo()
+      alert("Todos los datos han sido eliminados")
+    }
+  }
+}
+
+function generateThermalReceipt(paymentId) {
+  var payment = payments.find((p) => p.id === paymentId)
+  if (!payment) return ""
+
+  var loan = loans.find((l) => l.id === payment.loanId)
+  var client = clients.find((c) => c.id === payment.clientId)
+  
+  var companyName = companyInfo.name || "Sistema de Préstamos"
+  var address = companyInfo.address || ""
+  var phone = companyInfo.phone || ""
+  var rnc = companyInfo.rnc || ""
+  
+  var receipt = ""
+  receipt += "================================\n"
+  receipt += centerText(companyName, 32) + "\n"
+  if (address) receipt += centerText(address, 32) + "\n"
+  if (phone) receipt += centerText("Tel: " + phone, 32) + "\n"
+  if (rnc) receipt += centerText("RNC: " + rnc, 32) + "\n"
+  receipt += "================================\n\n"
+  receipt += centerText("RECIBO DE PAGO", 32) + "\n\n"
+  receipt += "Recibo No: " + payment.id + "\n"
+  receipt += "Fecha: " + formatDate(payment.date) + "\n"
+  receipt += "--------------------------------\n"
+  receipt += "Cliente: " + (client ? client.firstName + " " + client.lastName : "N/A") + "\n"
+  receipt += "Cedula: " + (client ? client.cedula : "N/A") + "\n"
+  receipt += "Telefono: " + (client ? client.phone : "N/A") + "\n"
+  receipt += "--------------------------------\n"
+  receipt += "Prestamo: " + payment.loanId + "\n"
+  receipt += "Tipo: " + getPaymentTypeLabel(payment.type) + "\n"
+  receipt += "Metodo: " + getPaymentMethodLabel(payment.method) + "\n"
+  receipt += "--------------------------------\n"
+  receipt += "MONTO PAGADO:\n"
+  receipt += centerText("RD$ " + formatMoney(payment.amount), 32) + "\n"
+  receipt += "--------------------------------\n"
+  
+  if (loan) {
+    receipt += "Saldo Restante:\n"
+    receipt += centerText("RD$ " + formatMoney(loan.remainingAmount), 32) + "\n"
+    receipt += "--------------------------------\n"
+  }
+  
+  if (payment.notes) {
+    receipt += "\nNotas: " + payment.notes + "\n"
+  }
+  
+  receipt += "\n" + centerText("Gracias por su pago!", 32) + "\n"
+  receipt += "================================\n\n\n\n"
+  
+  return receipt
+}
+
+function centerText(text, width) {
+  if (text.length >= width) return text
+  var padding = Math.floor((width - text.length) / 2)
+  return " ".repeat(padding) + text
+}
+
+function printThermal() {
+  var invoiceContent = document.getElementById("invoiceContent")
+  var paymentIdMatch = invoiceContent.textContent.match(/PAY-\d+/)
+  
+  if (!paymentIdMatch) {
+    alert("No se pudo identificar el pago")
+    return
+  }
+  
+  var paymentId = paymentIdMatch[0]
+  printThermalReceipt(paymentId)
+}
+
+function printThermalReceipt(paymentId) {
+  var thermalContent = generateThermalReceipt(paymentId)
+  
+  if (!thermalContent) {
+    alert("No se pudo generar el recibo")
+    return
+  }
+  
+  var printWindow = window.open("", "_blank", "width=300,height=600")
+  printWindow.document.write("<html><head><title>Recibo Termico</title>")
+  printWindow.document.write("<style>")
+  printWindow.document.write("@page { size: 80mm auto; margin: 0; }")
+  printWindow.document.write("body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 5mm; width: 70mm; }")
+  printWindow.document.write("pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }")
+  printWindow.document.write("@media print {")
+  printWindow.document.write("  body { width: 80mm; }")
+  printWindow.document.write("  @page { size: 80mm auto; margin: 0mm; }")
+  printWindow.document.write("}")
+  printWindow.document.write("</style></head><body>")
+  
+  if (companyInfo.logoBase64) {
+    printWindow.document.write('<div style="text-align: center; margin-bottom: 10px;">')
+    printWindow.document.write('<img src="' + companyInfo.logoBase64 + '" style="max-width: 150px; max-height: 60px;">')
+    printWindow.document.write('</div>')
+  }
+  
+  printWindow.document.write("<pre>" + thermalContent + "</pre>")
+  printWindow.document.write("</body></html>")
+  printWindow.document.close()
+  
+  setTimeout(function() {
+    printWindow.print()
+    printWindow.close()
+  }, 250)
+}
+
+// Event Listeners
+window.addEventListener("DOMContentLoaded", () => {
+  var loginForm = document.getElementById("loginForm")
+  if (loginForm) {
+    loginForm.addEventListener("submit", login)
+  }
+
+  var clientForm = document.getElementById("clientForm")
+  if (clientForm) {
+    clientForm.addEventListener("submit", saveClient)
+  }
+
+  var loanForm = document.getElementById("loanForm")
+  if (loanForm) {
+    loanForm.addEventListener("submit", saveLoan)
+  }
+
+  var paymentForm = document.getElementById("paymentForm")
+  if (paymentForm) {
+    paymentForm.addEventListener("submit", savePayment)
+  }
+
+  var companyForm = document.getElementById("companyForm")
+  if (companyForm) {
+    companyForm.addEventListener("submit", saveCompanyInfo)
+  }
+
+  var passwordForm = document.getElementById("passwordForm")
+  if (passwordForm) {
+    passwordForm.addEventListener("submit", changePassword)
+  }
+
+  // Close mobile menu when clicking outside
+  document.addEventListener("click", function (e) {
+    var sidebar = document.getElementById("sidebar")
+    var toggle = document.querySelector(".mobile-menu-toggle")
+    var overlay = document.querySelector(".sidebar-overlay")
+
+    if (
+      sidebar &&
+      sidebar.classList.contains("active") &&
+      !sidebar.contains(e.target) &&
+      !toggle.contains(e.target)
+    ) {
+      closeMobileMenu()
+    }
+  })
+})
+    </script>
+</body>
+</html>
