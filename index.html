@@ -690,10 +690,16 @@
                 <a class="nav-link" href="#" onclick="showSection('payment-history'); closeMobileMenu(); return false;">
                     <i class="fas fa-history"></i> <span>Historial de Pagos</span>
                 </a>
-                <a class="nav-link" href="#" onclick="showSection('pending-payments'); closeMobileMenu(); return false;">
-                    <i class="fas fa-exclamation-circle"></i> <span>Pagos Pendientes</span>
+                <!-- Eliminar el enlace de Pagos Pendientes -->
+                <!-- Sección de Pagos Pendientes eliminada según solicitud del usuario -->
+                <!-- Agregar enlace para Anular Pagos -->
+                <a class="nav-link" href="#" onclick="showSection('void-payments'); closeMobileMenu(); return false;">
+                    <i class="fas fa-ban"></i> <span>Anular Pagos</span>
                 </a>
-                <a class="nav-link" href="#" onclick="showSection('administration'); closeMobileMenu(); return false;">
+                <a class="nav-link" href="#" onclick="showSection('reports'); closeMobileMenu(); return false;">
+                    <i class="fas fa-chart-bar"></i> <span>Reportes</span>
+                </a>
+                <a class="nav-link" href="#" onclick="showSection('settings'); closeMobileMenu(); return false;">
                     <i class="fas fa-cog"></i> <span>Administración</span>
                 </a>
             </nav>
@@ -724,6 +730,30 @@
                                     <h3 class="mb-0" id="activeLoans">0</h3>
                                 </div>
                                 <i class="fas fa-file-invoice-dollar fa-3x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Agregar tarjeta de Capital Prestado -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="stat-card primary">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Capital Prestado</h6>
+                                    <h3 class="mb-0" id="capitalPrestado">RD$ 0.00</h3>
+                                </div>
+                                <i class="fas fa-hand-holding-usd fa-3x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Agregar tarjeta de Pagos al Día -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="stat-card success">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Pagos al Día</h6>
+                                    <h3 class="mb-0" id="pagosAlDia">0</h3>
+                                </div>
+                                <i class="fas fa-calendar-check fa-3x opacity-50"></i>
                             </div>
                         </div>
                     </div>
@@ -949,32 +979,75 @@
                 </div>
             </div>
 
-            <!-- Pending Payments Section -->
-            <div id="pending-payments" class="section">
-                <h2 class="mb-4">Pagos Pendientes</h2>
+            <!-- Eliminar sección de Pagos Pendientes completamente -->
+            <!-- Sección de Pagos Pendientes eliminada según solicitud del usuario -->
+
+            <!-- Agregar nueva sección de Anular Pagos -->
+            <!-- Void Payments Section -->
+            <div id="void-payments" class="section">
+                <h2 class="mb-4">Anular Pagos</h2>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Precaución:</strong> Al anular un pago, el monto se reintegrará al saldo del préstamo. Esta acción es útil para corregir pagos registrados por error.
+                </div>
                 <div class="card">
                     <div class="card-body">
+                        <div class="search-box mb-4">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="voidPaymentSearch" placeholder="Buscar por ID de pago, cliente o préstamo..." onkeyup="searchVoidPayments()">
+                        </div>
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
+                                        <th>ID Pago</th>
                                         <th>Cliente</th>
                                         <th>Préstamo</th>
-                                        <th>Pendiente</th>
-                                        <th class="hide-mobile">Próximo Pago</th>
-                                        <th>Estado</th>
+                                        <th>Monto</th>
+                                        <th class="hide-mobile">Fecha</th>
+                                        <th class="hide-mobile">Método</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody id="pendingPaymentsTable"></tbody>
+                                <tbody id="voidPaymentsTable"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Agregar nueva sección de Reportes -->
+            <!-- Reports Section -->
+            <div id="reports" class="section">
+                <h2 class="mb-4">Reportes del Sistema</h2>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Reportes Financieros</h5>
+                            </div>
+                            <div class="card-body">
+                                <button class="btn btn-primary w-100 mb-2" onclick="generateDailyReport()">
+                                    <i class="fas fa-calendar-day me-2"></i>Reporte Diario
+                                </button>
+                                <button class="btn btn-primary w-100 mb-2" onclick="generateBiweeklyReport()">
+                                    <i class="fas fa-calendar-week me-2"></i>Reporte Quincenal
+                                </button>
+                                <button class="btn btn-primary w-100 mb-2" onclick="generateMonthlyReport()">
+                                    <i class="fas fa-calendar-alt me-2"></i>Reporte Mensual
+                                </button>
+                                <button class="btn btn-outline-primary w-100" onclick="exportData()">
+                                    <i class="fas fa-download me-2"></i>Exportar Datos (JSON)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Se pueden agregar más tarjetas de reportes aquí si es necesario -->
+                </div>
+            </div>
+
             <!-- Administration Section -->
-            <div id="administration" class="section">
+            <div id="settings" class="section">
                 <h2 class="mb-4">Administración</h2>
                 <div class="row">
                     <div class="col-lg-6">
@@ -1366,10 +1439,11 @@ Variables disponibles:
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" id="contractContent" style="white-space: pre-wrap; font-family: 'Times New Roman', serif;"></div>
+                <!-- Agregar botón de imprimir contrato en el footer -->
                 <div class="modal-footer no-print">
                     <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button class="btn btn-primary" onclick="window.print()">
-                        <i class="fas fa-print me-2"></i>Imprimir
+                    <button class="btn btn-primary" onclick="printContract()">
+                        <i class="fas fa-print me-2"></i>Imprimir Contrato
                     </button>
                 </div>
             </div>
@@ -1529,13 +1603,14 @@ function login(e) {
   
   if (username === adminCredentials.username && password === adminCredentials.password) {
     isAuthenticated = true
+    localStorage.setItem("isLoggedIn", "true") // Set flag for auto-login
     document.getElementById("loginScreen").style.display = "none"
     document.getElementById("appContainer").classList.add("active")
     loadData()
     renderClients()
     renderLoans()
     renderPaymentHistory()
-    renderPendingPayments()
+    renderVoidPayments() // Render void payments table
     renderOverduePayments()
     renderFinishedLoans()
     updateDashboard()
@@ -1548,6 +1623,7 @@ function login(e) {
 
 function logout() {
   isAuthenticated = false
+  localStorage.removeItem("isLoggedIn") // Remove auto-login flag
   document.getElementById("loginScreen").style.display = "flex"
   document.getElementById("appContainer").classList.remove("active")
   document.getElementById("loginUsername").value = ""
@@ -1557,24 +1633,65 @@ function logout() {
 
 // Navigation Functions
 function showSection(sectionId) {
+  // Ocultar todas las secciones
   var sections = document.querySelectorAll(".section")
-  sections.forEach((section) => {
+  sections.forEach(function (section) {
     section.classList.remove("active")
   })
-  
+
+  // Mostrar la sección seleccionada
+  var activeSection = document.getElementById(sectionId)
+  if (activeSection) {
+    activeSection.classList.add("active")
+  }
+
+  // Actualizar enlaces activos en el menú
   var navLinks = document.querySelectorAll(".sidebar .nav-link")
-  navLinks.forEach((link) => {
+  navLinks.forEach(function (link) {
     link.classList.remove("active")
   })
-  
-  document.getElementById(sectionId).classList.add("active")
-  event.target.classList.add("active")
+  // Activar el enlace correspondiente en el menú lateral
+  var activeLink = document.querySelector(`.sidebar .nav-link[onclick*="'${sectionId}'"]`)
+  if (activeLink) {
+    activeLink.classList.add("active")
+  }
 
-  // Actualizar datos cuando se muestra una sección
-  if (sectionId === 'overdue-payments') {
-    renderOverduePayments()
-  } else if (sectionId === 'finished-loans') {
-    renderFinishedLoans()
+  // Renderizar contenido según la sección
+  switch (sectionId) {
+    case "dashboard":
+      updateDashboard()
+      break
+    case "clients":
+      renderClients()
+      break
+    case "loans":
+      renderLoans()
+      break
+    case "finished-loans":
+      renderFinishedLoans()
+      break
+    case "payments":
+      // No action needed, search handled by user input
+      break
+    case "overdue-payments":
+      renderOverduePayments()
+      break
+    case "payment-history":
+      renderPaymentHistory()
+      break
+    case "void-payments": // Llamar a renderVoidPayments para la nueva sección
+      renderVoidPayments()
+      break
+    case "reports":
+      // Reports are generated on button click
+      break
+    case "settings": // Renombrar "administration" a "settings"
+      loadCompanyInfo()
+      loadAdminCredentials()
+      if (contractTemplate && document.getElementById("contractTemplate")) {
+        document.getElementById("contractTemplate").value = contractTemplate
+      }
+      break
   }
 }
 
@@ -1599,12 +1716,33 @@ function updateDashboard() {
   var overdueAmount = 0
   var today = new Date()
   loans.filter(l => l.status === 'active').forEach(loan => {
-    var nextPayment = calculateNextPaymentDate(loan)
-    if (new Date(nextPayment) < today && loan.remainingAmount > 0) {
+    // Ensure nextPaymentDate is valid before comparison
+    var nextPaymentDateCalc = calculateNextPaymentDate(loan);
+    var nextPaymentDate = new Date(nextPaymentDateCalc);
+
+    if (!isNaN(nextPaymentDate.getTime()) && nextPaymentDate < today && loan.remainingAmount > 0) {
       overdueAmount += loan.remainingAmount
     }
   })
   document.getElementById("overduePayments").textContent = "RD$ " + formatMoney(overdueAmount)
+  
+  var capitalPrestado = loans
+    .filter((l) => l.status === "active")
+    .reduce((sum, l) => sum + l.amount, 0)
+  document.getElementById("capitalPrestado").textContent = "RD$ " + formatMoney(capitalPrestado)
+  
+  var pagosAlDia = 0
+  loans.filter(l => l.status === 'active').forEach(loan => {
+    var nextPaymentCalc = calculateNextPaymentDate(loan)
+    var nextPaymentDate = new Date(nextPaymentCalc)
+
+    // A loan is considered "al día" if its next payment date is today or in the future,
+    // OR if the loan has already been fully paid off (remainingAmount is 0 or very close to it).
+    if ((!isNaN(nextPaymentDate.getTime()) && nextPaymentDate >= today) || loan.remainingAmount <= 0.01) {
+      pagosAlDia++
+    }
+  })
+  document.getElementById("pagosAlDia").textContent = pagosAlDia
 }
 
 // Client Functions
@@ -1641,8 +1779,6 @@ function editClient(clientId) {
 function saveClient(e) {
   e.preventDefault()
   
-  console.log("[v0] Guardando cliente...")
-  
   var clientId = document.getElementById("clientId").value
   
   var clientData = {
@@ -1657,22 +1793,16 @@ function saveClient(e) {
     createdAt: clientId ? (clients.find(c => c.id === clientId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
   }
   
-  console.log("[v0] Datos del cliente:", clientData)
-  
   if (clientId) {
     var index = clients.findIndex((c) => c.id === clientId)
     if (index !== -1) {
       clients[index] = { ...clients[index], ...clientData }
-      console.log("[v0] Cliente actualizado en índice:", index)
     }
   } else {
     clients.push(clientData)
-    console.log("[v0] Nuevo cliente agregado. Total clientes:", clients.length)
   }
   
   saveClients()
-  console.log("[v0] Clientes guardados en localStorage")
-  
   bootstrap.Modal.getInstance(document.getElementById("clientModal")).hide()
   renderClients()
   updateDashboard()
@@ -1730,6 +1860,13 @@ function searchClients() {
 
 function deleteClient(clientId) {
   if (confirm("¿Está seguro de eliminar este cliente?")) {
+    // Check if client has active loans
+    var hasActiveLoans = loans.some(loan => loan.clientId === clientId && loan.status === 'active');
+    if (hasActiveLoans) {
+        alert("No se puede eliminar este cliente porque tiene préstamos activos.");
+        return;
+    }
+    
     clients = clients.filter((c) => c.id !== clientId)
     saveClients()
     renderClients()
@@ -1869,7 +2006,7 @@ function saveLoan(e) {
     type: document.getElementById("loanType").value,
     interestRate: Number.parseFloat(document.getElementById("loanInterestRate").value),
     notes: document.getElementById("loanNotes").value,
-    createdAt: new Date().toISOString(), // Default to new date if not editing
+    createdAt: new Date().toISOString(),
     status: "active",
   }
 
@@ -1881,15 +2018,15 @@ function saveLoan(e) {
     if (existingLoan) {
       loanData.totalPaid = existingLoan.totalPaid || 0
       loanData.remainingAmount = loanData.totalAmount - loanData.totalPaid
-      loanData.createdAt = existingLoan.createdAt // Preserve original creation date
+      loanData.createdAt = existingLoan.createdAt
       loanData.status = existingLoan.status
-      loanData.startDate = existingLoan.startDate // Preserve original start date
-      loanData.paidOffDate = existingLoan.paidOffDate // Preserve original paid off date
+      loanData.startDate = existingLoan.startDate
+      loanData.paidOffDate = existingLoan.paidOffDate
     }
   } else {
     loanData.totalPaid = 0
     loanData.remainingAmount = loanData.totalAmount
-    loanData.startDate = new Date().toISOString() // Set start date for new loans
+    loanData.startDate = new Date().toISOString()
   }
 
   if (loanData.type === "fixed") {
@@ -1899,7 +2036,7 @@ function saveLoan(e) {
     loanData.paidInstallments = editMode && loans.find(l => l.id === loanId) ? loans.find(l => l.id === loanId).paidInstallments : 0
   } else if (loanData.type === "indefinite") {
     loanData.frequency = document.getElementById("indefiniteFrequency").value
-    loanData.installmentAmount = 0 // Se define con cada pago
+    loanData.installmentAmount = 0
     loanData.paidInstallments = editMode && loans.find(l => l.id === loanId) ? loans.find(l => l.id === loanId).paidInstallments : 0
   } else if (loanData.type === "daily") {
     loanData.days = Number.parseInt(document.getElementById("loanDailyDays").value)
@@ -1907,7 +2044,6 @@ function saveLoan(e) {
     loanData.paidDays = editMode && loans.find(l => l.id === loanId) ? loans.find(l => l.id === loanId).paidDays : 0
   }
 
-  // Calculate next payment date after potential loan modification
   if (loanData.status === 'active') {
       loanData.nextPaymentDate = calculateNextPaymentDate(loanData)
   }
@@ -1927,8 +2063,16 @@ function saveLoan(e) {
   renderFinishedLoans()
   updateDashboard()
 
-  if (!editMode && confirm("¿Desea generar el contrato para este préstamo?")) {
-    generateContract(loanData.id)
+  if (!editMode) {
+    // Generar factura del préstamo
+    generateLoanInvoice(loanData.id)
+    
+    // Preguntar si desea generar e imprimir el contrato
+    setTimeout(() => {
+      if (confirm("¿Desea generar e imprimir el contrato para este préstamo?")) {
+        generateAndPrintContract(loanData.id)
+      }
+    }, 500)
   }
 }
 
@@ -1941,7 +2085,7 @@ function deleteLoan(loanId) {
     renderLoans()
     renderFinishedLoans()
     renderPaymentHistory()
-    renderPendingPayments()
+    renderVoidPayments() // Update void payments table after deletion
     renderOverduePayments()
     updateDashboard()
     alert("Préstamo eliminado exitosamente")
@@ -2274,7 +2418,7 @@ function savePayment(e) {
     renderLoans()
     renderFinishedLoans()
     renderPaymentHistory()
-    renderPendingPayments()
+    renderVoidPayments() // Update void payments table
     renderOverduePayments()
     updateDashboard()
 
@@ -2302,7 +2446,7 @@ function savePayment(e) {
   
   renderLoans()
   renderPaymentHistory()
-  renderPendingPayments()
+  renderVoidPayments() // Update void payments table
   renderOverduePayments()
   updateDashboard()
 
@@ -2376,8 +2520,9 @@ function renderOverduePayments() {
         loan.nextPaymentDate = calculateNextPaymentDate(loan) // Recalculate if missing or invalid
     }
     
-    if (new Date(loan.nextPaymentDate) < today && loan.remainingAmount > 0) {
-      var daysOverdue = Math.floor((today - new Date(loan.nextPaymentDate)) / (1000 * 60 * 60 * 24))
+    var nextPaymentDate = new Date(loan.nextPaymentDate)
+    if (!isNaN(nextPaymentDate.getTime()) && nextPaymentDate < today && loan.remainingAmount > 0) {
+      var daysOverdue = Math.floor((today - nextPaymentDate) / (1000 * 60 * 60 * 24))
       overdueLoans.push({
         loan: loan,
         daysOverdue: daysOverdue,
@@ -2649,7 +2794,7 @@ function generateClearanceLetter(loanId) {
   html += 'quedando sin ningún tipo de deuda pendiente con nuestra institución respecto al mismo.</p>'
   
   html += '<br>'
-  html += '<p>Se<bos>{COMPANY_NAME}rtilla la presente para los fines que el(la) interesado(a) estime conveniente.</p>'
+  html += '<p>Se extiende la presente para los fines que el(la) interesado(a) estime conveniente.</p>'
   html += '</div>'
 
   html += '<div style="margin-top: 80px;">'
@@ -2760,11 +2905,11 @@ Entre {COMPANY_NAME}, RNC: {COMPANY_RNC}, con domicilio en {COMPANY_ADDRESS}, te
 
 PRIMERA: EL PRESTAMISTA otorga a EL PRESTATARIO un préstamo por la suma de {LOAN_AMOUNT} pesos dominicanos.
 
-SEGUNDA: El préstamo devengará un interés del {LOAN_INTEREST}% sobre el capital prestado.
+SEGUNDA: El préstamo devengará un interés del {LOAN_INTEREST} sobre el capital prestado.
 
 TERCERA: El monto total a pagar será de {LOAN_TOTAL} pesos dominicanos.
 
-CUARTA: El plazo para el pago del préstamo es de {LOAN_TERM}, a realizarse en {INSTALLMENTS} cuotas.
+CUARTA: El plazo para el pago del préstamo es de {LOAN_TERM}.
 
 QUINTA: La fecha de otorgamiento del préstamo es {LOAN_DATE}.
 
@@ -2782,6 +2927,53 @@ Fecha: {LOAN_DATE}                         Cédula: {CLIENT_CEDULA}`
   contractTemplate = defaultTemplate
   localStorage.setItem("contractTemplate", contractTemplate)
   alert("Plantilla por defecto cargada")
+}
+
+function generateAndPrintContract(loanId) {
+  var loan = loans.find((l) => l.id === loanId)
+  if (!loan) return
+
+  var client = clients.find((c) => c.id === loan.clientId)
+  if (!client) return
+
+  if (!contractTemplate) {
+    alert("No hay plantilla de contrato configurada. Por favor, configure una plantilla en Administración.")
+    return
+  }
+
+  var contract = contractTemplate
+  contract = contract.replace(/\{COMPANY_NAME\}/g, companyInfo.name || "[NOMBRE DE LA EMPRESA]")
+  contract = contract.replace(/\{COMPANY_ADDRESS\}/g, companyInfo.address || "[DIRECCIÓN]")
+  contract = contract.replace(/\{COMPANY_PHONE\}/g, companyInfo.phone || "[TELÉFONO]")
+  contract = contract.replace(/\{COMPANY_RNC\}/g, companyInfo.rnc || "[RNC]")
+  contract = contract.replace(/\{CLIENT_NAME\}/g, client.firstName + " " + client.lastName)
+  contract = contract.replace(/\{CLIENT_CEDULA\}/g, client.cedula)
+  contract = contract.replace(/\{CLIENT_ADDRESS\}/g, client.address)
+  contract = contract.replace(/\{CLIENT_PHONE\}/g, client.phone)
+  contract = contract.replace(/\{LOAN_AMOUNT\}/g, loan.amount.toLocaleString("es-DO", { style: "currency", currency: "DOP" }))
+  contract = contract.replace(/\{LOAN_INTEREST\}/g, loan.interestRate + "%") // Corrected placeholder to LOAN_INTEREST
+  contract = contract.replace(/\{LOAN_TOTAL\}/g, loan.totalAmount.toLocaleString("es-DO", { style: "currency", currency: "DOP" }))
+  // Use loan.startDate for loan date if available, otherwise createdAt
+  contract = contract.replace(/\{LOAN_DATE\}/g, formatDate(loan.startDate || loan.createdAt)) 
+  // Dynamically set LOAN_TERM and INSTALLMENTS based on loan type
+  if (loan.type === "fixed") {
+    contract = contract.replace(/\{LOAN_TERM\}/g, `${loan.installments} cuotas ${loan.frequency}`)
+    contract = contract.replace(/\{INSTALLMENTS\}/g, loan.installments)
+  } else if (loan.type === "daily") {
+    contract = contract.replace(/\{LOAN_TERM\}/g, `${loan.days} días`)
+    contract = contract.replace(/\{INSTALLMENTS\}/g, loan.days)
+  } else { // indefinite
+    contract = contract.replace(/\{LOAN_TERM\}/g, `Indefinido (${loan.frequency})`)
+    contract = contract.replace(/\{INSTALLMENTS\}/g, "N/A")
+  }
+
+  document.getElementById("contractContent").innerHTML = contract
+  var modal = new bootstrap.Modal(document.getElementById("contractModal"))
+  modal.show()
+}
+
+function printContract() {
+  window.print()
 }
 
 function generateContract(loanId) {
@@ -2806,43 +2998,506 @@ function generateContract(loanId) {
   contract = contract.replace(/\{CLIENT_ADDRESS\}/g, client.address)
   contract = contract.replace(/\{CLIENT_PHONE\}/g, client.phone)
   contract = contract.replace(/\{LOAN_AMOUNT\}/g, loan.amount.toLocaleString("es-DO", { style: "currency", currency: "DOP" }))
-  contract = contract.replace(/\{LOAN_INTEREST\}/g, loan.interestRate) // Corrected placeholder to LOAN_INTEREST
+  contract = contract.replace(/\{LOAN_INTEREST\}/g, loan.interestRate + "%")
   contract = contract.replace(/\{LOAN_TOTAL\}/g, loan.totalAmount.toLocaleString("es-DO", { style: "currency", currency: "DOP" }))
-  contract = contract.replace(/\{LOAN_DATE\}/g, formatDate(loan.createdAt)) // Use a consistent date format
-  contract = contract.replace(/\{LOAN_TERM\}/g, loan.type === "fixed" ? loan.installments : (loan.type === "daily" ? loan.days : "Indefinido")) // More dynamic term based on loan type
-  contract = contract.replace(/\{INSTALLMENTS\}/g, loan.type === "fixed" ? loan.installments : (loan.type === "daily" ? loan.days : "N/A")) // More dynamic installments
+  contract = contract.replace(/\{LOAN_DATE\}/g, formatDate(loan.startDate || loan.createdAt))
+  contract = contract.replace(/\{LOAN_TERM\}/g, loan.type === "fixed" ? loan.installments + " cuotas" : (loan.type === "daily" ? loan.days + " días" : "Indefinido"))
+  contract = contract.replace(/\{INSTALLMENTS\}/g, loan.type === "fixed" ? loan.installments : (loan.type === "daily" ? loan.days : "N/A"))
 
-
-  var printWindow = window.open("", "_blank")
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Contrato de Préstamo</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          padding: 40px;
-          line-height: 1.6;
-        }
-        pre {
-          white-space: pre-wrap;
-          font-family: Arial, sans-serif;
-        }
-      </style>
-    </head>
-    <body>
-      <pre>${contract}</pre>
-    </body>
-    </html>
-  `)
-  printWindow.document.close()
-  printWindow.print()
+  document.getElementById("contractContent").innerHTML = contract
+  var modal = new bootstrap.Modal(document.getElementById("contractModal"))
+  modal.show()
 }
+
+function renderVoidPayments() {
+  var tbody = document.getElementById("voidPaymentsTable")
+  if (!tbody) return
+
+  tbody.innerHTML = ""
+
+  if (payments.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay pagos registrados</td></tr>'
+    return
+  }
+
+  // Ordenar pagos por fecha descendente (más recientes primero)
+  var sortedPayments = [...payments].sort((a, b) => new Date(b.date) - new Date(a.date))
+
+  sortedPayments.forEach((payment) => {
+    var loan = loans.find((l) => l.id === payment.loanId)
+    var client = clients.find((c) => c.id === payment.clientId)
+
+    var row =
+      "<tr>" +
+      "<td>" + payment.id + "</td>" +
+      "<td>" + (client ? client.firstName + " " + client.lastName : "N/A") + "</td>" +
+      "<td>" + payment.loanId + "</td>" +
+      "<td>RD$ " + formatMoney(payment.amount) + "</td>" +
+      '<td class="hide-mobile">' + formatDate(payment.date) + "</td>" +
+      '<td class="hide-mobile">' + getPaymentMethodLabel(payment.method) + "</td>" +
+      "<td>" +
+      '<button class="btn btn-sm btn-danger" onclick="voidPayment(\'' + payment.id + '\')"><i class="fas fa-ban me-1"></i>Anular</button>' +
+      "</td>" +
+      "</tr>"
+    tbody.innerHTML += row
+  })
+}
+
+function searchVoidPayments() {
+  var searchTerm = document.getElementById("voidPaymentSearch").value.toLowerCase()
+  var tbody = document.getElementById("voidPaymentsTable")
+  var rows = tbody.getElementsByTagName("tr")
+
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i]
+    var text = row.textContent.toLowerCase()
+    
+    if (text.includes(searchTerm)) {
+      row.style.display = ""
+    } else {
+      row.style.display = "none"
+    }
+  }
+}
+
+function voidPayment(paymentId) {
+  if (!confirm("¿Está seguro que desea anular este pago? El monto se reintegrará al saldo del préstamo.")) {
+    return
+  }
+
+  var payment = payments.find((p) => p.id === paymentId)
+  if (!payment) {
+    alert("Pago no encontrado.")
+    return
+  }
+
+  var loan = loans.find((l) => l.id === payment.loanId)
+  if (!loan) {
+    alert("Préstamo asociado no encontrado.")
+    return
+  }
+
+  // Reintegrar el monto al préstamo
+  loan.totalPaid -= payment.amount
+  loan.remainingAmount += payment.amount
+
+  // Ajustar contadores según el tipo de préstamo
+  if (loan.type === "fixed") {
+    loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1)
+  } else if (loan.type === "indefinite") {
+    loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1)
+  } else if (loan.type === "daily") {
+    loan.paidDays = Math.max(0, (loan.paidDays || 0) - 1)
+  }
+
+  // Si el préstamo estaba marcado como pagado, reactivarlo
+  if (loan.status === "paid") {
+    loan.status = "active"
+    delete loan.finishedAt
+    delete loan.paidOffDate
+    // Recalculate nextPaymentDate when reactivating
+    loan.nextPaymentDate = calculateNextPaymentDate(loan);
+  }
+
+  // Eliminar el pago de la lista
+  payments = payments.filter((p) => p.id !== paymentId)
+
+  savePayments()
+  saveLoans()
+
+  alert("Pago anulado exitosamente. El monto ha sido reintegrado al préstamo.")
+
+  renderVoidPayments()
+  renderPaymentHistory()
+  renderLoans()
+  renderFinishedLoans()
+  updateDashboard()
+}
+
+function generateLoanInvoice(loanId) {
+  var loan = loans.find((l) => l.id === loanId)
+  if (!loan) return
+
+  var client = clients.find((c) => c.id === loan.clientId)
+  if (!client) return
+
+  var companyName = companyInfo.name || "Sistema de Préstamos"
+  var address = companyInfo.address || ""
+  var phone = companyInfo.phone || ""
+  var rnc = companyInfo.rnc || ""
+  
+  // Calcular fecha final según el tipo de préstamo
+  var fechaFinal = ""
+  if (loan.type === "fixed") {
+    var diasPorFrecuencia = { 'weekly': 7, 'biweekly': 14, 'monthly': 30 } // Approximate days per frequency
+    var dias = (diasPorFrecuencia[loan.frequency] || 30) * loan.installments
+    var fechaFinalDate = new Date(loan.startDate)
+    fechaFinalDate.setDate(fechaFinalDate.getDate() + dias)
+    fechaFinal = formatDate(fechaFinalDate.toISOString())
+  } else if (loan.type === "daily") {
+    var fechaFinalDate = new Date(loan.startDate)
+    fechaFinalDate.setDate(fechaFinalDate.getDate() + loan.days)
+    fechaFinal = formatDate(fechaFinalDate.toISOString())
+  } else { // indefinite
+    fechaFinal = "Indefinido"
+  }
+  
+  var html = '<div class="text-center mb-4">'
+  
+  if (companyInfo.logoBase64) {
+    html += '<img src="' + companyInfo.logoBase64 + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">'
+  } else if (companyInfo.logo) {
+    html += '<img src="' + companyInfo.logo + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">'
+  }
+  
+  html +=
+    "<h3>" + companyName + "</h3>" +
+    "<p>" + address + "</p>" +
+    "<p>Tel: " + phone + " | RNC: " + rnc + "</p>" +
+    "</div>" +
+    '<h4 class="text-center mb-4">FACTURA DE PRÉSTAMO</h4>' +
+    '<table class="table">' +
+    "<tr><th>No. Préstamo:</th><td>" + loan.id + "</td></tr>" +
+    "<tr><th>Cliente:</th><td>" + client.firstName + " " + client.lastName + "</td></tr>" +
+    "<tr><th>Cédula:</th><td>" + client.cedula + "</td></tr>" +
+    "<tr><th>Teléfono:</th><td>" + client.phone + "</td></tr>" +
+    "<tr><th>Fecha Inicial:</th><td>" + formatDate(loan.startDate) + "</td></tr>" +
+    "<tr><th>Fecha Final Estimada:</th><td>" + fechaFinal + "</td></tr>" +
+    "<tr><th>Cantidad Prestada:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.amount) + "</strong></td></tr>" +
+    "<tr><th>Tasa de Interés:</th><td>" + loan.interestRate + "%</td></tr>" +
+    "<tr><th>Total a Pagar:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.totalAmount) + "</strong></td></tr>"
+
+  if (loan.type === "fixed") {
+    html += "<tr><th>Número de Cuotas:</th><td>" + loan.installments + "</td></tr>" +
+            "<tr><th>Frecuencia:</th><td>" + loan.frequency.charAt(0).toUpperCase() + loan.frequency.slice(1) + "</td></tr>" +
+            "<tr><th>Monto por Cuota:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.installmentAmount) + "</strong></td></tr>"
+  } else if (loan.type === "daily") {
+    html += "<tr><th>Días:</th><td>" + loan.days + "</td></tr>" +
+            "<tr><th>Pago Diario:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.dailyPayment) + "</strong></td></tr>"
+  } else { // indefinite
+    html += "<tr><th>Tipo:</th><td>Pago Indefinido</td></tr>" +
+            "<tr><th>Frecuencia:</th><td>" + loan.frequency.charAt(0).toUpperCase() + loan.frequency.slice(1) + "</td></tr>"
+  }
+
+  html += "</table>"
+  
+  html += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle me-2"></i>Préstamo otorgado exitosamente. Conserve esta factura para sus registros.</div>'
+
+  document.getElementById("invoiceContent").innerHTML = html
+  var modal = new bootstrap.Modal(document.getElementById("invoiceModal"))
+  modal.show()
+}
+
+// Utility Functions
+function formatMoney(amount) {
+  // Use localeCompare for more robust formatting, though toFixed(2) and replace might suffice for simple cases
+  return Number.parseFloat(amount).toLocaleString("es-DO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "N/A"
+  var date = new Date(dateString)
+  // Check if date is valid
+  if (isNaN(date.getTime())) return "Fecha inválida"
+
+  var day = String(date.getDate()).padStart(2, "0")
+  var month = String(date.getMonth() + 1).padStart(2, "0")
+  var year = date.getFullYear()
+  return day + "/" + month + "/" + year
+}
+
+function getLoanTypeLabel(type) {
+  var labels = {
+    fixed: "Plazo Definido",
+    indefinite: "Plazo Indefinido",
+    daily: "Préstamo Diario",
+  }
+  return labels[type] || type
+}
+
+function getPaymentTypeLabel(type) {
+  var labels = {
+    installment: "Pago de Cuota",
+    interest: "Solo Interés",
+    capital: "Abono a Capital",
+    payoff: "Liquidación Total",
+  }
+  return labels[type] || type
+}
+
+function getPaymentMethodLabel(method) {
+  var labels = {
+    cash: "Efectivo",
+    transfer: "Transferencia",
+    check: "Cheque",
+  }
+  return labels[method] || method
+}
+
+function getFrequencyLabel(frequency) {
+  var labels = {
+    weekly: "Semanal",
+    biweekly: "Quincenal",
+    monthly: "Mensual",
+  }
+  return labels[frequency] || frequency
+}
+
+function getMonthName(month) {
+  var months = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ]
+  return months[month]
+}
+
+function clearAllData() {
+  if (
+    confirm(
+      "¿Está seguro de eliminar TODOS los datos? Esta acción no se puede deshacer.\n\nEsto eliminará:\n- Todos los clientes\n- Todos los préstamos\n- Todos los pagos\n- Información de la empresa\n\n¿Desea continuar?"
+    )
+  ) {
+    if (confirm("ÚLTIMA ADVERTENCIA: ¿Realmente desea eliminar todos los datos?")) {
+      localStorage.clear()
+      clients = []
+      loans = []
+      payments = []
+      companyInfo = {}
+      contractTemplate = "" // Reset contract template as well
+      
+      renderClients()
+      renderLoans()
+      renderFinishedLoans()
+      renderPaymentHistory()
+      renderVoidPayments() // Clear void payments table
+      renderOverduePayments()
+      updateDashboard()
+      loadCompanyInfo() // Reset company info form
+      document.getElementById("companyNameSidebar").textContent = "Sistema de Préstamos" // Reset sidebar company name
+      
+      alert("Todos los datos han sido eliminados")
+      // Optionally force a logout or reload the page
+      logout(); 
+    }
+  }
+}
+
+function generateThermalReceipt(paymentId) {
+  var payment = payments.find((p) => p.id === paymentId)
+  if (!payment) return ""
+
+  var loan = loans.find((l) => l.id === payment.loanId)
+  var client = clients.find((c) => c.id === payment.clientId)
+  
+  var companyName = companyInfo.name || "Sistema de Préstamos"
+  var address = companyInfo.address || ""
+  var phone = companyInfo.phone || ""
+  var rnc = companyInfo.rnc || ""
+  
+  var receipt = ""
+  receipt += "================================\n"
+  receipt += centerText(companyName, 32) + "\n"
+  if (address) receipt += centerText(address, 32) + "\n"
+  if (phone) receipt += centerText("Tel: " + phone, 32) + "\n"
+  if (rnc) receipt += centerText("RNC: " + rnc, 32) + "\n"
+  receipt += "================================\n\n"
+  receipt += centerText("RECIBO DE PAGO", 32) + "\n\n"
+  receipt += "Recibo No: " + payment.id + "\n"
+  receipt += "Fecha: " + formatDate(payment.date) + "\n"
+  receipt += "--------------------------------\n"
+  receipt += "Cliente: " + (client ? client.firstName + " " + client.lastName : "N/A") + "\n"
+  receipt += "Cedula: " + (client ? client.cedula : "N/A") + "\n"
+  receipt += "Telefono: " + (client ? client.phone : "N/A") + "\n"
+  receipt += "--------------------------------\n"
+  receipt += "Prestamo: " + payment.loanId + "\n"
+  receipt += "Tipo: " + getPaymentTypeLabel(payment.type) + "\n"
+  receipt += "Metodo: " + getPaymentMethodLabel(payment.method) + "\n"
+  receipt += "--------------------------------\n"
+  receipt += "MONTO PAGADO:\n"
+  receipt += centerText("RD$ " + formatMoney(payment.amount), 32) + "\n"
+  receipt += "--------------------------------\n"
+  
+  if (loan) {
+    receipt += "Saldo Restante:\n"
+    receipt += centerText("RD$ " + formatMoney(loan.remainingAmount), 32) + "\n"
+    receipt += "--------------------------------\n"
+  }
+  
+  if (payment.notes) {
+    receipt += "\nNotas: " + payment.notes + "\n"
+  }
+  
+  receipt += "\n" + centerText("Gracias por su pago!", 32) + "\n"
+  receipt += "================================\n\n\n\n"
+  
+  return receipt
+}
+
+function centerText(text, width) {
+  if (text.length >= width) return text
+  var padding = Math.floor((width - text.length) / 2)
+  return " ".repeat(padding) + text + " ".repeat(width - text.length - padding) // Ensure total width
+}
+
+function printThermal() {
+  var invoiceContentDiv = document.getElementById("invoiceContent");
+  if (!invoiceContentDiv) {
+    alert("No se encontró el contenido de la factura.");
+    return;
+  }
+  
+  // Try to extract payment ID from the invoice content. This is brittle.
+  // A more robust way would be to pass the payment ID directly when showing the modal or function.
+  var invoiceText = invoiceContentDiv.innerText;
+  var paymentIdMatch = invoiceText.match(/Recibo No:\s*(PAY-\d+)/); // Assuming format "Recibo No: PAY-1234567890"
+  
+  if (!paymentIdMatch || !paymentIdMatch[1]) {
+    // Fallback: try to find it in the modal's hidden input if it exists
+    var hiddenPaymentId = document.getElementById("paymentLoanId")?.value;
+    if (!hiddenPaymentId) {
+      alert("No se pudo identificar el ID del pago para imprimir el recibo térmico.");
+      return;
+    }
+    printThermalReceipt(hiddenPaymentId);
+    return;
+  }
+  
+  var paymentId = paymentIdMatch[1];
+  printThermalReceipt(paymentId);
+}
+
+function printThermalReceipt(paymentId) {
+  var thermalContent = generateThermalReceipt(paymentId)
+  
+  if (!thermalContent) {
+    alert("No se pudo generar el recibo")
+    return
+  }
+  
+  var printWindow = window.open("", "_blank", "width=300,height=600")
+  printWindow.document.write("<html><head><title>Recibo Termico</title>")
+  printWindow.document.write("<style>")
+  printWindow.document.write("@page { size: 80mm auto; margin: 0; }") // Standard thermal printer paper size
+  printWindow.document.write("body { font-family: 'Courier New', Courier, monospace; font-size: 12px; margin: 0; padding: 5mm; width: 70mm; }") // Slightly smaller width for content within margins
+  printWindow.document.write("pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }")
+  printWindow.document.write("@media print {")
+  printWindow.document.write("  body { width: 80mm; }") // Set body width for print
+  printWindow.document.write("  @page { size: 80mm auto; margin: 0mm; }") // Ensure page margins are zero for printing
+  printWindow.document.write("}")
+  printWindow.document.write("</style></head><body>")
+  
+  if (companyInfo.logoBase64) {
+    printWindow.document.write('<div style="text-align: center; margin-bottom: 10px;">')
+    printWindow.document.write('<img src="' + companyInfo.logoBase64 + '" style="max-width: 150px; max-height: 60px;">')
+    printWindow.document.write('</div>')
+  }
+  
+  printWindow.document.write("<pre>" + thermalContent + "</pre>")
+  printWindow.document.write("</body></html>")
+  printWindow.document.close()
+  
+  setTimeout(function() {
+    printWindow.print()
+    // It's good practice to close the window after printing is initiated,
+    // but the user might want to cancel, so a slight delay is good.
+    // printWindow.close(); 
+  }, 250)
+}
+
+// Event Listeners
+window.addEventListener("DOMContentLoaded", () => {
+  var loginForm = document.getElementById("loginForm")
+  if (loginForm) {
+    loginForm.addEventListener("submit", login)
+  }
+
+  var clientForm = document.getElementById("clientForm")
+  if (clientForm) {
+    clientForm.addEventListener("submit", saveClient)
+  }
+
+  var loanForm = document.getElementById("loanForm")
+  if (loanForm) {
+    loanForm.addEventListener("submit", saveLoan)
+  }
+
+  var paymentForm = document.getElementById("paymentForm")
+  if (paymentForm) {
+    paymentForm.addEventListener("submit", savePayment)
+  }
+
+  var companyForm = document.getElementById("companyForm")
+  if (companyForm) {
+    companyForm.addEventListener("submit", saveCompanyInfo)
+  }
+
+  var passwordForm = document.getElementById("passwordForm")
+  if (passwordForm) {
+    passwordForm.addEventListener("submit", changePassword)
+  }
+
+  // Close mobile menu when clicking outside
+  document.addEventListener("click", function (e) {
+    var sidebar = document.getElementById("sidebar")
+    var toggle = document.querySelector(".mobile-menu-toggle")
+    var overlay = document.querySelector(".sidebar-overlay")
+
+    if (
+      sidebar &&
+      sidebar.classList.contains("active") &&
+      !sidebar.contains(e.target) &&
+      !toggle.contains(e.target) &&
+      !overlay.contains(e.target) // Also check overlay to prevent closing on overlay click
+    ) {
+      closeMobileMenu()
+    }
+  })
+})
+
+// Initial load and check for saved login state
+document.addEventListener("DOMContentLoaded", () => {
+  loadData(); // Load all data first
+
+  // Check for login persistence
+  if (localStorage.getItem("isLoggedIn") === "true") {
+    isAuthenticated = true;
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("appContainer").classList.add("active");
+    
+    // Render initial data
+    updateDashboard();
+    renderClients();
+    renderLoans();
+    renderFinishedLoans();
+    renderPaymentHistory();
+    renderVoidPayments(); // Render the void payments table
+    renderOverduePayments();
+    loadCompanyInfo();
+    
+    // Set the initial active link in the sidebar
+    showSection('dashboard'); 
+  } else {
+    document.getElementById("loginScreen").style.display = "flex";
+    document.getElementById("appContainer").classList.remove("active");
+  }
+});
 
 function generateInvoice(paymentId) {
   var payment = payments.find((p) => p.id === paymentId)
-  if (!payment) return
+  if (!payment) {
+    alert("No se encontró el pago")
+    return
+  }
 
   var loan = loans.find((l) => l.id === payment.loanId)
   var client = clients.find((c) => c.id === payment.clientId)
@@ -2887,6 +3542,9 @@ function generateInvoice(paymentId) {
     "<tr><th>Cédula:</th><td>" +
     (client ? client.cedula : "N/A") +
     "</td></tr>" +
+    "<tr><th>Teléfono:</th><td>" +
+    (client ? client.phone : "N/A") +
+    "</td></tr>" +
     "<tr><th>Préstamo:</th><td>" +
     payment.loanId +
     "</td></tr>" +
@@ -2918,10 +3576,9 @@ function generateInvoice(paymentId) {
   modal.show()
 }
 
-// Report Functions
 function generateDailyReport() {
   var now = new Date()
-  var today = now.toISOString().split('T')[0] // Format date as YYYY-MM-DD
+  var today = now.toISOString().split('T')[0]
 
   var dailyPayments = payments.filter((p) => {
     var paymentDate = new Date(p.date).toISOString().split('T')[0]
@@ -2931,11 +3588,10 @@ function generateDailyReport() {
   var totalCollected = dailyPayments.reduce((sum, p) => sum + p.amount, 0)
   var activeLoansCount = loans.filter((l) => l.status === "active").length
   
-  // Calculate overdue loans based on nextPaymentDate
   var overdueLoansCount = 0
   loans.filter(l => l.status === 'active').forEach(loan => {
       if (!loan.nextPaymentDate || isNaN(new Date(loan.nextPaymentDate).getTime())) {
-          loan.nextPaymentDate = calculateNextPaymentDate(loan) // Recalculate if missing or invalid
+          loan.nextPaymentDate = calculateNextPaymentDate(loan)
       }
       if (new Date(loan.nextPaymentDate) < new Date()) {
           overdueLoansCount++;
@@ -3001,7 +3657,6 @@ function generateDailyReport() {
 
   html += "</tbody></table></div></div>"
   
-  // Préstamos activos del día
   html += '<div class="card mb-3"><div class="card-header bg-info text-white"><h5>Préstamos Activos</h5></div><div class="card-body">'
   html += '<table class="table table-striped"><thead><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Fecha Entrega</th><th>Próximo Pago</th></tr></thead><tbody>'
   
@@ -3012,9 +3667,8 @@ function generateDailyReport() {
   } else {
     activeLoans.forEach((loan) => {
       var client = clients.find((c) => c.id === loan.clientId)
-      // Ensure nextPaymentDate is available for display
       var nextPaymentDisplay = loan.nextPaymentDate ? formatDate(loan.nextPaymentDate) : "N/A";
-      if (!nextPaymentDisplay || nextPaymentDisplay === "NaN/aN/NaN") {
+      if (!nextPaymentDisplay || nextPaymentDisplay === "Fecha inválida") {
           nextPaymentDisplay = formatDate(calculateNextPaymentDate(loan));
       }
 
@@ -3028,7 +3682,7 @@ function generateDailyReport() {
         "</td><td>" +
         loan.interestRate +
         "%</td><td>" +
-        formatDate(loan.startDate) + // Assuming startDate is set when loan is created
+        formatDate(loan.startDate) +
         "</td><td>" +
         nextPaymentDisplay +
         "</td></tr>"
@@ -3054,7 +3708,6 @@ function generateBiweeklyReport() {
   var totalCollected = biweeklyPayments.reduce((sum, p) => sum + p.amount, 0)
   var activeLoansCount = loans.filter((l) => l.status === "active").length
   
-  // Count loans that finished in the last two weeks
   var finishedLoansInPeriod = loans.filter((l) => {
     if (l.status !== "paid" || !l.paidOffDate) return false
     var paidDate = new Date(l.paidOffDate)
@@ -3118,7 +3771,6 @@ function generateBiweeklyReport() {
 
   html += "</tbody></table></div></div>"
   
-  // Préstamos finalizados en el período
   if (finishedLoansInPeriod > 0) {
     html += '<div class="card mb-3"><div class="card-header bg-success text-white"><h5>Préstamos Finalizados en el Período</h5></div><div class="card-body">'
     html += '<table class="table table-striped"><thead><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Fecha Entrega</th><th>Fecha Finalización</th></tr></thead><tbody>'
@@ -3204,15 +3856,15 @@ function generateMonthlyReport() {
     formatMoney(totalCollected) +
     "</h3></div></div></div>"
   html +=
-    '<div class="col-md-3 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Préstamos Activos</h6><h3 class="text-primary">' +
-    activeLoansCount +
-    "</h3></div></div></div>"
-  html +=
     '<div class="col-md-3 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Préstamos Finalizados</h6><h3 class="text-info">' +
     finishedLoansCount +
     "</h3></div></div></div>"
   html +=
-    '<div class="col-md-3 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Saldo Pendiente</h6><h3 class="text-warning">RD$ ' +
+    '<div class="col-md-3 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Préstamos Activos</h6><h3 class="text-primary">' +
+    activeLoansCount +
+    "</h3></div></div></div>"
+  html +=
+    '<div class="col-md-3 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Total Pendiente</h6><h3 class="text-warning">RD$ ' +
     formatMoney(totalPending) +
     "</h3></div></div></div>"
   html += "</div>"
@@ -3226,6 +3878,7 @@ function generateMonthlyReport() {
     monthlyPayments.forEach((payment) => {
       var client = clients.find((c) => c.id === payment.clientId)
       var loan = loans.find((l) => l.id === payment.loanId)
+      
       html +=
         "<tr><td>" +
         formatDate(payment.date) +
@@ -3241,41 +3894,7 @@ function generateMonthlyReport() {
     })
   }
 
-  html += "</tbody></table></div></div>"
-  
-  // Préstamos finalizados del mes
-  if (finishedLoansCount > 0) {
-    html += '<div class="card mb-3"><div class="card-header bg-success text-white"><h5>Préstamos Finalizados del Mes</h5></div><div class="card-body">'
-    html += '<table class="table table-striped"><thead><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Fecha Entrega</th><th>Fecha Finalización</th></tr></thead><tbody>'
-    
-    var finishedLoans = loans.filter((l) => {
-      if (l.status !== "paid" || !l.paidOffDate) return false
-      var paidDate = new Date(l.paidOffDate)
-      return paidDate.getMonth() === currentMonth && paidDate.getFullYear() === currentYear
-    })
-    
-    finishedLoans.forEach((loan) => {
-      var client = clients.find((c) => c.id === loan.clientId)
-      html +=
-        "<tr><td>" +
-        loan.id +
-        "</td><td>" +
-        (client ? client.firstName + " " + client.lastName : "N/A") +
-        "</td><td>RD$ " +
-        formatMoney(loan.amount) +
-        "</td><td>" +
-        loan.interestRate +
-        "%</td><td>" +
-        formatDate(loan.startDate) +
-        "</td><td>" +
-        formatDate(loan.paidOffDate) +
-        "</td></tr>"
-    })
-    
-    html += "</tbody></table></div></div>"
-  }
-  
-  html += "</div>"
+  html += "</tbody></table></div></div></div>"
 
   document.getElementById("reportContent").innerHTML = html
   var modal = new bootstrap.Modal(document.getElementById("reportModal"))
@@ -3288,27 +3907,27 @@ function exportData() {
     loans: loans,
     payments: payments,
     companyInfo: companyInfo,
-    exportDate: new Date().toISOString(),
+    exportDate: new Date().toISOString()
   }
 
   var dataStr = JSON.stringify(data, null, 2)
-  var dataBlob = new Blob([dataStr], { type: "application/json" })
-  var url = URL.createObjectURL(dataBlob)
-  var link = document.createElement("a")
-  link.href = url
-  link.download = "sistema-prestamos-backup-" + Date.now() + ".json"
-  link.click()
-  URL.revokeObjectURL(url)
+  var dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr)
+
+  var exportFileDefaultName = 'prestamos_backup_' + new Date().toISOString().split('T')[0] + '.json'
+
+  var linkElement = document.createElement('a')
+  linkElement.setAttribute('href', dataUri)
+  linkElement.setAttribute('download', exportFileDefaultName)
+  linkElement.click()
 }
 
-// Theme Functions
 function changeTheme(theme) {
   currentTheme = theme
   document.body.className = theme
   localStorage.setItem("theme", theme)
+  alert("Tema cambiado exitosamente")
 }
 
-// Password Functions
 function changePassword(e) {
   e.preventDefault()
   
@@ -3331,254 +3950,81 @@ function changePassword(e) {
   alert("Contraseña cambiada exitosamente")
 }
 
-// Utility Functions
-function formatMoney(amount) {
-  return Number.parseFloat(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-}
+function showSection(sectionId) {
+  // Ocultar todas las secciones
+  var sections = document.querySelectorAll(".section")
+  sections.forEach(function (section) {
+    section.classList.remove("active")
+  })
 
-function formatDate(dateString) {
-  if (!dateString) return "N/A"
-  var date = new Date(dateString)
-  var day = String(date.getDate()).padStart(2, "0")
-  var month = String(date.getMonth() + 1).padStart(2, "0")
-  var year = date.getFullYear()
-  return day + "/" + month + "/" + year
-}
-
-function getLoanTypeLabel(type) {
-  var labels = {
-    fixed: "Plazo Definido",
-    indefinite: "Plazo Indefinido",
-    daily: "Préstamo Diario",
+  // Mostrar la sección seleccionada
+  var activeSection = document.getElementById(sectionId)
+  if (activeSection) {
+    activeSection.classList.add("active")
   }
-  return labels[type] || type
-}
 
-function getPaymentTypeLabel(type) {
-  var labels = {
-    installment: "Pago de Cuota",
-    interest: "Solo Interés",
-    capital: "Abono a Capital",
-    payoff: "Liquidación Total",
+  // Actualizar enlaces activos en el menú
+  var navLinks = document.querySelectorAll(".sidebar .nav-link")
+  navLinks.forEach(function (link) {
+    link.classList.remove("active")
+  })
+  // Activar el enlace correspondiente en el menú lateral
+  var activeLink = document.querySelector(`.sidebar .nav-link[onclick*="'${sectionId}'"]`)
+  if (activeLink) {
+    activeLink.classList.add("active")
   }
-  return labels[type] || type
-}
 
-function getPaymentMethodLabel(method) {
-  var labels = {
-    cash: "Efectivo",
-    transfer: "Transferencia",
-    check: "Cheque",
-  }
-  return labels[method] || method
-}
-
-function getFrequencyLabel(frequency) {
-  var labels = {
-    weekly: "Semanal",
-    biweekly: "Quincenal",
-    monthly: "Mensual",
-  }
-  return labels[frequency] || frequency
-}
-
-function getMonthName(month) {
-  var months = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre",
-  ]
-  return months[month]
-}
-
-function clearAllData() {
-  if (
-    confirm(
-      "¿Está seguro de eliminar TODOS los datos? Esta acción no se puede deshacer.\n\nEsto eliminará:\n- Todos los clientes\n- Todos los préstamos\n- Todos los pagos\n- Información de la empresa\n\n¿Desea continuar?"
-    )
-  ) {
-    if (confirm("ÚLTIMA ADVERTENCIA: ¿Realmente desea eliminar todos los datos?")) {
-      localStorage.clear()
-      clients = []
-      loans = []
-      payments = []
-      companyInfo = {}
-      renderClients()
-      renderLoans()
-      renderFinishedLoans()
-      renderPaymentHistory()
-      renderPendingPayments()
-      renderOverduePayments()
+  // Renderizar contenido según la sección
+  switch (sectionId) {
+    case "dashboard":
       updateDashboard()
+      break
+    case "clients":
+      renderClients()
+      break
+    case "loans":
+      renderLoans()
+      break
+    case "finished-loans":
+      renderFinishedLoans()
+      break
+    case "payments":
+      // No action needed, search handled by user input
+      break
+    case "overdue-payments":
+      renderOverduePayments()
+      break
+    case "payment-history":
+      renderPaymentHistory()
+      break
+    case "void-payments": // Llamar a renderVoidPayments para la nueva sección
+      renderVoidPayments()
+      break
+    case "reports":
+      // Reports are generated on button click
+      break
+    case "settings": // Cambiado de "administration" a "settings"
       loadCompanyInfo()
-      alert("Todos los datos han sido eliminados")
-    }
+      loadAdminCredentials()
+      if (contractTemplate && document.getElementById("contractTemplate")) {
+        document.getElementById("contractTemplate").value = contractTemplate
+      }
+      break
   }
 }
 
-function generateThermalReceipt(paymentId) {
-  var payment = payments.find((p) => p.id === paymentId)
-  if (!payment) return ""
 
-  var loan = loans.find((l) => l.id === payment.loanId)
-  var client = clients.find((c) => c.id === payment.clientId)
-  
-  var companyName = companyInfo.name || "Sistema de Préstamos"
-  var address = companyInfo.address || ""
-  var phone = companyInfo.phone || ""
-  var rnc = companyInfo.rnc || ""
-  
-  var receipt = ""
-  receipt += "================================\n"
-  receipt += centerText(companyName, 32) + "\n"
-  if (address) receipt += centerText(address, 32) + "\n"
-  if (phone) receipt += centerText("Tel: " + phone, 32) + "\n"
-  if (rnc) receipt += centerText("RNC: " + rnc, 32) + "\n"
-  receipt += "================================\n\n"
-  receipt += centerText("RECIBO DE PAGO", 32) + "\n\n"
-  receipt += "Recibo No: " + payment.id + "\n"
-  receipt += "Fecha: " + formatDate(payment.date) + "\n"
-  receipt += "--------------------------------\n"
-  receipt += "Cliente: " + (client ? client.firstName + " " + client.lastName : "N/A") + "\n"
-  receipt += "Cedula: " + (client ? client.cedula : "N/A") + "\n"
-  receipt += "Telefono: " + (client ? client.phone : "N/A") + "\n"
-  receipt += "--------------------------------\n"
-  receipt += "Prestamo: " + payment.loanId + "\n"
-  receipt += "Tipo: " + getPaymentTypeLabel(payment.type) + "\n"
-  receipt += "Metodo: " + getPaymentMethodLabel(payment.method) + "\n"
-  receipt += "--------------------------------\n"
-  receipt += "MONTO PAGADO:\n"
-  receipt += centerText("RD$ " + formatMoney(payment.amount), 32) + "\n"
-  receipt += "--------------------------------\n"
-  
-  if (loan) {
-    receipt += "Saldo Restante:\n"
-    receipt += centerText("RD$ " + formatMoney(loan.remainingAmount), 32) + "\n"
-    receipt += "--------------------------------\n"
-  }
-  
-  if (payment.notes) {
-    receipt += "\nNotas: " + payment.notes + "\n"
-  }
-  
-  receipt += "\n" + centerText("Gracias por su pago!", 32) + "\n"
-  receipt += "================================\n\n\n\n"
-  
-  return receipt
-}
+// Cambiar <div id="administration" class="section"> por <div id="settings" class="section">
 
-function centerText(text, width) {
-  if (text.length >= width) return text
-  var padding = Math.floor((width - text.length) / 2)
-  return " ".repeat(padding) + text
-}
-
-function printThermal() {
-  var invoiceContent = document.getElementById("invoiceContent")
-  var paymentIdMatch = invoiceContent.textContent.match(/PAY-\d+/)
+window.addEventListener("DOMContentLoaded", function() {
   
-  if (!paymentIdMatch) {
-    alert("No se pudo identificar el pago")
-    return
-  }
-  
-  var paymentId = paymentIdMatch[0]
-  printThermalReceipt(paymentId)
-}
-
-function printThermalReceipt(paymentId) {
-  var thermalContent = generateThermalReceipt(paymentId)
-  
-  if (!thermalContent) {
-    alert("No se pudo generar el recibo")
-    return
-  }
-  
-  var printWindow = window.open("", "_blank", "width=300,height=600")
-  printWindow.document.write("<html><head><title>Recibo Termico</title>")
-  printWindow.document.write("<style>")
-  printWindow.document.write("@page { size: 80mm auto; margin: 0; }")
-  printWindow.document.write("body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 5mm; width: 70mm; }")
-  printWindow.document.write("pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }")
-  printWindow.document.write("@media print {")
-  printWindow.document.write("  body { width: 80mm; }")
-  printWindow.document.write("  @page { size: 80mm auto; margin: 0mm; }")
-  printWindow.document.write("}")
-  printWindow.document.write("</style></head><body>")
-  
-  if (companyInfo.logoBase64) {
-    printWindow.document.write('<div style="text-align: center; margin-bottom: 10px;">')
-    printWindow.document.write('<img src="' + companyInfo.logoBase64 + '" style="max-width: 150px; max-height: 60px;">')
-    printWindow.document.write('</div>')
-  }
-  
-  printWindow.document.write("<pre>" + thermalContent + "</pre>")
-  printWindow.document.write("</body></html>")
-  printWindow.document.close()
-  
-  setTimeout(function() {
-    printWindow.print()
-    printWindow.close()
-  }, 250)
-}
-
-// Event Listeners
-window.addEventListener("DOMContentLoaded", () => {
-  var loginForm = document.getElementById("loginForm")
-  if (loginForm) {
-    loginForm.addEventListener("submit", login)
-  }
-
-  var clientForm = document.getElementById("clientForm")
-  if (clientForm) {
-    clientForm.addEventListener("submit", saveClient)
-  }
-
-  var loanForm = document.getElementById("loanForm")
-  if (loanForm) {
-    loanForm.addEventListener("submit", saveLoan)
-  }
-
-  var paymentForm = document.getElementById("paymentForm")
-  if (paymentForm) {
-    paymentForm.addEventListener("submit", savePayment)
-  }
-
-  var companyForm = document.getElementById("companyForm")
-  if (companyForm) {
-    companyForm.addEventListener("submit", saveCompanyInfo)
-  }
-
   var passwordForm = document.getElementById("passwordForm")
   if (passwordForm) {
     passwordForm.addEventListener("submit", changePassword)
   }
-
-  // Close mobile menu when clicking outside
-  document.addEventListener("click", function (e) {
-    var sidebar = document.getElementById("sidebar")
-    var toggle = document.querySelector(".mobile-menu-toggle")
-    var overlay = document.querySelector(".sidebar-overlay")
-
-    if (
-      sidebar &&
-      sidebar.classList.contains("active") &&
-      !sidebar.contains(e.target) &&
-      !toggle.contains(e.target)
-    ) {
-      closeMobileMenu()
-    }
-  })
+  
 })
+
     </script>
 </body>
 </html>
