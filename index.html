@@ -291,7 +291,6 @@
 
         /* Print Styles */
         @media print {
-            /* Mejorando estilos de impresión para lista de préstamos */
             .sidebar, .no-print, .mobile-menu-toggle, .logout-btn, .search-box, .btn, button {
                 display: none !important;
             }
@@ -304,7 +303,6 @@
                 visibility: hidden;
             }
             
-            /* Mostrar contenido de sección activa para impresión */
             .section.active,
             .section.active * {
                 visibility: visible;
@@ -375,7 +373,6 @@
                 print-color-adjust: exact;
             }
             
-            /* Impresión de lista de préstamos */
             .print-header {
                 text-align: center;
                 margin-bottom: 20px;
@@ -441,7 +438,6 @@
                 content: 'Salir';
             }
 
-            /* Stack stat cards on mobile */
             .stat-card {
                 margin-bottom: 15px;
             }
@@ -452,13 +448,11 @@
                 gap: 10px;
             }
 
-            /* Responsive buttons */
             .btn {
                 font-size: 0.875rem;
                 padding: 0.5rem 0.75rem;
             }
 
-            /* Modal adjustments */
             .modal-dialog {
                 margin: 0.5rem;
             }
@@ -467,7 +461,6 @@
                 padding: 1rem;
             }
 
-            /* Form adjustments */
             .form-label {
                 font-size: 0.875rem;
             }
@@ -476,22 +469,18 @@
                 font-size: 0.875rem;
             }
 
-            /* Card headers */
             .card-header h5 {
                 font-size: 1rem;
             }
 
-            /* Table font size */
             .table {
                 font-size: 0.875rem;
             }
 
-            /* Action buttons in tables */
             .table td:last-child {
                 white-space: nowrap;
             }
 
-            /* Flex wrap for action groups */
             .d-flex.justify-content-between {
                 flex-direction: column;
                 gap: 15px;
@@ -507,7 +496,6 @@
                 margin-bottom: 10px;
             }
 
-            /* Alert text */
             .alert {
                 font-size: 0.875rem;
             }
@@ -540,7 +528,6 @@
                 font-size: 0.75rem;
             }
 
-            /* Stack all buttons vertically */
             .text-end {
                 text-align: center !important;
             }
@@ -551,13 +538,11 @@
                 margin-bottom: 10px;
             }
 
-            /* Reduce table padding */
             .table td, .table th {
                 padding: 0.5rem 0.25rem;
                 font-size: 0.75rem;
             }
 
-            /* Hide less important columns on very small screens */
             .table .hide-mobile {
                 display: none;
             }
@@ -595,7 +580,6 @@
             }
         }
 
-        /* Utility Classes for Responsive */
         .mobile-only {
             display: none;
         }
@@ -609,15 +593,125 @@
             }
         }
 
-        /* Smooth Scrolling */
         html {
             scroll-behavior: smooth;
         }
 
-        /* Loading State */
         .loading {
             opacity: 0.6;
             pointer-events: none;
+        }
+        
+        /* Estilos para animaciones de alertas */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes bellRing {
+            0% { transform: rotate(0); }
+            10% { transform: rotate(10deg); }
+            20% { transform: rotate(-10deg); }
+            30% { transform: rotate(10deg); }
+            40% { transform: rotate(-10deg); }
+            50% { transform: rotate(0); }
+            100% { transform: rotate(0); }
+        }
+        
+        /* Estilos para la notificación de pagos vencidos */
+        .overdue-notification {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 2000;
+            font-weight: bold;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .overdue-notification button {
+            background: none;
+            border: none;
+            color: white;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        
+        /* Estilos para la tabla de pagos vencidos */
+        .table-danger {
+            background-color: rgba(220, 53, 69, 0.1) !important;
+        }
+        
+        .table-warning {
+            background-color: rgba(255, 193, 7, 0.1) !important;
+        }
+        
+        .table-light {
+            background-color: rgba(248, 249, 250, 0.1) !important;
+        }
+        
+        /* Estilos para icono de notificaciones */
+        .notification-icon {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            min-width: 18px;
+            text-align: center;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .notification-bell {
+            animation: bellRing 2s ease-in-out;
+        }
+        
+        /* Estilos para configuración de impresora */
+        .printer-status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .printer-connected {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+        
+        .printer-disconnected {
+            background-color: #fee2e2;
+            color: #7f1d1d;
+            border: 2px solid #ef4444;
+        }
+        
+        /* Estilos para formulario de mora */
+        .late-payment-form {
+            background-color: #fef3c7;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
         }
     </style>
 </head>
@@ -667,6 +761,10 @@
             <div class="logo">
                 <i class="fas fa-hand-holding-usd fa-3x mb-3"></i>
                 <h4 id="companyNameSidebar">Sistema de Préstamos</h4>
+                <div class="notification-icon mt-2">
+                    <i class="fas fa-bell fa-lg notification-bell" id="sidebarNotificationBell"></i>
+                    <span class="notification-badge" id="sidebarNotificationBadge" style="display: none;">0</span>
+                </div>
             </div>
             <nav class="nav flex-column">
                 <a class="nav-link active" href="#" onclick="showSection('dashboard'); closeMobileMenu(); return false;">
@@ -686,18 +784,19 @@
                 </a>
                 <a class="nav-link" href="#" onclick="showSection('overdue-payments'); closeMobileMenu(); return false;">
                     <i class="fas fa-exclamation-triangle"></i> <span>Pagos Vencidos</span>
+                    <span class="notification-badge" id="overdueNotificationBadge" style="display: none;">0</span>
                 </a>
                 <a class="nav-link" href="#" onclick="showSection('payment-history'); closeMobileMenu(); return false;">
                     <i class="fas fa-history"></i> <span>Historial de Pagos</span>
                 </a>
-                <!-- Eliminar el enlace de Pagos Pendientes -->
-                <!-- Sección de Pagos Pendientes eliminada según solicitud del usuario -->
-                <!-- Agregar enlace para Anular Pagos -->
                 <a class="nav-link" href="#" onclick="showSection('void-payments'); closeMobileMenu(); return false;">
                     <i class="fas fa-ban"></i> <span>Anular Pagos</span>
                 </a>
                 <a class="nav-link" href="#" onclick="showSection('reports'); closeMobileMenu(); return false;">
                     <i class="fas fa-chart-bar"></i> <span>Reportes</span>
+                </a>
+                <a class="nav-link" href="#" onclick="showSection('printer-settings'); closeMobileMenu(); return false;">
+                    <i class="fas fa-print"></i> <span>Configurar Impresora</span>
                 </a>
                 <a class="nav-link" href="#" onclick="showSection('settings'); closeMobileMenu(); return false;">
                     <i class="fas fa-cog"></i> <span>Administración</span>
@@ -733,7 +832,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Agregar tarjeta de Capital Prestado -->
                     <div class="col-12 col-sm-6 col-lg-4">
                         <div class="stat-card primary">
                             <div class="d-flex justify-content-between align-items-center">
@@ -745,7 +843,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Agregar tarjeta de Pagos al Día -->
                     <div class="col-12 col-sm-6 col-lg-4">
                         <div class="stat-card success">
                             <div class="d-flex justify-content-between align-items-center">
@@ -827,7 +924,6 @@
                                         <th>Cédula</th>
                                         <th>Teléfono</th>
                                         <th class="hide-mobile">Dirección</th>
-                                        <!-- Agregando columnas de ocupación y salario -->
                                         <th class="hide-mobile">Ocupación</th>
                                         <th class="hide-mobile">Salario</th>
                                         <th>Acciones</th>
@@ -880,7 +976,6 @@
                 </div>
             </div>
 
-            <!-- Nueva sección de préstamos finalizados -->
             <!-- Finished Loans Section -->
             <div id="finished-loans" class="section">
                 <h2 class="mb-4">Préstamos Finalizados</h2>
@@ -924,7 +1019,6 @@
                 </div>
             </div>
 
-            <!-- Nueva sección de pagos vencidos -->
             <!-- Overdue Payments Section -->
             <div id="overdue-payments" class="section">
                 <h2 class="mb-4">Pagos Vencidos</h2>
@@ -979,10 +1073,6 @@
                 </div>
             </div>
 
-            <!-- Eliminar sección de Pagos Pendientes completamente -->
-            <!-- Sección de Pagos Pendientes eliminada según solicitud del usuario -->
-
-            <!-- Agregar nueva sección de Anular Pagos -->
             <!-- Void Payments Section -->
             <div id="void-payments" class="section">
                 <h2 class="mb-4">Anular Pagos</h2>
@@ -1016,7 +1106,225 @@
                 </div>
             </div>
 
-            <!-- Agregar nueva sección de Reportes -->
+            <!-- Nueva sección de Configuración de Impresora -->
+            <div id="printer-settings" class="section">
+                <h2 class="mb-4">Configuración de Impresora Térmica</h2>
+                
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Conexión Bluetooth</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="printerStatus" class="printer-status printer-disconnected">
+                                    <i class="fas fa-times-circle me-2"></i>
+                                    Impresora no conectada
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre de la Impresora</label>
+                                    <input type="text" class="form-control" id="printerName" placeholder="Ej: BT-1234, POS-58, etc.">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Tamaño de Papel</label>
+                                    <select class="form-select" id="paperSize">
+                                        <option value="50mm">50mm (Estándar)</option>
+                                        <option value="80mm">80mm (Grande)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Fuente</label>
+                                    <select class="form-select" id="printerFont">
+                                        <option value="small">Pequeña (12px)</option>
+                                        <option value="medium" selected>Mediana (14px)</option>
+                                        <option value="large">Grande (16px)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-primary" onclick="connectToPrinter()">
+                                        <i class="fas fa-bluetooth me-2"></i>Buscar y Conectar Impresora
+                                    </button>
+                                    <button class="btn btn-success" onclick="testPrinter()">
+                                        <i class="fas fa-print me-2"></i>Probar Impresión
+                                    </button>
+                                    <button class="btn btn-warning" onclick="disconnectPrinter()">
+                                        <i class="fas fa-times me-2"></i>Desconectar Impresora
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-3">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">Configuración Avanzada</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Encabezado Personalizado</label>
+                                    <textarea class="form-control" id="customHeader" rows="3" placeholder="Texto personalizado para el encabezado del recibo..."></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Pie de Página</label>
+                                    <textarea class="form-control" id="customFooter" rows="2" placeholder="Texto personalizado para el pie de página..."></textarea>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="printLogo" checked>
+                                    <label class="form-check-label" for="printLogo">
+                                        Incluir logo en los recibos
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="printQR" checked>
+                                    <label class="form-check-label" for="printQR">
+                                        Incluir código QR en recibos
+                                    </label>
+                                </div>
+                                
+                                <button class="btn btn-info w-100" onclick="savePrinterSettings()">
+                                    <i class="fas fa-save me-2"></i>Guardar Configuración
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">Vista Previa de Impresión</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="printPreview" class="bg-light p-3 border rounded" style="font-family: 'Courier New', monospace; font-size: 12px;">
+                                    <div class="text-center mb-2">
+                                        <strong>VISTA PREVIA DEL RECIBO</strong>
+                                    </div>
+                                    <div class="text-center mb-2">
+                                        <small>================================</small>
+                                    </div>
+                                    <div class="text-center mb-2">
+                                        <strong>EMPRESA DE PRÉSTAMOS</strong><br>
+                                        <small>Calle Principal #123</small><br>
+                                        <small>Tel: (809) 123-4567</small><br>
+                                        <small>RNC: 123-45678-9</small>
+                                    </div>
+                                    <div class="text-center mb-2">
+                                        <small>================================</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small>Recibo No: PAY-1234567890</small><br>
+                                        <small>Fecha: 01/01/2024 10:30 AM</small><br>
+                                        <small>Cliente: Juan Pérez</small><br>
+                                        <small>Cédula: 001-1234567-8</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small>--------------------------------</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small>Préstamo: LOAN-123456</small><br>
+                                        <small>Tipo: Pago de Cuota</small><br>
+                                        <small>Método: Efectivo</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small>--------------------------------</small>
+                                    </div>
+                                    <div class="text-center mb-2">
+                                        <strong>MONTO PAGADO:</strong><br>
+                                        <strong>RD$ 1,000.00</strong>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small>--------------------------------</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small>Saldo Restante: RD$ 5,000.00</small><br>
+                                        <small>Próximo Pago: 01/02/2024</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small>--------------------------------</small>
+                                    </div>
+                                    <div class="text-center mb-2">
+                                        <small>¡Gracias por su pago!</small>
+                                    </div>
+                                    <div class="text-center">
+                                        <small>================================</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <h6>Información de la Impresora:</h6>
+                                    <ul class="list-group">
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>Estado:</span>
+                                            <span id="printerInfoStatus" class="badge bg-danger">Desconectada</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>Tamaño de Papel:</span>
+                                            <span id="printerInfoSize">50mm</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>Fuente:</span>
+                                            <span id="printerInfoFont">Mediana</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>Última Conexión:</span>
+                                            <span id="printerInfoLastConnect">Nunca</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-3">
+                            <div class="card-header bg-warning text-white">
+                                <h5 class="mb-0">Solución de Problemas</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="accordion" id="printerTroubleshooting">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#problem1">
+                                                La impresora no se conecta
+                                            </button>
+                                        </h2>
+                                        <div id="problem1" class="accordion-collapse collapse show" data-bs-parent="#printerTroubleshooting">
+                                            <div class="accordion-body">
+                                                <ol>
+                                                    <li>Asegúrate que la impresora esté encendida</li>
+                                                    <li>Verifica que el Bluetooth esté activado en ambos dispositivos</li>
+                                                    <li>Acerca la impresora al dispositivo (máximo 10 metros)</li>
+                                                    <li>Reinicia la impresora y vuelve a intentar</li>
+                                                </ol>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#problem2">
+                                                La impresión sale cortada
+                                            </button>
+                                        </h2>
+                                        <div id="problem2" class="accordion-collapse collapse" data-bs-parent="#printerTroubleshooting">
+                                            <div class="accordion-body">
+                                                <ul>
+                                                    <li>Verifica que el tamaño de papel seleccionado coincida con el rollo instalado</li>
+                                                    <li>Ajusta los márgenes en la configuración avanzada</li>
+                                                    <li>Reduce el tamaño de fuente si es necesario</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Reports Section -->
             <div id="reports" class="section">
                 <h2 class="mb-4">Reportes del Sistema</h2>
@@ -1042,7 +1350,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Se pueden agregar más tarjetas de reportes aquí si es necesario -->
                 </div>
             </div>
 
@@ -1051,7 +1358,6 @@
                 <h2 class="mb-4">Administración</h2>
                 <div class="row">
                     <div class="col-lg-6">
-                        <!-- Company Info Card -->
                         <div class="card">
                             <div class="card-header bg-primary text-white">
                                 <h5 class="mb-0">Información de la Empresa</h5>
@@ -1093,29 +1399,36 @@
                             </div>
                         </div>
                         
-                        <!-- Change Password Card -->
                         <div class="card mt-3">
                             <div class="card-header bg-warning">
-                                <h5 class="mb-0">Cambiar Contraseña</h5>
+                                <h5 class="mb-0">Configuración de Moras</h5>
                             </div>
                             <div class="card-body">
-                                <form id="passwordForm">
+                                <form id="lateFeeForm">
                                     <div class="mb-3">
-                                        <label class="form-label">Nueva Contraseña</label>
-                                        <input type="password" class="form-control" id="newPassword" required>
+                                        <label class="form-label">Tasa de Mora Diaria (%)</label>
+                                        <input type="number" class="form-control" id="dailyLateFee" step="0.01" min="0" value="1.0">
+                                        <small class="text-muted">Porcentaje de mora que se aplica por cada día de atraso</small>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Confirmar Contraseña</label>
-                                        <input type="password" class="form-control" id="confirmPassword" required>
+                                        <label class="form-label">Días de Gracia</label>
+                                        <input type="number" class="form-control" id="graceDays" min="0" value="3">
+                                        <small class="text-muted">Número de días después del vencimiento antes de aplicar mora</small>
                                     </div>
-                                    <button type="submit" class="btn btn-warning w-100">Cambiar Contraseña</button>
+                                    <div class="mb-3">
+                                        <label class="form-label">Mora Máxima (%)</label>
+                                        <input type="number" class="form-control" id="maxLateFee" step="0.01" min="0" value="30.0">
+                                        <small class="text-muted">Porcentaje máximo de mora que se puede aplicar</small>
+                                    </div>
+                                    <button type="button" class="btn btn-warning w-100" onclick="saveLateFeeSettings()">
+                                        <i class="fas fa-save me-2"></i>Guardar Configuración de Moras
+                                    </button>
                                 </form>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-lg-6">
-                        <!-- Theme Selection Card -->
                         <div class="card">
                             <div class="card-header bg-info text-white">
                                 <h5 class="mb-0">Personalización</h5>
@@ -1145,13 +1458,11 @@
                             </div>
                         </div>
 
-                        <!-- Reports Card -->
                         <div class="card mt-3">
                             <div class="card-header bg-success text-white">
                                 <h5 class="mb-0">Reportes</h5>
                             </div>
                             <div class="card-body">
-                                <!-- Agregando reportes diarios y quincenales -->
                                 <button class="btn btn-success w-100 mb-2" onclick="generateDailyReport()">
                                     <i class="fas fa-calendar-day me-2"></i>Reporte Diario
                                 </button>
@@ -1167,7 +1478,6 @@
                             </div>
                         </div>
 
-                        <!-- Contract Template Card -->
                         <div class="card mt-3">
                             <div class="card-header bg-primary text-white">
                                 <h5 class="mb-0">Plantilla de Contrato</h5>
@@ -1181,23 +1491,7 @@
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Editar Plantilla</label>
-                                        <textarea class="form-control" id="contractTemplate" rows="10" placeholder="Escriba o pegue aquí la plantilla del contrato...
-
-Variables disponibles:
-{COMPANY_NAME} - Nombre de la empresa
-{COMPANY_ADDRESS} - Dirección de la empresa
-{COMPANY_PHONE} - Teléfono de la empresa
-{COMPANY_RNC} - RNC de la empresa
-{CLIENT_NAME} - Nombre del cliente
-{CLIENT_CEDULA} - Cédula del cliente
-{CLIENT_ADDRESS} - Dirección del cliente
-{CLIENT_PHONE} - Teléfono del cliente
-{LOAN_AMOUNT} - Monto del préstamo
-{LOAN_INTEREST} - Tasa de interés
-{LOAN_TOTAL} - Total a pagar
-{LOAN_DATE} - Fecha del préstamo
-{LOAN_TERM} - Plazo del préstamo
-{INSTALLMENTS} - Número de cuotas"></textarea>
+                                        <textarea class="form-control" id="contractTemplate" rows="10" placeholder="Escriba o pegue aquí la plantilla del contrato..."></textarea>
                                     </div>
                                     <button type="button" class="btn btn-primary w-100 mb-2" onclick="saveContractTemplate()">
                                         <i class="fas fa-save me-2"></i>Guardar Plantilla
@@ -1209,7 +1503,6 @@ Variables disponibles:
                             </div>
                         </div>
 
-                        <!-- Data Management Card -->
                         <div class="card mt-3">
                             <div class="card-header bg-danger text-white">
                                 <h5 class="mb-0">Gestión de Datos</h5>
@@ -1258,7 +1551,6 @@ Variables disponibles:
                             <label class="form-label">Dirección *</label>
                             <textarea class="form-control" id="clientAddress" required></textarea>
                         </div>
-                        <!-- Agregando campos de ocupación y salario -->
                         <div class="mb-3">
                             <label class="form-label">Ocupación</label>
                             <input type="text" class="form-control" id="clientOccupation" placeholder="Ej: Comerciante, Empleado, etc.">
@@ -1277,8 +1569,7 @@ Variables disponibles:
         </div>
     </div>
 
-    <!-- Modal de préstamo mejorado con soporte para edición y plazo indefinido -->
-    <!-- Loan Modal -->
+    <!-- Loan Modal - Modificado para incluir fecha personalizada -->
     <div class="modal fade" id="loanModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
@@ -1313,6 +1604,16 @@ Variables disponibles:
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Tasa de Interés (%) *</label>
                                 <input type="number" class="form-control" id="loanInterestRate" required step="0.01" onchange="updateLoanPreview()">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha de Inicio *</label>
+                                <input type="date" class="form-control" id="loanStartDate" required>
+                                <small class="text-muted">Fecha en que se otorga el préstamo</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha de Primer Pago</label>
+                                <input type="date" class="form-control" id="firstPaymentDate">
+                                <small class="text-muted">Opcional: Si es diferente a la fecha de inicio</small>
                             </div>
                             <div class="col-md-6 mb-3" id="installmentsGroup" style="display:none;">
                                 <label class="form-label">Número de Cuotas *</label>
@@ -1360,7 +1661,7 @@ Variables disponibles:
         </div>
     </div>
 
-    <!-- Payment Modal -->
+    <!-- Payment Modal - Modificado para incluir mora -->
     <div class="modal fade" id="paymentModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
@@ -1378,9 +1679,24 @@ Variables disponibles:
                                 <option value="interest">Solo Interés</option>
                                 <option value="capital">Abono a Capital</option>
                                 <option value="payoff">Liquidación Total</option>
+                                <option value="late">Pago con Mora</option>
                             </select>
                             <small id="paymentTypeHelp" class="form-text text-muted"></small>
                         </div>
+                        
+                        <div id="lateFeeSection" class="late-payment-form" style="display: none;">
+                            <h6><i class="fas fa-exclamation-triangle me-2"></i>Información de Mora</h6>
+                            <div class="mb-2">
+                                <small>Días de atraso: <span id="lateDays">0</span> días</small><br>
+                                <small>Tasa de mora: <span id="lateFeeRate">0</span>% diario</small><br>
+                                <small>Mora calculada: RD$ <span id="calculatedLateFee">0.00</span></small>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Monto de Mora (RD$)</label>
+                                <input type="number" class="form-control" id="lateFeeAmount" step="0.01" min="0" value="0">
+                            </div>
+                        </div>
+                        
                         <div class="mb-3">
                             <label class="form-label">Monto (RD$) *</label>
                             <input type="number" class="form-control" id="paymentAmount" required step="0.01">
@@ -1392,6 +1708,7 @@ Variables disponibles:
                                 <option value="cash">Efectivo</option>
                                 <option value="transfer">Transferencia</option>
                                 <option value="check">Cheque</option>
+                                <option value="card">Tarjeta</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -1439,7 +1756,6 @@ Variables disponibles:
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" id="contractContent" style="white-space: pre-wrap; font-family: 'Times New Roman', serif;"></div>
-                <!-- Agregar botón de imprimir contrato en el footer -->
                 <div class="modal-footer no-print">
                     <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     <button class="btn btn-primary" onclick="printContract()">
@@ -1469,7 +1785,6 @@ Variables disponibles:
         </div>
     </div>
 
-    <!-- Nuevo modal para carta de saldo -->
     <!-- Clearance Letter Modal -->
     <div class="modal fade" id="clearanceLetterModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -1496,12 +1811,38 @@ var clients = []
 var loans = []
 var payments = []
 var companyInfo = {}
-var contractTemplate = "" // Added to store contract template
+var contractTemplate = ""
 var currentTheme = "theme-blue"
 var isAuthenticated = false
 var adminCredentials = {
   username: "admin",
   password: "admin123",
+}
+
+// Configuración de impresora
+var printerSettings = {
+    connected: false,
+    printerName: "",
+    paperSize: "50mm",
+    fontSize: "medium",
+    customHeader: "",
+    customFooter: "",
+    printLogo: true,
+    printQR: true,
+    lastConnected: null
+}
+
+// Configuración de moras
+var lateFeeSettings = {
+    dailyLateFee: 1.0,
+    graceDays: 3,
+    maxLateFee: 30.0
+}
+
+// Notificaciones
+var notifications = {
+    overdueCount: 0,
+    showSidebarBadge: true
 }
 
 // Mobile Menu Functions
@@ -1553,7 +1894,6 @@ function loadData() {
     companyInfo = {}
   }
   
-  // Load contract template from localStorage
   try {
     var contractData = localStorage.getItem("contractTemplate")
     contractTemplate = contractData || ""
@@ -1580,6 +1920,28 @@ function loadData() {
   } catch (e) {
     console.error("Error loading credentials:", e)
   }
+  
+  try {
+    var printerData = localStorage.getItem("printerSettings")
+    if (printerData) {
+      printerSettings = JSON.parse(printerData)
+      updatePrinterUI()
+    }
+  } catch (e) {
+    console.error("Error loading printer settings:", e)
+  }
+  
+  try {
+    var lateFeeData = localStorage.getItem("lateFeeSettings")
+    if (lateFeeData) {
+      lateFeeSettings = JSON.parse(lateFeeData)
+      document.getElementById("dailyLateFee").value = lateFeeSettings.dailyLateFee
+      document.getElementById("graceDays").value = lateFeeSettings.graceDays
+      document.getElementById("maxLateFee").value = lateFeeSettings.maxLateFee
+    }
+  } catch (e) {
+    console.error("Error loading late fee settings:", e)
+  }
 }
 
 function saveClients() {
@@ -1594,6 +1956,142 @@ function savePayments() {
   localStorage.setItem("payments", JSON.stringify(payments))
 }
 
+function savePrinterSettings() {
+  printerSettings.printerName = document.getElementById("printerName").value
+  printerSettings.paperSize = document.getElementById("paperSize").value
+  printerSettings.fontSize = document.getElementById("printerFont").value
+  printerSettings.customHeader = document.getElementById("customHeader").value
+  printerSettings.customFooter = document.getElementById("customFooter").value
+  printerSettings.printLogo = document.getElementById("printLogo").checked
+  printerSettings.printQR = document.getElementById("printQR").checked
+  
+  localStorage.setItem("printerSettings", JSON.stringify(printerSettings))
+  updatePrinterUI()
+  alert("Configuración de impresora guardada exitosamente")
+}
+
+function saveLateFeeSettings() {
+  lateFeeSettings.dailyLateFee = parseFloat(document.getElementById("dailyLateFee").value)
+  lateFeeSettings.graceDays = parseInt(document.getElementById("graceDays").value)
+  lateFeeSettings.maxLateFee = parseFloat(document.getElementById("maxLateFee").value)
+  
+  localStorage.setItem("lateFeeSettings", JSON.stringify(lateFeeSettings))
+  alert("Configuración de moras guardada exitosamente")
+}
+
+// Funciones para alertas y notificaciones
+function checkOverduePaymentsAlert() {
+    var today = new Date();
+    var hasOverdue = false;
+    var overdueDetails = [];
+
+    loans.filter(l => l.status === 'active').forEach(loan => {
+        if (!loan.nextPaymentDate || isNaN(new Date(loan.nextPaymentDate).getTime())) {
+            loan.nextPaymentDate = calculateNextPaymentDate(loan);
+        }
+        
+        var nextPaymentDate = new Date(loan.nextPaymentDate);
+        if (!isNaN(nextPaymentDate.getTime()) && nextPaymentDate < today && loan.remainingAmount > 0) {
+            hasOverdue = true;
+            var daysOverdue = Math.floor((today - nextPaymentDate) / (1000 * 60 * 60 * 24));
+            var client = clients.find(c => c.id === loan.clientId);
+            overdueDetails.push({
+                cliente: client ? client.firstName + " " + client.lastName : "N/A",
+                prestamo: loan.id,
+                dias: daysOverdue,
+                saldo: formatMoney(loan.remainingAmount)
+            });
+        }
+    });
+
+    // Actualizar contador de notificaciones
+    notifications.overdueCount = overdueDetails.length
+    updateNotificationBadges()
+
+    if (hasOverdue && notifications.showSidebarBadge) {
+        var message = "⚠️ ALERTA: PAGOS VENCIDOS ⚠️\n\n";
+        message += "Se encontraron " + overdueDetails.length + " préstamos con pagos vencidos:\n\n";
+        
+        overdueDetails.forEach((item, index) => {
+            message += (index + 1) + ". " + item.cliente + "\n";
+            message += "   Préstamo: " + item.prestamo + "\n";
+            message += "   Saldo: RD$ " + item.saldo + "\n";
+            message += "   Días vencido: " + item.dias + "\n";
+            message += "   -------------------------\n";
+        });
+        
+        message += "\nPor favor, tome acción inmediata.";
+        
+        // Solo mostrar alerta si estamos en la sección de pagos vencidos
+        var activeSection = document.querySelector('.section.active');
+        if (activeSection && activeSection.id === 'overdue-payments') {
+            alert(message);
+        }
+        
+        showOnScreenNotification(overdueDetails.length);
+    }
+}
+
+function showOnScreenNotification(count) {
+    var notification = document.createElement('div');
+    notification.id = 'overdue-notification';
+    notification.className = 'overdue-notification';
+    
+    notification.innerHTML = `
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <span>${count} préstamo(s) con pagos vencidos</span>
+        <button onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    var existing = document.getElementById('overdue-notification');
+    if (existing) existing.remove();
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+            notification.style.transform = 'translateX(100%)';
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                if (notification.parentNode) notification.remove();
+            }, 300);
+        }
+    }, 10000);
+}
+
+function updateNotificationBadges() {
+    // Actualizar badge en el sidebar
+    var sidebarBadge = document.getElementById('sidebarNotificationBadge');
+    var sidebarBell = document.getElementById('sidebarNotificationBell');
+    var overdueBadge = document.getElementById('overdueNotificationBadge');
+    
+    if (notifications.overdueCount > 0) {
+        sidebarBadge.textContent = notifications.overdueCount;
+        sidebarBadge.style.display = 'inline-block';
+        overdueBadge.textContent = notifications.overdueCount;
+        overdueBadge.style.display = 'inline-block';
+        
+        // Animar la campana
+        sidebarBell.classList.add('notification-bell');
+        setTimeout(() => {
+            sidebarBell.classList.remove('notification-bell');
+        }, 2000);
+    } else {
+        sidebarBadge.style.display = 'none';
+        overdueBadge.style.display = 'none';
+    }
+}
+
+function startPeriodicOverdueCheck() {
+    // Verificar cada 5 minutos si hay pagos vencidos
+    setInterval(() => {
+        checkOverduePaymentsAlert();
+    }, 300000); // 5 minutos
+}
+
 // Login Functions
 function login(e) {
   e.preventDefault()
@@ -1603,18 +2101,23 @@ function login(e) {
   
   if (username === adminCredentials.username && password === adminCredentials.password) {
     isAuthenticated = true
-    localStorage.setItem("isLoggedIn", "true") // Set flag for auto-login
+    localStorage.setItem("isLoggedIn", "true")
     document.getElementById("loginScreen").style.display = "none"
     document.getElementById("appContainer").classList.add("active")
     loadData()
     renderClients()
     renderLoans()
     renderPaymentHistory()
-    renderVoidPayments() // Render void payments table
+    renderVoidPayments()
     renderOverduePayments()
     renderFinishedLoans()
     updateDashboard()
     loadCompanyInfo()
+    updatePrinterUI()
+    
+    // Verificar notificaciones inmediatamente
+    checkOverduePaymentsAlert()
+    startPeriodicOverdueCheck()
   } else {
     document.getElementById("loginError").textContent = "Usuario o contraseña incorrectos"
     document.getElementById("loginError").style.display = "block"
@@ -1623,7 +2126,7 @@ function login(e) {
 
 function logout() {
   isAuthenticated = false
-  localStorage.removeItem("isLoggedIn") // Remove auto-login flag
+  localStorage.removeItem("isLoggedIn")
   document.getElementById("loginScreen").style.display = "flex"
   document.getElementById("appContainer").classList.remove("active")
   document.getElementById("loginUsername").value = ""
@@ -1633,30 +2136,25 @@ function logout() {
 
 // Navigation Functions
 function showSection(sectionId) {
-  // Ocultar todas las secciones
   var sections = document.querySelectorAll(".section")
   sections.forEach(function (section) {
     section.classList.remove("active")
   })
 
-  // Mostrar la sección seleccionada
   var activeSection = document.getElementById(sectionId)
   if (activeSection) {
     activeSection.classList.add("active")
   }
 
-  // Actualizar enlaces activos en el menú
   var navLinks = document.querySelectorAll(".sidebar .nav-link")
   navLinks.forEach(function (link) {
     link.classList.remove("active")
   })
-  // Activar el enlace correspondiente en el menú lateral
   var activeLink = document.querySelector(`.sidebar .nav-link[onclick*="'${sectionId}'"]`)
   if (activeLink) {
     activeLink.classList.add("active")
   }
 
-  // Renderizar contenido según la sección
   switch (sectionId) {
     case "dashboard":
       updateDashboard()
@@ -1671,23 +2169,26 @@ function showSection(sectionId) {
       renderFinishedLoans()
       break
     case "payments":
-      // No action needed, search handled by user input
       break
     case "overdue-payments":
       renderOverduePayments()
+      setTimeout(() => {
+        checkOverduePaymentsAlert();
+      }, 500);
       break
     case "payment-history":
       renderPaymentHistory()
       break
-    case "void-payments": // Llamar a renderVoidPayments para la nueva sección
+    case "void-payments":
       renderVoidPayments()
       break
-    case "reports":
-      // Reports are generated on button click
+    case "printer-settings":
+      updatePrinterUI()
       break
-    case "settings": // Renombrar "administration" a "settings"
+    case "reports":
+      break
+    case "settings":
       loadCompanyInfo()
-      loadAdminCredentials()
       if (contractTemplate && document.getElementById("contractTemplate")) {
         document.getElementById("contractTemplate").value = contractTemplate
       }
@@ -1716,7 +2217,6 @@ function updateDashboard() {
   var overdueAmount = 0
   var today = new Date()
   loans.filter(l => l.status === 'active').forEach(loan => {
-    // Ensure nextPaymentDate is valid before comparison
     var nextPaymentDateCalc = calculateNextPaymentDate(loan);
     var nextPaymentDate = new Date(nextPaymentDateCalc);
 
@@ -1736,13 +2236,14 @@ function updateDashboard() {
     var nextPaymentCalc = calculateNextPaymentDate(loan)
     var nextPaymentDate = new Date(nextPaymentCalc)
 
-    // A loan is considered "al día" if its next payment date is today or in the future,
-    // OR if the loan has already been fully paid off (remainingAmount is 0 or very close to it).
     if ((!isNaN(nextPaymentDate.getTime()) && nextPaymentDate >= today) || loan.remainingAmount <= 0.01) {
       pagosAlDia++
     }
   })
   document.getElementById("pagosAlDia").textContent = pagosAlDia
+  
+  // Actualizar notificaciones
+  checkOverduePaymentsAlert()
 }
 
 // Client Functions
@@ -1759,7 +2260,6 @@ function openClientModal(clientId = null) {
       document.getElementById("clientCedula").value = client.cedula
       document.getElementById("clientPhone").value = client.phone
       document.getElementById("clientAddress").value = client.address
-      // Agregando campos de ocupación y salario al modal
       document.getElementById("clientOccupation").value = client.occupation || ""
       document.getElementById("clientSalary").value = client.salary || 0
       document.querySelector("#clientModal .modal-title").textContent = "Editar Cliente"
@@ -1771,7 +2271,6 @@ function openClientModal(clientId = null) {
   modal.show()
 }
 
-// Modificando editClient para que llame a openClientModal
 function editClient(clientId) {
   openClientModal(clientId)
 }
@@ -1807,7 +2306,6 @@ function saveClient(e) {
   renderClients()
   updateDashboard()
   
-  // Limpiar formulario
   document.getElementById("clientForm").reset()
   document.getElementById("clientId").value = ""
 }
@@ -1860,7 +2358,6 @@ function searchClients() {
 
 function deleteClient(clientId) {
   if (confirm("¿Está seguro de eliminar este cliente?")) {
-    // Check if client has active loans
     var hasActiveLoans = loans.some(loan => loan.clientId === clientId && loan.status === 'active');
     if (hasActiveLoans) {
         alert("No se puede eliminar este cliente porque tiene préstamos activos.");
@@ -1874,11 +2371,16 @@ function deleteClient(clientId) {
   }
 }
 
-// Loan Functions
+// Loan Functions - Modificado para incluir fecha
 function openLoanModal(loanId = null) {
   var modal = new bootstrap.Modal(document.getElementById("loanModal"))
   document.getElementById("loanForm").reset()
   document.getElementById("editMode").value = loanId ? "true" : "false"
+  
+  // Establecer fecha por defecto a hoy
+  var today = new Date().toISOString().split('T')[0]
+  document.getElementById("loanStartDate").value = today
+  document.getElementById("firstPaymentDate").value = ""
 
   var clientSelect = document.getElementById("loanClient")
   clientSelect.innerHTML = '<option value="">Seleccionar cliente...</option>'
@@ -1899,6 +2401,8 @@ function openLoanModal(loanId = null) {
       document.getElementById("loanType").value = loan.type
       document.getElementById("loanInterestRate").value = loan.interestRate
       document.getElementById("loanNotes").value = loan.notes || ""
+      document.getElementById("loanStartDate").value = loan.startDate ? loan.startDate.split('T')[0] : today
+      document.getElementById("firstPaymentDate").value = loan.firstPaymentDate ? loan.firstPaymentDate.split('T')[0] : ""
       
       toggleLoanType()
       
@@ -1967,6 +2471,11 @@ function updateLoanPreview() {
   preview += "Capital: RD$ " + formatMoney(amount) + "<br>"
   preview += "Interés Total: RD$ " + formatMoney(totalInterest) + "<br>"
   preview += "Monto Total a Pagar: RD$ " + formatMoney(totalAmount) + "<br>"
+  
+  var startDate = document.getElementById("loanStartDate").value
+  if (startDate) {
+    preview += "Fecha de Inicio: " + formatDate(startDate) + "<br>"
+  }
 
   if (type === "fixed") {
     var installments = Number.parseInt(document.getElementById("loanInstallments").value) || 0
@@ -1999,12 +2508,22 @@ function saveLoan(e) {
   var loanId = document.getElementById("loanId").value
   var editMode = document.getElementById("editMode").value === "true"
   
+  var startDate = document.getElementById("loanStartDate").value
+  var firstPaymentDate = document.getElementById("firstPaymentDate").value
+  
+  if (!startDate) {
+    alert("Por favor, seleccione una fecha de inicio para el préstamo")
+    return
+  }
+  
   var loanData = {
     id: loanId || "LOAN-" + Date.now(),
     clientId: document.getElementById("loanClient").value,
     amount: Number.parseFloat(document.getElementById("loanAmount").value),
     type: document.getElementById("loanType").value,
     interestRate: Number.parseFloat(document.getElementById("loanInterestRate").value),
+    startDate: startDate + "T00:00:00",
+    firstPaymentDate: firstPaymentDate ? firstPaymentDate + "T00:00:00" : null,
     notes: document.getElementById("loanNotes").value,
     createdAt: new Date().toISOString(),
     status: "active",
@@ -2020,13 +2539,11 @@ function saveLoan(e) {
       loanData.remainingAmount = loanData.totalAmount - loanData.totalPaid
       loanData.createdAt = existingLoan.createdAt
       loanData.status = existingLoan.status
-      loanData.startDate = existingLoan.startDate
       loanData.paidOffDate = existingLoan.paidOffDate
     }
   } else {
     loanData.totalPaid = 0
     loanData.remainingAmount = loanData.totalAmount
-    loanData.startDate = new Date().toISOString()
   }
 
   if (loanData.type === "fixed") {
@@ -2064,10 +2581,8 @@ function saveLoan(e) {
   updateDashboard()
 
   if (!editMode) {
-    // Generar factura del préstamo
     generateLoanInvoice(loanData.id)
     
-    // Preguntar si desea generar e imprimir el contrato
     setTimeout(() => {
       if (confirm("¿Desea generar e imprimir el contrato para este préstamo?")) {
         generateAndPrintContract(loanData.id)
@@ -2085,7 +2600,7 @@ function deleteLoan(loanId) {
     renderLoans()
     renderFinishedLoans()
     renderPaymentHistory()
-    renderVoidPayments() // Update void payments table after deletion
+    renderVoidPayments()
     renderOverduePayments()
     updateDashboard()
     alert("Préstamo eliminado exitosamente")
@@ -2129,7 +2644,7 @@ function renderLoans() {
       loan.interestRate +
       "%</td>" +
       '<td class="hide-mobile">' +
-      formatDate(loan.createdAt) +
+      formatDate(loan.startDate) +
       "</td>" +
       "<td>" +
       statusBadge +
@@ -2234,6 +2749,7 @@ function viewLoanDetails(loanId) {
   details += "Monto Total: RD$ " + formatMoney(loan.totalAmount) + "\n"
   details += "Monto Pagado: RD$ " + formatMoney(loan.totalPaid) + "\n"
   details += "Saldo Restante: RD$ " + formatMoney(loan.remainingAmount) + "\n"
+  details += "Fecha de Inicio: " + formatDate(loan.startDate) + "\n"
 
   if (loan.type === "fixed") {
     details += "\nTipo: Plazo Definido\n"
@@ -2255,6 +2771,9 @@ function viewLoanDetails(loanId) {
   } else {
     loanPayments.forEach((payment, index) => {
       details += "\n" + (index + 1) + ". " + formatDate(payment.date) + " - RD$ " + formatMoney(payment.amount)
+      if (payment.type === "late") {
+        details += " (Incluye mora: RD$ " + formatMoney(payment.lateFee || 0) + ")"
+      }
     })
   }
 
@@ -2284,7 +2803,7 @@ function viewFinishedLoanDetails(loanId) {
   details += "Monto: RD$ " + formatMoney(loan.amount) + "\n"
   details += "Interés: " + loan.interestRate + "%\n"
   details += "Monto Total Pagado: RD$ " + formatMoney(loan.totalAmount) + "\n"
-  details += "Fecha de Creación: " + formatDate(loan.createdAt) + "\n"
+  details += "Fecha de Inicio: " + formatDate(loan.startDate) + "\n"
   details += "Fecha de Finalización: " + (loan.finishedAt ? formatDate(loan.finishedAt) : "N/A") + "\n\n"
   details += "=== HISTORIAL DE PAGOS ===\n"
   
@@ -2293,6 +2812,9 @@ function viewFinishedLoanDetails(loanId) {
     details += "   Monto: RD$ " + formatMoney(payment.amount) + "\n"
     details += "   Tipo: " + getPaymentTypeLabel(payment.type) + "\n"
     details += "   Método: " + getPaymentMethodLabel(payment.method) + "\n"
+    if (payment.lateFee && payment.lateFee > 0) {
+      details += "   Mora: RD$ " + formatMoney(payment.lateFee) + "\n"
+    }
     if (payment.notes) {
       details += "   Notas: " + payment.notes + "\n"
     }
@@ -2301,7 +2823,7 @@ function viewFinishedLoanDetails(loanId) {
   alert(details)
 }
 
-// Payment Functions
+// Payment Functions - Modificado para incluir mora
 function openPaymentModal(loanId) {
   var loan = loans.find((l) => l.id === loanId)
   if (!loan) return
@@ -2314,6 +2836,9 @@ function openPaymentModal(loanId) {
   var modal = new bootstrap.Modal(document.getElementById("paymentModal"))
   document.getElementById("paymentForm").reset()
   document.getElementById("paymentLoanId").value = loanId
+  
+  // Ocultar sección de mora inicialmente
+  document.getElementById("lateFeeSection").style.display = "none"
   
   updatePaymentAmount()
   modal.show()
@@ -2328,6 +2853,12 @@ function updatePaymentAmount() {
   var amountInput = document.getElementById("paymentAmount")
   var typeHelp = document.getElementById("paymentTypeHelp")
   var amountHelp = document.getElementById("paymentAmountHelp")
+  
+  var lateFeeSection = document.getElementById("lateFeeSection")
+  var lateDaysElement = document.getElementById("lateDays")
+  var lateFeeRateElement = document.getElementById("lateFeeRate")
+  var calculatedLateFeeElement = document.getElementById("calculatedLateFee")
+  var lateFeeAmountInput = document.getElementById("lateFeeAmount")
 
   var suggestedAmount = 0
 
@@ -2339,23 +2870,64 @@ function updatePaymentAmount() {
         suggestedAmount = loan.dailyPayment
       }
       typeHelp.textContent = "Pago regular según el plan del préstamo"
+      lateFeeSection.style.display = "none"
       break
     case "interest":
       suggestedAmount = loan.amount * (loan.interestRate / 100)
       typeHelp.textContent = "Solo paga el interés, el capital permanece igual"
+      lateFeeSection.style.display = "none"
       break
     case "capital":
       suggestedAmount = 0
       typeHelp.textContent = "Abono directo al capital del préstamo"
+      lateFeeSection.style.display = "none"
       break
     case "payoff":
       suggestedAmount = loan.remainingAmount
       typeHelp.textContent = "Paga el saldo total restante"
+      lateFeeSection.style.display = "none"
+      break
+    case "late":
+      // Mostrar sección de mora
+      lateFeeSection.style.display = "block"
+      
+      // Calcular días de atraso
+      var today = new Date()
+      var nextPaymentDate = new Date(loan.nextPaymentDate || calculateNextPaymentDate(loan))
+      var daysLate = Math.max(0, Math.floor((today - nextPaymentDate) / (1000 * 60 * 60 * 24)) - lateFeeSettings.graceDays)
+      
+      // Calcular mora
+      var dailyFee = (loan.remainingAmount * lateFeeSettings.dailyLateFee) / 100
+      var calculatedLateFee = Math.min(dailyFee * daysLate, (loan.remainingAmount * lateFeeSettings.maxLateFee) / 100)
+      
+      // Mostrar información
+      lateDaysElement.textContent = daysLate
+      lateFeeRateElement.textContent = lateFeeSettings.dailyLateFee
+      calculatedLateFeeElement.textContent = formatMoney(calculatedLateFee)
+      lateFeeAmountInput.value = calculatedLateFee.toFixed(2)
+      
+      // Sugerir monto de cuota + mora
+      if (loan.type === "fixed" || loan.type === "indefinite") {
+        suggestedAmount = (loan.installmentAmount || (loan.totalAmount / (loan.installments || 1))) + calculatedLateFee
+      } else if (loan.type === "daily") {
+        suggestedAmount = loan.dailyPayment + calculatedLateFee
+      }
+      typeHelp.textContent = "Pago de cuota con mora aplicada por días de atraso"
       break
   }
 
   amountInput.value = suggestedAmount.toFixed(2)
   amountHelp.textContent = "Saldo restante: RD$ " + formatMoney(loan.remainingAmount)
+}
+
+function calculateLateFee(loan, daysLate) {
+  if (daysLate <= lateFeeSettings.graceDays) return 0
+  
+  var dailyFee = (loan.remainingAmount * lateFeeSettings.dailyLateFee) / 100
+  var calculatedFee = dailyFee * (daysLate - lateFeeSettings.graceDays)
+  var maxFee = (loan.remainingAmount * lateFeeSettings.maxLateFee) / 100
+  
+  return Math.min(calculatedFee, maxFee)
 }
 
 function savePayment(e) {
@@ -2370,15 +2942,33 @@ function savePayment(e) {
     return
   }
 
+  var paymentType = document.getElementById("paymentType").value
+  var paymentAmount = Number.parseFloat(document.getElementById("paymentAmount").value)
+  var lateFeeAmount = 0
+
+  if (paymentType === "late") {
+    lateFeeAmount = Number.parseFloat(document.getElementById("lateFeeAmount").value) || 0
+    if (lateFeeAmount < 0) {
+      alert("El monto de mora no puede ser negativo")
+      return
+    }
+  }
+
   var paymentData = {
     id: "PAY-" + Date.now(),
     loanId: loanId,
     clientId: loan.clientId,
-    amount: Number.parseFloat(document.getElementById("paymentAmount").value),
-    type: document.getElementById("paymentType").value,
+    amount: paymentAmount,
+    type: paymentType,
     method: document.getElementById("paymentMethod").value,
     notes: document.getElementById("paymentNotes").value,
     date: new Date().toISOString(),
+  }
+
+  // Agregar mora si corresponde
+  if (paymentType === "late" && lateFeeAmount > 0) {
+    paymentData.lateFee = lateFeeAmount
+    paymentData.principalAmount = paymentAmount - lateFeeAmount
   }
 
   // Actualizar campos del préstamo
@@ -2394,18 +2984,18 @@ function savePayment(e) {
   }
 
   var wasOverdue = false
-  var nextPaymentDateCalc = calculateNextPaymentDate(loan) // Calculate based on current loan data
+  var nextPaymentDateCalc = calculateNextPaymentDate(loan)
   if (loan.status === 'active') {
       if (new Date(nextPaymentDateCalc) < new Date()) {
           wasOverdue = true
       }
   }
 
-  if (loan.remainingAmount <= 0.01) { // Pequeño margen para errores de redondeo
+  if (loan.remainingAmount <= 0.01) {
     loan.status = "paid"
     loan.remainingAmount = 0
     loan.finishedAt = new Date().toISOString()
-    loan.paidOffDate = new Date().toISOString() // Set paidOffDate for reporting
+    loan.paidOffDate = new Date().toISOString()
     
     payments.push(paymentData)
     savePayments()
@@ -2418,7 +3008,7 @@ function savePayment(e) {
     renderLoans()
     renderFinishedLoans()
     renderPaymentHistory()
-    renderVoidPayments() // Update void payments table
+    renderVoidPayments()
     renderOverduePayments()
     updateDashboard()
 
@@ -2426,7 +3016,6 @@ function savePayment(e) {
       generateInvoice(paymentData.id)
     }
     
-    // Generar carta de saldo
     setTimeout(() => {
       generateClearanceLetter(loanId)
     }, 500)
@@ -2440,13 +3029,15 @@ function savePayment(e) {
 
   bootstrap.Modal.getInstance(document.getElementById("paymentModal")).hide()
   
-  if (wasOverdue) {
+  if (wasOverdue && paymentType !== "late") {
     alert("Pago registrado exitosamente. El préstamo ha sido puesto al día.")
+  } else if (paymentType === "late") {
+    alert("Pago con mora registrado exitosamente.")
   }
   
   renderLoans()
   renderPaymentHistory()
-  renderVoidPayments() // Update void payments table
+  renderVoidPayments()
   renderOverduePayments()
   updateDashboard()
 
@@ -2485,6 +3076,7 @@ function renderPaymentHistory() {
       "</td>" +
       "<td>RD$ " +
       formatMoney(payment.amount) +
+      (payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : "") +
       "</td>" +
       '<td class="hide-mobile">' +
       getPaymentTypeLabel(payment.type) +
@@ -2506,124 +3098,82 @@ function renderPaymentHistory() {
 }
 
 function renderOverduePayments() {
-  var tbody = document.getElementById("overduePaymentsTable")
-  if (!tbody) return
+    var tbody = document.getElementById("overduePaymentsTable");
+    if (!tbody) return;
 
-  tbody.innerHTML = ""
+    tbody.innerHTML = "";
 
-  var overdueLoans = []
-  var today = new Date()
+    var overdueLoans = [];
+    var today = new Date();
 
-  loans.filter(l => l.status === 'active').forEach(loan => {
-    // Ensure nextPaymentDate exists and is a valid date
-    if (!loan.nextPaymentDate || isNaN(new Date(loan.nextPaymentDate).getTime())) {
-        loan.nextPaymentDate = calculateNextPaymentDate(loan) // Recalculate if missing or invalid
-    }
-    
-    var nextPaymentDate = new Date(loan.nextPaymentDate)
-    if (!isNaN(nextPaymentDate.getTime()) && nextPaymentDate < today && loan.remainingAmount > 0) {
-      var daysOverdue = Math.floor((today - nextPaymentDate) / (1000 * 60 * 60 * 24))
-      overdueLoans.push({
-        loan: loan,
-        daysOverdue: daysOverdue,
-        nextPaymentDate: loan.nextPaymentDate
-      })
-    }
-  })
+    loans.filter(l => l.status === 'active').forEach(loan => {
+        if (!loan.nextPaymentDate || isNaN(new Date(loan.nextPaymentDate).getTime())) {
+            loan.nextPaymentDate = calculateNextPaymentDate(loan);
+        }
+        
+        var nextPaymentDate = new Date(loan.nextPaymentDate);
+        if (!isNaN(nextPaymentDate.getTime()) && nextPaymentDate < today && loan.remainingAmount > 0) {
+            var daysOverdue = Math.floor((today - nextPaymentDate) / (1000 * 60 * 60 * 24));
+            var lateFee = calculateLateFee(loan, daysOverdue);
+            overdueLoans.push({
+                loan: loan,
+                daysOverdue: daysOverdue,
+                nextPaymentDate: loan.nextPaymentDate,
+                lateFee: lateFee
+            });
+        }
+    });
 
-  if (overdueLoans.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay pagos vencidos</td></tr>'
-    return
-  }
-
-  // Ordenar por días vencidos (más vencidos primero)
-  overdueLoans.sort((a, b) => b.daysOverdue - a.daysOverdue)
-
-  overdueLoans.forEach(item => {
-    var loan = item.loan
-    var client = clients.find(c => c.id === loan.clientId)
-    var clientName = client ? client.firstName + " " + client.lastName : "N/A"
-
-    var row =
-      "<tr class='table-danger'>" +
-      "<td>" +
-      clientName +
-      "</td>" +
-      "<td>" +
-      loan.id +
-      "</td>" +
-      "<td>RD$ " +
-      formatMoney(loan.remainingAmount) +
-      "</td>" +
-      '<td class="hide-mobile">' +
-      item.daysOverdue +
-      " días</td>" +
-      '<td class="hide-mobile">' +
-      formatDate(item.nextPaymentDate) +
-      "</td>" +
-      "<td>" +
-      '<button class="btn btn-sm btn-danger" onclick="openPaymentModal(\'' +
-      loan.id +
-      '\')"><i class="fas fa-dollar-sign"></i> Pagar Ahora</button>' +
-      "</td>" +
-      "</tr>"
-    tbody.innerHTML += row
-  })
-}
-
-function renderPendingPayments() {
-  var tbody = document.getElementById("pendingPaymentsTable")
-  if (!tbody) return
-
-  tbody.innerHTML = ""
-
-  var activeLoans = loans.filter((l) => l.status === "active")
-
-  if (activeLoans.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay pagos pendientes</td></tr>'
-    return
-  }
-
-  activeLoans.forEach((loan) => {
-    var client = clients.find((c) => c.id === loan.clientId)
-    var clientName = client ? client.firstName + " " + client.lastName : "N/A"
-
-    // Ensure nextPaymentDate is calculated
-    if (!loan.nextPaymentDate || isNaN(new Date(loan.nextPaymentDate).getTime())) {
-        loan.nextPaymentDate = calculateNextPaymentDate(loan)
+    if (overdueLoans.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay pagos vencidos</td></tr>';
+        return;
     }
 
-    var nextPaymentDate = loan.nextPaymentDate
-    var isOverdue = new Date(nextPaymentDate) < new Date()
-    var statusBadge = isOverdue
-      ? '<span class="badge badge-overdue">Vencido</span>'
-      : '<span class="badge badge-pending">Pendiente</span>'
+    overdueLoans.sort((a, b) => b.daysOverdue - a.daysOverdue);
 
-    var row =
-      "<tr>" +
-      "<td>" +
-      clientName +
-      "</td>" +
-      "<td>" +
-      loan.id +
-      "</td>" +
-      "<td>RD$ " +
-      formatMoney(loan.remainingAmount) +
-      "</td>" +
-      '<td class="hide-mobile">' +
-      formatDate(nextPaymentDate) +
-      "</td>" +
-      "<td>" +
-      statusBadge +
-      "</td>" +
-      "<td>" +
-      '<button class="btn btn-sm btn-success" onclick="openPaymentModal(\'' +
-      loan.id +
-      '\')"><i class="fas fa-dollar-sign"></i> Pagar</button>' +
-      "</td>" +
-      "</tr>"
-    tbody.innerHTML += row
-  })
+    overdueLoans.forEach(item => {
+        var loan = item.loan;
+        var client = clients.find(c => c.id === loan.clientId);
+        var clientName = client ? client.firstName + " " + client.lastName : "N/A";
+
+        var urgencyClass = "";
+        if (item.daysOverdue > 30) {
+            urgencyClass = "table-danger";
+        } else if (item.daysOverdue > 15) {
+            urgencyClass = "table-warning";
+        } else {
+            urgencyClass = "table-light";
+        }
+
+        var row =
+            "<tr class='" + urgencyClass + "'>" +
+            "<td>" +
+            clientName +
+            "</td>" +
+            "<td>" +
+            loan.id +
+            "</td>" +
+            "<td>RD$ " +
+            formatMoney(loan.remainingAmount) +
+            (item.lateFee > 0 ? "<br><small class='text-danger'>+ Mora: RD$ " + formatMoney(item.lateFee) + "</small>" : "") +
+            "</td>" +
+            '<td class="hide-mobile">' +
+            '<span class="badge bg-danger">' + item.daysOverdue + " días</span>" +
+            "</td>" +
+            '<td class="hide-mobile">' +
+            formatDate(item.nextPaymentDate) +
+            "</td>" +
+            "<td>" +
+            '<button class="btn btn-sm btn-danger me-1" onclick="openPaymentModal(\'' +
+            loan.id +
+            '\')"><i class="fas fa-dollar-sign"></i> Pagar</button>' +
+            '<button class="btn btn-sm btn-warning" onclick="viewLoanDetails(\'' +
+            loan.id +
+            '\')"><i class="fas fa-eye"></i></button>' +
+            "</td>" +
+            "</tr>";
+        tbody.innerHTML += row;
+    });
 }
 
 function searchClientForPayment() {
@@ -2676,6 +3226,13 @@ function searchClientForPayment() {
     } else {
       html += '<h6>Préstamos Activos:</h6><ul class="list-group">'
       clientLoans.forEach((loan) => {
+        // Verificar si está vencido
+        var today = new Date();
+        var nextPaymentDate = new Date(loan.nextPaymentDate || calculateNextPaymentDate(loan));
+        var isOverdue = nextPaymentDate < today;
+        var daysOverdue = isOverdue ? Math.floor((today - nextPaymentDate) / (1000 * 60 * 60 * 24)) : 0;
+        var lateFee = calculateLateFee(loan, daysOverdue);
+        
         html +=
           '<li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">' +
           "<div>" +
@@ -2684,10 +3241,12 @@ function searchClientForPayment() {
           "</strong>" +
           " - Saldo: RD$ " +
           formatMoney(loan.remainingAmount) +
+          (isOverdue ? '<br><span class="badge bg-danger">Vencido: ' + daysOverdue + ' días</span>' : '') +
+          (lateFee > 0 ? '<br><small class="text-danger">Mora acumulada: RD$ ' + formatMoney(lateFee) + '</small>' : '') +
           "</div>" +
-          '<button class="btn btn-sm btn-success mt-2 mt-md-0" onclick="openPaymentModal(\'' +
+          '<button class="btn btn-sm ' + (isOverdue ? 'btn-danger' : 'btn-success') + ' mt-2 mt-md-0" onclick="openPaymentModal(\'' +
           loan.id +
-          '\')"><i class="fas fa-dollar-sign me-1"></i>Pagar</button>' +
+          '\')"><i class="fas fa-dollar-sign me-1"></i>' + (isOverdue ? 'Pagar con Mora' : 'Pagar') + '</button>' +
           "</li>"
       })
       html += "</ul>"
@@ -2704,11 +3263,11 @@ function calculateNextPaymentDate(loan) {
     .filter((p) => p.loanId === loan.id)
     .sort((a, b) => new Date(b.date) - new Date(a.date))[0]
 
-  // Use loan.startDate if no payments exist, otherwise use the date of the last payment.
-  var baseDate = lastPayment ? new Date(lastPayment.date) : new Date(loan.startDate || loan.createdAt)
+  var baseDate = lastPayment ? new Date(lastPayment.date) : 
+                 (loan.firstPaymentDate ? new Date(loan.firstPaymentDate) : new Date(loan.startDate))
   var nextDate = new Date(baseDate)
 
-  var frequency = loan.frequency || "monthly" // Default to monthly if not specified
+  var frequency = loan.frequency || "monthly"
 
   switch (frequency) {
     case "weekly":
@@ -2725,14 +3284,8 @@ function calculateNextPaymentDate(loan) {
       break
   }
 
-  // If the loan type is 'fixed', ensure the calculated date aligns with the installments logic.
-  // For example, if the loan has a specific number of installments, the date calculation might need adjustments.
-  // However, for basic functionality, adding the frequency interval is generally sufficient.
-
-  // Ensure the date is returned in a consistent format, like ISO string, for comparison.
   return nextDate.toISOString()
 }
-
 
 function generateClearanceLetter(loanId) {
   var loan = loans.find(l => l.id === loanId)
@@ -2784,7 +3337,7 @@ function generateClearanceLetter(loanId) {
   html += '<li>• Monto del Préstamo: <strong>RD$ ' + formatMoney(loan.amount) + '</strong></li>'
   html += '<li>• Tasa de Interés: <strong>' + loan.interestRate + '%</strong></li>'
   html += '<li>• Monto Total Pagado: <strong>RD$ ' + formatMoney(loan.totalAmount) + '</strong></li>'
-  html += '<li>• Fecha de Otorgamiento: <strong>' + formatDate(loan.createdAt) + '</strong></li>'
+  html += '<li>• Fecha de Otorgamiento: <strong>' + formatDate(loan.startDate) + '</strong></li>'
   html += '<li>• Fecha de Liquidación: <strong>' + formatDate(finishDate.toISOString()) + '</strong></li>'
   html += '<li>• Tipo de Préstamo: <strong>' + getLoanTypeLabel(loan.type) + '</strong></li>'
   html += '</ul>'
@@ -2905,7 +3458,7 @@ Entre {COMPANY_NAME}, RNC: {COMPANY_RNC}, con domicilio en {COMPANY_ADDRESS}, te
 
 PRIMERA: EL PRESTAMISTA otorga a EL PRESTATARIO un préstamo por la suma de {LOAN_AMOUNT} pesos dominicanos.
 
-SEGUNDA: El préstamo devengará un interés del {LOAN_INTEREST} sobre el capital prestado.
+SEGUNDA: El préstamo devengará un interés del {LOAN_INTEREST}% sobre el capital prestado.
 
 TERCERA: El monto total a pagar será de {LOAN_TOTAL} pesos dominicanos.
 
@@ -2951,20 +3504,15 @@ function generateAndPrintContract(loanId) {
   contract = contract.replace(/\{CLIENT_ADDRESS\}/g, client.address)
   contract = contract.replace(/\{CLIENT_PHONE\}/g, client.phone)
   contract = contract.replace(/\{LOAN_AMOUNT\}/g, loan.amount.toLocaleString("es-DO", { style: "currency", currency: "DOP" }))
-  contract = contract.replace(/\{LOAN_INTEREST\}/g, loan.interestRate + "%") // Corrected placeholder to LOAN_INTEREST
+  contract = contract.replace(/\{LOAN_INTEREST\}/g, loan.interestRate)
   contract = contract.replace(/\{LOAN_TOTAL\}/g, loan.totalAmount.toLocaleString("es-DO", { style: "currency", currency: "DOP" }))
-  // Use loan.startDate for loan date if available, otherwise createdAt
-  contract = contract.replace(/\{LOAN_DATE\}/g, formatDate(loan.startDate || loan.createdAt)) 
-  // Dynamically set LOAN_TERM and INSTALLMENTS based on loan type
+  contract = contract.replace(/\{LOAN_DATE\}/g, formatDate(loan.startDate || loan.createdAt))
   if (loan.type === "fixed") {
     contract = contract.replace(/\{LOAN_TERM\}/g, `${loan.installments} cuotas ${loan.frequency}`)
-    contract = contract.replace(/\{INSTALLMENTS\}/g, loan.installments)
   } else if (loan.type === "daily") {
     contract = contract.replace(/\{LOAN_TERM\}/g, `${loan.days} días`)
-    contract = contract.replace(/\{INSTALLMENTS\}/g, loan.days)
-  } else { // indefinite
+  } else {
     contract = contract.replace(/\{LOAN_TERM\}/g, `Indefinido (${loan.frequency})`)
-    contract = contract.replace(/\{INSTALLMENTS\}/g, "N/A")
   }
 
   document.getElementById("contractContent").innerHTML = contract
@@ -2998,15 +3546,301 @@ function generateContract(loanId) {
   contract = contract.replace(/\{CLIENT_ADDRESS\}/g, client.address)
   contract = contract.replace(/\{CLIENT_PHONE\}/g, client.phone)
   contract = contract.replace(/\{LOAN_AMOUNT\}/g, loan.amount.toLocaleString("es-DO", { style: "currency", currency: "DOP" }))
-  contract = contract.replace(/\{LOAN_INTEREST\}/g, loan.interestRate + "%")
+  contract = contract.replace(/\{LOAN_INTEREST\}/g, loan.interestRate)
   contract = contract.replace(/\{LOAN_TOTAL\}/g, loan.totalAmount.toLocaleString("es-DO", { style: "currency", currency: "DOP" }))
   contract = contract.replace(/\{LOAN_DATE\}/g, formatDate(loan.startDate || loan.createdAt))
   contract = contract.replace(/\{LOAN_TERM\}/g, loan.type === "fixed" ? loan.installments + " cuotas" : (loan.type === "daily" ? loan.days + " días" : "Indefinido"))
-  contract = contract.replace(/\{INSTALLMENTS\}/g, loan.type === "fixed" ? loan.installments : (loan.type === "daily" ? loan.days : "N/A"))
 
   document.getElementById("contractContent").innerHTML = contract
   var modal = new bootstrap.Modal(document.getElementById("contractModal"))
   modal.show()
+}
+
+// Funciones de impresora térmica
+function updatePrinterUI() {
+  // Actualizar estado de la impresora
+  var printerStatus = document.getElementById("printerStatus")
+  var printerInfoStatus = document.getElementById("printerInfoStatus")
+  var printerInfoSize = document.getElementById("printerInfoSize")
+  var printerInfoFont = document.getElementById("printerInfoFont")
+  var printerInfoLastConnect = document.getElementById("printerInfoLastConnect")
+  
+  if (printerSettings.connected) {
+    printerStatus.className = "printer-status printer-connected"
+    printerStatus.innerHTML = '<i class="fas fa-check-circle me-2"></i>Impresora conectada: ' + printerSettings.printerName
+    printerInfoStatus.className = "badge bg-success"
+    printerInfoStatus.textContent = "Conectada"
+  } else {
+    printerStatus.className = "printer-status printer-disconnected"
+    printerStatus.innerHTML = '<i class="fas fa-times-circle me-2"></i>Impresora no conectada'
+    printerInfoStatus.className = "badge bg-danger"
+    printerInfoStatus.textContent = "Desconectada"
+  }
+  
+  // Actualizar configuración en la UI
+  document.getElementById("printerName").value = printerSettings.printerName
+  document.getElementById("paperSize").value = printerSettings.paperSize
+  document.getElementById("printerFont").value = printerSettings.fontSize
+  document.getElementById("customHeader").value = printerSettings.customHeader
+  document.getElementById("customFooter").value = printerSettings.customFooter
+  document.getElementById("printLogo").checked = printerSettings.printLogo
+  document.getElementById("printQR").checked = printerSettings.printQR
+  
+  // Actualizar información
+  printerInfoSize.textContent = printerSettings.paperSize === "50mm" ? "50mm (Estándar)" : "80mm (Grande)"
+  
+  var fontLabels = {
+    "small": "Pequeña",
+    "medium": "Mediana",
+    "large": "Grande"
+  }
+  printerInfoFont.textContent = fontLabels[printerSettings.fontSize] || "Mediana"
+  
+  if (printerSettings.lastConnected) {
+    printerInfoLastConnect.textContent = formatDate(printerSettings.lastConnected)
+  } else {
+    printerInfoLastConnect.textContent = "Nunca"
+  }
+}
+
+function connectToPrinter() {
+  // Simulación de conexión Bluetooth
+  // En un entorno real, aquí se usaría la Web Bluetooth API
+  var printerName = document.getElementById("printerName").value
+  
+  if (!printerName) {
+    alert("Por favor, ingrese un nombre para la impresora")
+    return
+  }
+  
+  // Simular búsqueda de dispositivos Bluetooth
+  if (confirm("Buscando impresoras Bluetooth...\n\n¿Desea simular la conexión con '" + printerName + "'?\n\n(En un entorno real, esto abriría el selector de dispositivos Bluetooth)")) {
+    printerSettings.connected = true
+    printerSettings.printerName = printerName
+    printerSettings.lastConnected = new Date().toISOString()
+    savePrinterSettings()
+    
+    alert("Impresora '" + printerName + "' conectada exitosamente")
+    updatePrinterUI()
+  }
+}
+
+function disconnectPrinter() {
+  if (!printerSettings.connected) {
+    alert("No hay ninguna impresora conectada")
+    return
+  }
+  
+  if (confirm("¿Desea desconectar la impresora '" + printerSettings.printerName + "'?")) {
+    printerSettings.connected = false
+    savePrinterSettings()
+    alert("Impresora desconectada")
+    updatePrinterUI()
+  }
+}
+
+function testPrinter() {
+  if (!printerSettings.connected) {
+    alert("Por favor, conecte una impresora primero")
+    return
+  }
+  
+  // Generar recibo de prueba
+  var testReceipt = generateThermalReceipt(null, true)
+  
+  // Mostrar vista previa
+  var printWindow = window.open("", "_blank", "width=350,height=600")
+  printWindow.document.write("<html><head><title>Prueba de Impresión</title>")
+  printWindow.document.write("<style>")
+  printWindow.document.write("@page { size: " + printerSettings.paperSize + " auto; margin: 0; }")
+  printWindow.document.write("body { font-family: 'Courier New', Courier, monospace; font-size: " + 
+    (printerSettings.fontSize === "small" ? "10px" : 
+     printerSettings.fontSize === "large" ? "14px" : "12px") + 
+    "; margin: 0; padding: 5mm; width: " + 
+    (printerSettings.paperSize === "50mm" ? "45mm" : "75mm") + "; }")
+  printWindow.document.write("pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }")
+  printWindow.document.write("</style></head><body>")
+  printWindow.document.write("<pre>" + testReceipt + "</pre>")
+  printWindow.document.write("</body></html>")
+  printWindow.document.close()
+  
+  // Preguntar si desea imprimir
+  if (confirm("Se ha generado una vista previa del recibo de prueba.\n\n¿Desea imprimir ahora?")) {
+    setTimeout(() => {
+      printWindow.print()
+      printWindow.close()
+    }, 500)
+  }
+}
+
+function generateThermalReceipt(paymentId, isTest = false) {
+  var payment, loan, client
+  
+  if (isTest) {
+    // Datos de prueba
+    payment = {
+      id: "PAY-TEST-123",
+      date: new Date().toISOString(),
+      amount: 1000.00,
+      type: "installment",
+      method: "cash",
+      notes: "Pago de prueba"
+    }
+    loan = {
+      id: "LOAN-TEST-456",
+      remainingAmount: 5000.00,
+      nextPaymentDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+    }
+    client = {
+      firstName: "Juan",
+      lastName: "Pérez",
+      cedula: "001-1234567-8"
+    }
+  } else {
+    payment = payments.find((p) => p.id === paymentId)
+    if (!payment) return ""
+    
+    loan = loans.find((l) => l.id === payment.loanId)
+    client = clients.find((c) => c.id === payment.clientId)
+  }
+  
+  var companyName = companyInfo.name || "Sistema de Préstamos"
+  var address = companyInfo.address || ""
+  var phone = companyInfo.phone || ""
+  var rnc = companyInfo.rnc || ""
+  
+  var receipt = ""
+  
+  // Encabezado personalizado si existe
+  if (printerSettings.customHeader) {
+    receipt += printerSettings.customHeader + "\n"
+  }
+  
+  receipt += "================================\n"
+  receipt += centerText(companyName, printerSettings.paperSize === "50mm" ? 32 : 48) + "\n"
+  if (address) receipt += centerText(address, printerSettings.paperSize === "50mm" ? 32 : 48) + "\n"
+  if (phone) receipt += centerText("Tel: " + phone, printerSettings.paperSize === "50mm" ? 32 : 48) + "\n"
+  if (rnc) receipt += centerText("RNC: " + rnc, printerSettings.paperSize === "50mm" ? 32 : 48) + "\n"
+  receipt += "================================\n\n"
+  receipt += centerText("RECIBO DE PAGO", printerSettings.paperSize === "50mm" ? 32 : 48) + "\n\n"
+  receipt += "Recibo No: " + payment.id + "\n"
+  receipt += "Fecha: " + formatDate(payment.date) + "\n"
+  receipt += "Hora: " + new Date(payment.date).toLocaleTimeString('es-DO', {hour: '2-digit', minute: '2-digit'}) + "\n"
+  receipt += "--------------------------------\n"
+  receipt += "Cliente: " + (client ? client.firstName + " " + client.lastName : "N/A") + "\n"
+  receipt += "Cedula: " + (client ? client.cedula : "N/A") + "\n"
+  receipt += "--------------------------------\n"
+  receipt += "Prestamo: " + payment.loanId + "\n"
+  receipt += "Tipo: " + getPaymentTypeLabel(payment.type) + "\n"
+  receipt += "Metodo: " + getPaymentMethodLabel(payment.method) + "\n"
+  receipt += "--------------------------------\n"
+  
+  if (payment.lateFee && payment.lateFee > 0) {
+    receipt += "Monto Cuota: RD$ " + formatMoney(payment.amount - payment.lateFee) + "\n"
+    receipt += "Mora: RD$ " + formatMoney(payment.lateFee) + "\n"
+    receipt += "--------------------------------\n"
+  }
+  
+  receipt += "MONTO PAGADO:\n"
+  receipt += centerText("RD$ " + formatMoney(payment.amount), printerSettings.paperSize === "50mm" ? 32 : 48) + "\n"
+  receipt += "--------------------------------\n"
+  
+  if (loan) {
+    receipt += "Saldo Restante:\n"
+    receipt += centerText("RD$ " + formatMoney(loan.remainingAmount), printerSettings.paperSize === "50mm" ? 32 : 48) + "\n"
+    if (loan.nextPaymentDate) {
+      receipt += "Proximo Pago:\n"
+      receipt += centerText(formatDate(loan.nextPaymentDate), printerSettings.paperSize === "50mm" ? 32 : 48) + "\n"
+    }
+    receipt += "--------------------------------\n"
+  }
+  
+  if (payment.notes) {
+    receipt += "\nNotas: " + payment.notes + "\n"
+    receipt += "--------------------------------\n"
+  }
+  
+  // Pie de página personalizado si existe
+  if (printerSettings.customFooter) {
+    receipt += "\n" + printerSettings.customFooter + "\n"
+  }
+  
+  receipt += "\n" + centerText("¡Gracias por su pago!", printerSettings.paperSize === "50mm" ? 32 : 48) + "\n"
+  
+  // Código QR en modo prueba
+  if (printerSettings.printQR && isTest) {
+    receipt += "--------------------------------\n"
+    receipt += centerText("[CÓDIGO QR]", printerSettings.paperSize === "50mm" ? 32 : 48) + "\n"
+    receipt += centerText("ID: " + payment.id, printerSettings.paperSize === "50mm" ? 32 : 48) + "\n"
+  }
+  
+  receipt += "================================\n\n\n\n"
+  
+  return receipt
+}
+
+function centerText(text, width) {
+  if (text.length >= width) return text
+  var padding = Math.floor((width - text.length) / 2)
+  return " ".repeat(padding) + text + " ".repeat(width - text.length - padding)
+}
+
+function printThermal() {
+  var invoiceContentDiv = document.getElementById("invoiceContent");
+  if (!invoiceContentDiv) {
+    alert("No se encontró el contenido de la factura.");
+    return;
+  }
+  
+  if (!printerSettings.connected) {
+    alert("No hay impresora conectada. Por favor, configure una impresora primero.")
+    return;
+  }
+  
+  var invoiceText = invoiceContentDiv.innerText;
+  var paymentIdMatch = invoiceText.match(/Recibo No:\s*(PAY-\d+)/);
+  
+  if (!paymentIdMatch || !paymentIdMatch[1]) {
+    alert("No se pudo identificar el ID del pago para imprimir el recibo térmico.");
+    return;
+  }
+  
+  var paymentId = paymentIdMatch[1];
+  var thermalContent = generateThermalReceipt(paymentId)
+  
+  if (!thermalContent) {
+    alert("No se pudo generar el recibo")
+    return
+  }
+  
+  var printWindow = window.open("", "_blank", "width=350,height=600")
+  printWindow.document.write("<html><head><title>Impresión Térmica</title>")
+  printWindow.document.write("<style>")
+  printWindow.document.write("@page { size: " + printerSettings.paperSize + " auto; margin: 0; }")
+  printWindow.document.write("body { font-family: 'Courier New', Courier, monospace; font-size: " + 
+    (printerSettings.fontSize === "small" ? "10px" : 
+     printerSettings.fontSize === "large" ? "14px" : "12px") + 
+    "; margin: 0; padding: 5mm; width: " + 
+    (printerSettings.paperSize === "50mm" ? "45mm" : "75mm") + "; }")
+  printWindow.document.write("pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }")
+  printWindow.document.write("@media print {")
+  printWindow.document.write("  @page { size: " + printerSettings.paperSize + " auto; margin: 0mm; }")
+  printWindow.document.write("}")
+  printWindow.document.write("</style></head><body>")
+  
+  if (companyInfo.logoBase64 && printerSettings.printLogo) {
+    printWindow.document.write('<div style="text-align: center; margin-bottom: 10px;">')
+    printWindow.document.write('<img src="' + companyInfo.logoBase64 + '" style="max-width: 100px; max-height: 40px;">')
+    printWindow.document.write('</div>')
+  }
+  
+  printWindow.document.write("<pre>" + thermalContent + "</pre>")
+  printWindow.document.write("</body></html>")
+  printWindow.document.close()
+  
+  setTimeout(function() {
+    printWindow.print()
+  }, 500)
 }
 
 function renderVoidPayments() {
@@ -3020,7 +3854,6 @@ function renderVoidPayments() {
     return
   }
 
-  // Ordenar pagos por fecha descendente (más recientes primero)
   var sortedPayments = [...payments].sort((a, b) => new Date(b.date) - new Date(a.date))
 
   sortedPayments.forEach((payment) => {
@@ -3032,7 +3865,8 @@ function renderVoidPayments() {
       "<td>" + payment.id + "</td>" +
       "<td>" + (client ? client.firstName + " " + client.lastName : "N/A") + "</td>" +
       "<td>" + payment.loanId + "</td>" +
-      "<td>RD$ " + formatMoney(payment.amount) + "</td>" +
+      "<td>RD$ " + formatMoney(payment.amount) +
+      (payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : "") + "</td>" +
       '<td class="hide-mobile">' + formatDate(payment.date) + "</td>" +
       '<td class="hide-mobile">' + getPaymentMethodLabel(payment.method) + "</td>" +
       "<td>" +
@@ -3077,11 +3911,9 @@ function voidPayment(paymentId) {
     return
   }
 
-  // Reintegrar el monto al préstamo
   loan.totalPaid -= payment.amount
   loan.remainingAmount += payment.amount
 
-  // Ajustar contadores según el tipo de préstamo
   if (loan.type === "fixed") {
     loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1)
   } else if (loan.type === "indefinite") {
@@ -3090,16 +3922,13 @@ function voidPayment(paymentId) {
     loan.paidDays = Math.max(0, (loan.paidDays || 0) - 1)
   }
 
-  // Si el préstamo estaba marcado como pagado, reactivarlo
   if (loan.status === "paid") {
     loan.status = "active"
     delete loan.finishedAt
     delete loan.paidOffDate
-    // Recalculate nextPaymentDate when reactivating
     loan.nextPaymentDate = calculateNextPaymentDate(loan);
   }
 
-  // Eliminar el pago de la lista
   payments = payments.filter((p) => p.id !== paymentId)
 
   savePayments()
@@ -3126,10 +3955,9 @@ function generateLoanInvoice(loanId) {
   var phone = companyInfo.phone || ""
   var rnc = companyInfo.rnc || ""
   
-  // Calcular fecha final según el tipo de préstamo
   var fechaFinal = ""
   if (loan.type === "fixed") {
-    var diasPorFrecuencia = { 'weekly': 7, 'biweekly': 14, 'monthly': 30 } // Approximate days per frequency
+    var diasPorFrecuencia = { 'weekly': 7, 'biweekly': 14, 'monthly': 30 }
     var dias = (diasPorFrecuencia[loan.frequency] || 30) * loan.installments
     var fechaFinalDate = new Date(loan.startDate)
     fechaFinalDate.setDate(fechaFinalDate.getDate() + dias)
@@ -3138,7 +3966,7 @@ function generateLoanInvoice(loanId) {
     var fechaFinalDate = new Date(loan.startDate)
     fechaFinalDate.setDate(fechaFinalDate.getDate() + loan.days)
     fechaFinal = formatDate(fechaFinalDate.toISOString())
-  } else { // indefinite
+  } else {
     fechaFinal = "Indefinido"
   }
   
@@ -3161,7 +3989,7 @@ function generateLoanInvoice(loanId) {
     "<tr><th>Cliente:</th><td>" + client.firstName + " " + client.lastName + "</td></tr>" +
     "<tr><th>Cédula:</th><td>" + client.cedula + "</td></tr>" +
     "<tr><th>Teléfono:</th><td>" + client.phone + "</td></tr>" +
-    "<tr><th>Fecha Inicial:</th><td>" + formatDate(loan.startDate) + "</td></tr>" +
+    "<tr><th>Fecha de Inicio:</th><td>" + formatDate(loan.startDate) + "</td></tr>" +
     "<tr><th>Fecha Final Estimada:</th><td>" + fechaFinal + "</td></tr>" +
     "<tr><th>Cantidad Prestada:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.amount) + "</strong></td></tr>" +
     "<tr><th>Tasa de Interés:</th><td>" + loan.interestRate + "%</td></tr>" +
@@ -3174,7 +4002,7 @@ function generateLoanInvoice(loanId) {
   } else if (loan.type === "daily") {
     html += "<tr><th>Días:</th><td>" + loan.days + "</td></tr>" +
             "<tr><th>Pago Diario:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.dailyPayment) + "</strong></td></tr>"
-  } else { // indefinite
+  } else {
     html += "<tr><th>Tipo:</th><td>Pago Indefinido</td></tr>" +
             "<tr><th>Frecuencia:</th><td>" + loan.frequency.charAt(0).toUpperCase() + loan.frequency.slice(1) + "</td></tr>"
   }
@@ -3190,14 +4018,12 @@ function generateLoanInvoice(loanId) {
 
 // Utility Functions
 function formatMoney(amount) {
-  // Use localeCompare for more robust formatting, though toFixed(2) and replace might suffice for simple cases
   return Number.parseFloat(amount).toLocaleString("es-DO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
 function formatDate(dateString) {
   if (!dateString) return "N/A"
   var date = new Date(dateString)
-  // Check if date is valid
   if (isNaN(date.getTime())) return "Fecha inválida"
 
   var day = String(date.getDate()).padStart(2, "0")
@@ -3221,6 +4047,7 @@ function getPaymentTypeLabel(type) {
     interest: "Solo Interés",
     capital: "Abono a Capital",
     payoff: "Liquidación Total",
+    late: "Pago con Mora",
   }
   return labels[type] || type
 }
@@ -3230,6 +4057,7 @@ function getPaymentMethodLabel(method) {
     cash: "Efectivo",
     transfer: "Transferencia",
     check: "Cheque",
+    card: "Tarjeta",
   }
   return labels[method] || method
 }
@@ -3264,7 +4092,7 @@ function getMonthName(month) {
 function clearAllData() {
   if (
     confirm(
-      "¿Está seguro de eliminar TODOS los datos? Esta acción no se puede deshacer.\n\nEsto eliminará:\n- Todos los clientes\n- Todos los préstamos\n- Todos los pagos\n- Información de la empresa\n\n¿Desea continuar?"
+      "¿Está seguro de eliminar TODOS los datos? Esta acción no se puede deshacer.\n\nEsto eliminará:\n- Todos los clientes\n- Todos los préstamos\n- Todos los pagos\n- Información de la empresa\n- Configuración de impresora\n\n¿Desea continuar?"
     )
   ) {
     if (confirm("ÚLTIMA ADVERTENCIA: ¿Realmente desea eliminar todos los datos?")) {
@@ -3273,145 +4101,34 @@ function clearAllData() {
       loans = []
       payments = []
       companyInfo = {}
-      contractTemplate = "" // Reset contract template as well
+      contractTemplate = ""
+      printerSettings = {
+        connected: false,
+        printerName: "",
+        paperSize: "50mm",
+        fontSize: "medium",
+        customHeader: "",
+        customFooter: "",
+        printLogo: true,
+        printQR: true,
+        lastConnected: null
+      }
       
       renderClients()
       renderLoans()
       renderFinishedLoans()
       renderPaymentHistory()
-      renderVoidPayments() // Clear void payments table
+      renderVoidPayments()
       renderOverduePayments()
       updateDashboard()
-      loadCompanyInfo() // Reset company info form
-      document.getElementById("companyNameSidebar").textContent = "Sistema de Préstamos" // Reset sidebar company name
+      loadCompanyInfo()
+      updatePrinterUI()
+      document.getElementById("companyNameSidebar").textContent = "Sistema de Préstamos"
       
       alert("Todos los datos han sido eliminados")
-      // Optionally force a logout or reload the page
-      logout(); 
+      logout();
     }
   }
-}
-
-function generateThermalReceipt(paymentId) {
-  var payment = payments.find((p) => p.id === paymentId)
-  if (!payment) return ""
-
-  var loan = loans.find((l) => l.id === payment.loanId)
-  var client = clients.find((c) => c.id === payment.clientId)
-  
-  var companyName = companyInfo.name || "Sistema de Préstamos"
-  var address = companyInfo.address || ""
-  var phone = companyInfo.phone || ""
-  var rnc = companyInfo.rnc || ""
-  
-  var receipt = ""
-  receipt += "================================\n"
-  receipt += centerText(companyName, 32) + "\n"
-  if (address) receipt += centerText(address, 32) + "\n"
-  if (phone) receipt += centerText("Tel: " + phone, 32) + "\n"
-  if (rnc) receipt += centerText("RNC: " + rnc, 32) + "\n"
-  receipt += "================================\n\n"
-  receipt += centerText("RECIBO DE PAGO", 32) + "\n\n"
-  receipt += "Recibo No: " + payment.id + "\n"
-  receipt += "Fecha: " + formatDate(payment.date) + "\n"
-  receipt += "--------------------------------\n"
-  receipt += "Cliente: " + (client ? client.firstName + " " + client.lastName : "N/A") + "\n"
-  receipt += "Cedula: " + (client ? client.cedula : "N/A") + "\n"
-  receipt += "Telefono: " + (client ? client.phone : "N/A") + "\n"
-  receipt += "--------------------------------\n"
-  receipt += "Prestamo: " + payment.loanId + "\n"
-  receipt += "Tipo: " + getPaymentTypeLabel(payment.type) + "\n"
-  receipt += "Metodo: " + getPaymentMethodLabel(payment.method) + "\n"
-  receipt += "--------------------------------\n"
-  receipt += "MONTO PAGADO:\n"
-  receipt += centerText("RD$ " + formatMoney(payment.amount), 32) + "\n"
-  receipt += "--------------------------------\n"
-  
-  if (loan) {
-    receipt += "Saldo Restante:\n"
-    receipt += centerText("RD$ " + formatMoney(loan.remainingAmount), 32) + "\n"
-    receipt += "--------------------------------\n"
-  }
-  
-  if (payment.notes) {
-    receipt += "\nNotas: " + payment.notes + "\n"
-  }
-  
-  receipt += "\n" + centerText("Gracias por su pago!", 32) + "\n"
-  receipt += "================================\n\n\n\n"
-  
-  return receipt
-}
-
-function centerText(text, width) {
-  if (text.length >= width) return text
-  var padding = Math.floor((width - text.length) / 2)
-  return " ".repeat(padding) + text + " ".repeat(width - text.length - padding) // Ensure total width
-}
-
-function printThermal() {
-  var invoiceContentDiv = document.getElementById("invoiceContent");
-  if (!invoiceContentDiv) {
-    alert("No se encontró el contenido de la factura.");
-    return;
-  }
-  
-  // Try to extract payment ID from the invoice content. This is brittle.
-  // A more robust way would be to pass the payment ID directly when showing the modal or function.
-  var invoiceText = invoiceContentDiv.innerText;
-  var paymentIdMatch = invoiceText.match(/Recibo No:\s*(PAY-\d+)/); // Assuming format "Recibo No: PAY-1234567890"
-  
-  if (!paymentIdMatch || !paymentIdMatch[1]) {
-    // Fallback: try to find it in the modal's hidden input if it exists
-    var hiddenPaymentId = document.getElementById("paymentLoanId")?.value;
-    if (!hiddenPaymentId) {
-      alert("No se pudo identificar el ID del pago para imprimir el recibo térmico.");
-      return;
-    }
-    printThermalReceipt(hiddenPaymentId);
-    return;
-  }
-  
-  var paymentId = paymentIdMatch[1];
-  printThermalReceipt(paymentId);
-}
-
-function printThermalReceipt(paymentId) {
-  var thermalContent = generateThermalReceipt(paymentId)
-  
-  if (!thermalContent) {
-    alert("No se pudo generar el recibo")
-    return
-  }
-  
-  var printWindow = window.open("", "_blank", "width=300,height=600")
-  printWindow.document.write("<html><head><title>Recibo Termico</title>")
-  printWindow.document.write("<style>")
-  printWindow.document.write("@page { size: 80mm auto; margin: 0; }") // Standard thermal printer paper size
-  printWindow.document.write("body { font-family: 'Courier New', Courier, monospace; font-size: 12px; margin: 0; padding: 5mm; width: 70mm; }") // Slightly smaller width for content within margins
-  printWindow.document.write("pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }")
-  printWindow.document.write("@media print {")
-  printWindow.document.write("  body { width: 80mm; }") // Set body width for print
-  printWindow.document.write("  @page { size: 80mm auto; margin: 0mm; }") // Ensure page margins are zero for printing
-  printWindow.document.write("}")
-  printWindow.document.write("</style></head><body>")
-  
-  if (companyInfo.logoBase64) {
-    printWindow.document.write('<div style="text-align: center; margin-bottom: 10px;">')
-    printWindow.document.write('<img src="' + companyInfo.logoBase64 + '" style="max-width: 150px; max-height: 60px;">')
-    printWindow.document.write('</div>')
-  }
-  
-  printWindow.document.write("<pre>" + thermalContent + "</pre>")
-  printWindow.document.write("</body></html>")
-  printWindow.document.close()
-  
-  setTimeout(function() {
-    printWindow.print()
-    // It's good practice to close the window after printing is initiated,
-    // but the user might want to cancel, so a slight delay is good.
-    // printWindow.close(); 
-  }, 250)
 }
 
 // Event Listeners
@@ -3446,7 +4163,6 @@ window.addEventListener("DOMContentLoaded", () => {
     passwordForm.addEventListener("submit", changePassword)
   }
 
-  // Close mobile menu when clicking outside
   document.addEventListener("click", function (e) {
     var sidebar = document.getElementById("sidebar")
     var toggle = document.querySelector(".mobile-menu-toggle")
@@ -3457,7 +4173,7 @@ window.addEventListener("DOMContentLoaded", () => {
       sidebar.classList.contains("active") &&
       !sidebar.contains(e.target) &&
       !toggle.contains(e.target) &&
-      !overlay.contains(e.target) // Also check overlay to prevent closing on overlay click
+      !overlay.contains(e.target)
     ) {
       closeMobileMenu()
     }
@@ -3466,26 +4182,26 @@ window.addEventListener("DOMContentLoaded", () => {
 
 // Initial load and check for saved login state
 document.addEventListener("DOMContentLoaded", () => {
-  loadData(); // Load all data first
+  loadData();
 
-  // Check for login persistence
   if (localStorage.getItem("isLoggedIn") === "true") {
     isAuthenticated = true;
     document.getElementById("loginScreen").style.display = "none";
     document.getElementById("appContainer").classList.add("active");
     
-    // Render initial data
     updateDashboard();
     renderClients();
     renderLoans();
     renderFinishedLoans();
     renderPaymentHistory();
-    renderVoidPayments(); // Render the void payments table
+    renderVoidPayments();
     renderOverduePayments();
     loadCompanyInfo();
+    updatePrinterUI();
     
-    // Set the initial active link in the sidebar
-    showSection('dashboard'); 
+    showSection('dashboard');
+    
+    startPeriodicOverdueCheck();
   } else {
     document.getElementById("loginScreen").style.display = "flex";
     document.getElementById("appContainer").classList.remove("active");
@@ -3536,6 +4252,9 @@ function generateInvoice(paymentId) {
     "<tr><th>Fecha:</th><td>" +
     formatDate(payment.date) +
     "</td></tr>" +
+    "<tr><th>Hora:</th><td>" +
+    new Date(payment.date).toLocaleTimeString('es-DO', {hour: '2-digit', minute: '2-digit'}) +
+    "</td></tr>" +
     "<tr><th>Cliente:</th><td>" +
     (client ? client.firstName + " " + client.lastName : "N/A") +
     "</td></tr>" +
@@ -3557,6 +4276,13 @@ function generateInvoice(paymentId) {
     '<tr><th class="text-end">Monto Pagado:</th><td class="text-end"><strong>RD$ ' +
     formatMoney(payment.amount) +
     "</strong></td></tr>"
+
+  if (payment.lateFee && payment.lateFee > 0) {
+    html +=
+      '<tr><th class="text-end">Incluye Mora:</th><td class="text-end text-danger">RD$ ' +
+      formatMoney(payment.lateFee) +
+      "</td></tr>"
+  }
 
   if (loan) {
     html +=
@@ -3651,6 +4377,7 @@ function generateDailyReport() {
         (loan ? loan.interestRate + "%" : "N/A") +
         "</td><td>RD$ " +
         formatMoney(payment.amount) +
+        (payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : "") +
         "</td></tr>"
     })
   }
@@ -3765,6 +4492,7 @@ function generateBiweeklyReport() {
         (loan ? loan.interestRate + "%" : "N/A") +
         "</td><td>RD$ " +
         formatMoney(payment.amount) +
+        (payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : "") +
         "</td></tr>"
     })
   }
@@ -3890,6 +4618,7 @@ function generateMonthlyReport() {
         (loan ? loan.interestRate + "%" : "N/A") +
         "</td><td>RD$ " +
         formatMoney(payment.amount) +
+        (payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : "") +
         "</td></tr>"
     })
   }
@@ -3907,6 +4636,8 @@ function exportData() {
     loans: loans,
     payments: payments,
     companyInfo: companyInfo,
+    printerSettings: printerSettings,
+    lateFeeSettings: lateFeeSettings,
     exportDate: new Date().toISOString()
   }
 
@@ -3949,81 +4680,6 @@ function changePassword(e) {
   document.getElementById("passwordForm").reset()
   alert("Contraseña cambiada exitosamente")
 }
-
-function showSection(sectionId) {
-  // Ocultar todas las secciones
-  var sections = document.querySelectorAll(".section")
-  sections.forEach(function (section) {
-    section.classList.remove("active")
-  })
-
-  // Mostrar la sección seleccionada
-  var activeSection = document.getElementById(sectionId)
-  if (activeSection) {
-    activeSection.classList.add("active")
-  }
-
-  // Actualizar enlaces activos en el menú
-  var navLinks = document.querySelectorAll(".sidebar .nav-link")
-  navLinks.forEach(function (link) {
-    link.classList.remove("active")
-  })
-  // Activar el enlace correspondiente en el menú lateral
-  var activeLink = document.querySelector(`.sidebar .nav-link[onclick*="'${sectionId}'"]`)
-  if (activeLink) {
-    activeLink.classList.add("active")
-  }
-
-  // Renderizar contenido según la sección
-  switch (sectionId) {
-    case "dashboard":
-      updateDashboard()
-      break
-    case "clients":
-      renderClients()
-      break
-    case "loans":
-      renderLoans()
-      break
-    case "finished-loans":
-      renderFinishedLoans()
-      break
-    case "payments":
-      // No action needed, search handled by user input
-      break
-    case "overdue-payments":
-      renderOverduePayments()
-      break
-    case "payment-history":
-      renderPaymentHistory()
-      break
-    case "void-payments": // Llamar a renderVoidPayments para la nueva sección
-      renderVoidPayments()
-      break
-    case "reports":
-      // Reports are generated on button click
-      break
-    case "settings": // Cambiado de "administration" a "settings"
-      loadCompanyInfo()
-      loadAdminCredentials()
-      if (contractTemplate && document.getElementById("contractTemplate")) {
-        document.getElementById("contractTemplate").value = contractTemplate
-      }
-      break
-  }
-}
-
-
-// Cambiar <div id="administration" class="section"> por <div id="settings" class="section">
-
-window.addEventListener("DOMContentLoaded", function() {
-  
-  var passwordForm = document.getElementById("passwordForm")
-  if (passwordForm) {
-    passwordForm.addEventListener("submit", changePassword)
-  }
-  
-})
 
     </script>
 </body>
