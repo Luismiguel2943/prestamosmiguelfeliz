@@ -2868,14 +2868,14 @@ function saveThemeToFirebase() {
         .catch(error => console.error("Error saving theme to profile:", error));
 }
 
-// Funciones para alertas y notificaciones
+// Funciones para alertas y notificaciones - MODIFICADO
 function checkOverduePaymentsAlert() {
     var today = new Date();
     var hasOverdue = false;
     var overdueDetails = [];
+    var shouldShowAlert = false; // Nueva variable para controlar
 
     loans.filter(l => l.status === 'active').forEach(loan => {
-        // Calcular próxima fecha de pago según el tipo de préstamo
         var nextPaymentDate = calculateNextPaymentDate(loan);
         
         if (nextPaymentDate && loan.remainingAmount > 0) {
@@ -2902,36 +2902,34 @@ function checkOverduePaymentsAlert() {
     notifications.overdueCount = overdueDetails.length;
     updateNotificationBadges();
 
+    // Solo mostrar alerta si es la primera vez o si no se ha mostrado hoy
+    var lastAlertDate = localStorage.getItem('lastOverdueAlertDate');
+    var todayStr = today.toISOString().split('T')[0];
+    
     if (hasOverdue && notifications.showSidebarBadge) {
-        var message = "⚠️ ALERTA: PAGOS VENCIDOS ⚠️\n\n";
-        message += "Se encontraron " + overdueDetails.length + " préstamos con pagos vencidos:\n\n";
+        // Mostrar notificación en pantalla solo si no hay una ya visible
+        var existingNotification = document.getElementById('overdue-notification');
+        if (!existingNotification && overdueDetails.length > 0) {
+            showOnScreenNotification(overdueDetails.length);
+        }
         
-        overdueDetails.forEach((item, index) => {
-            message += (index + 1) + ". " + item.cliente + "\n";
-            message += "   Préstamo: " + item.prestamo + "\n";
-            message += "   Tipo: " + item.tipo + " (" + item.frecuencia + ")\n";
-            message += "   Saldo: RD$ " + item.saldo + "\n";
-            message += "   Días vencido: " + item.dias + "\n";
-            message += "   Próximo pago: " + item.proximoPago + "\n";
-            message += "   -------------------------\n";
-        });
+        // Solo mostrar alerta popup si no se ha mostrado hoy
+        if (!lastAlertDate || lastAlertDate !== todayStr) {
+            shouldShowAlert = true;
+            localStorage.setItem('lastOverdueAlertDate', todayStr);
+        }
         
-        message += "\nPor favor, tome acción inmediata.";
-        
-        // Mostrar alerta solo si el usuario no está en la sección de pagos vencidos
+        // Mostrar alerta solo si es necesario y el usuario no está en la sección de pagos vencidos
         var activeSection = document.querySelector('.section.active');
-        if (!activeSection || activeSection.id !== 'overdue-payments') {
-            if (notifications.overdueCount > 0 && notifications.showSidebarBadge) {
-                // Mostrar notificación emergente
-                showOnScreenNotification(overdueDetails.length);
-                
-                // También mostrar alerta después de 1 segundo
-                setTimeout(function() {
-                    if (notifications.overdueCount > 0) {
-                        alert(message);
-                    }
-                }, 1000);
-            }
+        if (shouldShowAlert && (!activeSection || activeSection.id !== 'overdue-payments')) {
+            var message = "⚠️ ALERTA: PAGOS VENCIDOS ⚠️\n\n";
+            message += "Se encontraron " + overdueDetails.length + " préstamo(s) con pagos vencidos.\n\n";
+            message += "Consulte la sección 'Pagos Vencidos' para más detalles.\n\n";
+            message += "Esta alerta solo se mostrará una vez al día.";
+            
+            setTimeout(function() {
+                alert(message);
+            }, 1000);
         }
     }
 }
@@ -2964,6 +2962,13 @@ function showOnScreenNotification(count) {
             }, 300);
         }
     }, 10000);
+}
+
+function clearOverdueNotifications() {
+    var notification = document.getElementById('overdue-notification');
+    if (notification) {
+        notification.remove();
+    }
 }
 
 function updateNotificationBadges() {
@@ -3093,6 +3098,8 @@ function showSection(sectionId) {
             break;
         case "overdue-payments":
             renderOverduePayments();
+            // Limpiar notificaciones cuando se visita la sección
+            clearOverdueNotifications();
             setTimeout(() => {
                 checkOverduePaymentsAlert();
             }, 500);
@@ -3380,8 +3387,33 @@ function updateLoanPreview() {
     var totalAmount = amount + totalInterest;
     var preview = "<strong>Vista Previa:</strong><br>";
     preview += "Capital: RD$ " + formatMoney(amount) + "<br>";
-    preview += "Interés Total: RD$ " + formatMoney(totalInterest) + "<br>";
-    preview += "Monto Total a Pagar: RD$ " + formatMoney(totalAmount) + "<br>";
+    
+    // MODIFICACIÓN PARA PRÉSTAMOS INDEFINIDOS
+    if (type === "indefinite") {
+        preview += "Interés Mensual: 20% sobre el capital<br>";
+        preview += "Total Interés: RD$ " + formatMoney(totalInterest) + "<br>";
+        preview += "Monto Total a Pagar: RD$ " + formatMoney(totalAmount) + "<br>";
+        
+        var frequency = document.getElementById("indefiniteFrequency").value;
+        var monthlyInterest = amount * 0.20; // 20% mensual
+        
+        if (frequency === "weekly") {
+            // Semanal: Un cuarto del interés mensual
+            var weeklyPayment = monthlyInterest / 4;
+            preview += "Pago Semanal (solo interés): RD$ " + formatMoney(weeklyPayment);
+        } else if (frequency === "biweekly") {
+            // Quincenal: La mitad del interés mensual
+            var biweeklyPayment = monthlyInterest / 2;
+            preview += "Pago Quincenal (solo interés): RD$ " + formatMoney(biweeklyPayment);
+        } else if (frequency === "monthly") {
+            // Mensual: Todo el interés
+            preview += "Pago Mensual (solo interés): RD$ " + formatMoney(monthlyInterest);
+        }
+    } else {
+        // Para otros tipos de préstamos, mantener el cálculo actual
+        preview += "Interés Total: RD$ " + formatMoney(totalInterest) + "<br>";
+        preview += "Monto Total a Pagar: RD$ " + formatMoney(totalAmount) + "<br>";
+    }
     
     var startDate = document.getElementById("loanStartDate").value;
     if (startDate) {
@@ -3397,8 +3429,8 @@ function updateLoanPreview() {
         }
     } else if (type === "indefinite") {
         var frequency = document.getElementById("indefiniteFrequency").value;
-        preview += "Frecuencia: " + getFrequencyLabel(frequency) + "<br>";
-        preview += "Se pagarán cuotas hasta saldar el monto total";
+        preview += "<br>Frecuencia: " + getFrequencyLabel(frequency) + "<br>";
+        preview += "<small>Se pagarán solo los intereses hasta saldar el capital</small>";
     } else if (type === "daily") {
         var days = Number.parseInt(document.getElementById("loanDailyDays").value) || 0;
         if (days > 0) {
@@ -3413,6 +3445,7 @@ function updateLoanPreview() {
     document.getElementById("loanPreview").style.display = "block";
 }
 
+// FUNCIÓN MODIFICADA PARA GUARDAR PRÉSTAMOS
 function saveLoan(e) {
     e.preventDefault();
 
@@ -3427,12 +3460,69 @@ function saveLoan(e) {
         return;
     }
     
+    // Validar que se haya seleccionado un cliente
+    var clientId = document.getElementById("loanClient").value;
+    if (!clientId) {
+        alert("Por favor, seleccione un cliente");
+        return;
+    }
+    
+    // Validar monto del préstamo
+    var loanAmount = Number.parseFloat(document.getElementById("loanAmount").value);
+    if (!loanAmount || loanAmount <= 0) {
+        alert("Por favor, ingrese un monto válido para el préstamo");
+        return;
+    }
+    
+    // Validar tasa de interés
+    var interestRate = Number.parseFloat(document.getElementById("loanInterestRate").value);
+    if (!interestRate || interestRate <= 0) {
+        alert("Por favor, ingrese una tasa de interés válida");
+        return;
+    }
+    
+    // VALIDACIÓN PARA PRÉSTAMOS INDEFINIDOS
+    var loanType = document.getElementById("loanType").value;
+    
+    if (loanType === "indefinite" && interestRate !== 20) {
+        if (!confirm("Para préstamos indefinidos, la tasa recomendada es 20% mensual. ¿Desea continuar con " + interestRate + "%?")) {
+            document.getElementById("loanInterestRate").value = "20";
+            return;
+        }
+    }
+    
+    // Validaciones específicas por tipo de préstamo
+    if (loanType === "fixed") {
+        var installments = Number.parseInt(document.getElementById("loanInstallments").value);
+        if (!installments || installments <= 0) {
+            alert("Por favor, ingrese un número válido de cuotas");
+            return;
+        }
+        var frequency = document.getElementById("loanFrequency").value;
+        if (!frequency) {
+            alert("Por favor, seleccione una frecuencia de pago");
+            return;
+        }
+    } else if (loanType === "indefinite") {
+        var frequency = document.getElementById("indefiniteFrequency").value;
+        if (!frequency) {
+            alert("Por favor, seleccione una frecuencia de pago");
+            return;
+        }
+    } else if (loanType === "daily") {
+        var days = Number.parseInt(document.getElementById("loanDailyDays").value);
+        if (!days || days <= 0) {
+            alert("Por favor, ingrese un número válido de días");
+            return;
+        }
+    }
+    
     var loanData = {
         id: loanId || "LOAN-" + Date.now(),
-        clientId: document.getElementById("loanClient").value,
-        amount: Number.parseFloat(document.getElementById("loanAmount").value),
-        type: document.getElementById("loanType").value,
-        interestRate: Number.parseFloat(document.getElementById("loanInterestRate").value),
+        clientId: clientId,
+        amount: loanAmount,
+        type: loanType,
+        interestRate: interestRate,
         startDate: startDate + "T00:00:00",
         firstPaymentDate: firstPaymentDate ? firstPaymentDate + "T00:00:00" : null,
         notes: document.getElementById("loanNotes").value,
@@ -3451,30 +3541,30 @@ function saveLoan(e) {
             loanData.createdAt = existingLoan.createdAt;
             loanData.status = existingLoan.status;
             loanData.paidOffDate = existingLoan.paidOffDate;
+            loanData.paidInstallments = existingLoan.paidInstallments || 0;
+            loanData.paidDays = existingLoan.paidDays || 0;
         }
     } else {
         loanData.totalPaid = 0;
         loanData.remainingAmount = loanData.totalAmount;
+        loanData.paidInstallments = 0;
+        loanData.paidDays = 0;
     }
 
     if (loanData.type === "fixed") {
         loanData.installments = Number.parseInt(document.getElementById("loanInstallments").value);
         loanData.frequency = document.getElementById("loanFrequency").value;
         loanData.installmentAmount = loanData.totalAmount / loanData.installments;
-        loanData.paidInstallments = editMode && loans.find(l => l.id === loanId) ? loans.find(l => l.id === loanId).paidInstallments : 0;
     } else if (loanData.type === "indefinite") {
         loanData.frequency = document.getElementById("indefiniteFrequency").value;
-        loanData.installmentAmount = 0;
-        loanData.paidInstallments = editMode && loans.find(l => l.id === loanId) ? loans.find(l => l.id === loanId).paidInstallments : 0;
+        loanData.installmentAmount = 0; // Se calculará dinámicamente
     } else if (loanData.type === "daily") {
         loanData.days = Number.parseInt(document.getElementById("loanDailyDays").value);
         loanData.dailyPayment = loanData.totalAmount / loanData.days;
-        loanData.paidDays = editMode && loans.find(l => l.id === loanId) ? loans.find(l => l.id === loanId).paidDays : 0;
     }
 
-    if (loanData.status === 'active') {
-        loanData.nextPaymentDate = calculateNextPaymentDate(loanData);
-    }
+    // Calcular próxima fecha de pago
+    loanData.nextPaymentDate = calculateNextPaymentDate(loanData);
 
     if (editMode) {
         var index = loans.findIndex(l => l.id === loanId);
@@ -3492,6 +3582,7 @@ function saveLoan(e) {
     updateDashboard();
 
     if (!editMode) {
+        alert("Préstamo creado exitosamente");
         generateLoanInvoice(loanData.id);
         
         setTimeout(() => {
@@ -3499,6 +3590,8 @@ function saveLoan(e) {
                 generateAndPrintContract(loanData.id);
             }
         }, 500);
+    } else {
+        alert("Préstamo actualizado exitosamente");
     }
 }
 
@@ -3670,6 +3763,15 @@ function viewLoanDetails(loanId) {
         details += "\nTipo: Plazo Indefinido\n";
         details += "Frecuencia: " + getFrequencyLabel(loan.frequency) + "\n";
         details += "Pagos realizados: " + loanPayments.length + "\n";
+        // Mostrar cálculo de interés para préstamos indefinidos
+        var monthlyInterest = loan.amount * 0.20;
+        if (loan.frequency === "weekly") {
+            details += "Pago semanal (solo interés): RD$ " + formatMoney(monthlyInterest / 4) + "\n";
+        } else if (loan.frequency === "biweekly") {
+            details += "Pago quincenal (solo interés): RD$ " + formatMoney(monthlyInterest / 2) + "\n";
+        } else {
+            details += "Pago mensual (solo interés): RD$ " + formatMoney(monthlyInterest) + "\n";
+        }
     } else if (loan.type === "daily") {
         details += "\nTipo: Préstamo Diario\n";
         details += "Días pagados: " + loan.paidDays + " de " + loan.days + "\n";
@@ -3734,7 +3836,7 @@ function viewFinishedLoanDetails(loanId) {
     alert(details);
 }
 
-// Payment Functions - Modificado para incluir mora
+// Payment Functions - Modificado para incluir mora y préstamos indefinidos
 function openPaymentModal(loanId) {
     var loan = loans.find((l) => l.id === loanId);
     if (!loan) return;
@@ -3775,17 +3877,39 @@ function updatePaymentAmount() {
 
     switch (paymentType) {
         case "installment":
-            if (loan.type === "fixed" || loan.type === "indefinite") {
+            if (loan.type === "fixed") {
                 suggestedAmount = loan.installmentAmount || (loan.totalAmount / (loan.installments || 1));
+            } else if (loan.type === "indefinite") {
+                // MODIFICACIÓN: Para préstamos indefinidos, el pago es solo el interés según frecuencia
+                var monthlyInterest = loan.amount * 0.20; // 20% mensual
+                if (loan.frequency === "weekly") {
+                    suggestedAmount = monthlyInterest / 4; // Semanal: 1/4
+                    typeHelp.textContent = "Pago semanal del interés (20% mensual dividido en 4)";
+                } else if (loan.frequency === "biweekly") {
+                    suggestedAmount = monthlyInterest / 2; // Quincenal: 1/2
+                    typeHelp.textContent = "Pago quincenal del interés (20% mensual dividido en 2)";
+                } else {
+                    suggestedAmount = monthlyInterest; // Mensual: completo
+                    typeHelp.textContent = "Pago mensual del interés (20% sobre el capital)";
+                }
             } else if (loan.type === "daily") {
                 suggestedAmount = loan.dailyPayment;
+                typeHelp.textContent = "Pago diario regular según el plan del préstamo";
+            } else {
+                typeHelp.textContent = "Pago regular según el plan del préstamo";
             }
-            typeHelp.textContent = "Pago regular según el plan del préstamo";
             lateFeeSection.style.display = "none";
             break;
         case "interest":
-            suggestedAmount = loan.amount * (loan.interestRate / 100);
-            typeHelp.textContent = "Solo paga el interés, el capital permanece igual";
+            // MODIFICACIÓN: Para préstamos indefinidos, mostrar el cálculo correcto
+            if (loan.type === "indefinite") {
+                var monthlyInterest = loan.amount * 0.20;
+                typeHelp.textContent = "Interés mensual completo: 20% sobre el capital";
+                suggestedAmount = monthlyInterest;
+            } else {
+                suggestedAmount = loan.amount * (loan.interestRate / 100);
+                typeHelp.textContent = "Solo paga el interés, el capital permanece igual";
+            }
             lateFeeSection.style.display = "none";
             break;
         case "capital":
@@ -3818,8 +3942,17 @@ function updatePaymentAmount() {
             lateFeeAmountInput.value = calculatedLateFee.toFixed(2);
             
             // Sugerir monto de cuota + mora
-            if (loan.type === "fixed" || loan.type === "indefinite") {
+            if (loan.type === "fixed") {
                 suggestedAmount = (loan.installmentAmount || (loan.totalAmount / (loan.installments || 1))) + calculatedLateFee;
+            } else if (loan.type === "indefinite") {
+                var monthlyInterest = loan.amount * 0.20;
+                if (loan.frequency === "weekly") {
+                    suggestedAmount = (monthlyInterest / 4) + calculatedLateFee;
+                } else if (loan.frequency === "biweekly") {
+                    suggestedAmount = (monthlyInterest / 2) + calculatedLateFee;
+                } else {
+                    suggestedAmount = monthlyInterest + calculatedLateFee;
+                }
             } else if (loan.type === "daily") {
                 suggestedAmount = loan.dailyPayment + calculatedLateFee;
             }
@@ -3841,6 +3974,7 @@ function calculateLateFee(loan, daysLate) {
     return Math.min(calculatedFee, maxFee);
 }
 
+// FUNCIÓN MODIFICADA PARA REGISTRAR PAGOS
 function savePayment(e) {
     e.preventDefault();
 
@@ -3856,7 +3990,8 @@ function savePayment(e) {
     var paymentType = document.getElementById("paymentType").value;
     var paymentAmount = Number.parseFloat(document.getElementById("paymentAmount").value);
     var lateFeeAmount = 0;
-
+    
+    // Calcular mora si es pago con mora
     if (paymentType === "late") {
         lateFeeAmount = Number.parseFloat(document.getElementById("lateFeeAmount").value) || 0;
         if (lateFeeAmount < 0) {
@@ -3882,27 +4017,37 @@ function savePayment(e) {
         paymentData.principalAmount = paymentAmount - lateFeeAmount;
     }
 
-    // Actualizar campos del préstamo
-    loan.totalPaid += paymentData.amount;
-    loan.remainingAmount -= paymentData.amount;
+    // Validar que el pago no exceda el saldo restante
+    if (paymentData.amount > loan.remainingAmount + 0.01) { // Margen de error de 1 centavo
+        alert("El monto del pago (" + formatMoney(paymentData.amount) + ") excede el saldo restante del préstamo (" + formatMoney(loan.remainingAmount) + ")");
+        return;
+    }
 
+    // Actualizar campos del préstamo
+    loan.totalPaid = (loan.totalPaid || 0) + paymentData.amount;
+    loan.remainingAmount = loan.totalAmount - loan.totalPaid;
+
+    // Actualizar contadores según tipo de préstamo
     if (loan.type === "fixed") {
-        loan.paidInstallments++;
+        loan.paidInstallments = (loan.paidInstallments || 0) + 1;
     } else if (loan.type === "indefinite") {
         loan.paidInstallments = (loan.paidInstallments || 0) + 1;
     } else if (loan.type === "daily") {
-        loan.paidDays++;
+        loan.paidDays = (loan.paidDays || 0) + 1;
     }
 
+    // Calcular si el préstamo fue vencido
     var wasOverdue = false;
-    var nextPaymentDateCalc = calculateNextPaymentDate(loan);
-    if (loan.status === 'active') {
-        if (new Date(nextPaymentDateCalc) < new Date()) {
+    if (loan.nextPaymentDate) {
+        var nextDate = new Date(loan.nextPaymentDate);
+        var today = new Date();
+        if (nextDate < today) {
             wasOverdue = true;
         }
     }
 
-    if (loan.remainingAmount <= 0.01) {
+    // Verificar si el préstamo ha sido saldado
+    if (loan.remainingAmount <= 0.01) { // Margen de error de 1 centavo
         loan.status = "paid";
         loan.remainingAmount = 0;
         loan.finishedAt = new Date().toISOString();
@@ -3934,17 +4079,22 @@ function savePayment(e) {
         return;
     }
 
+    // Calcular próxima fecha de pago
+    loan.nextPaymentDate = calculateNextPaymentDate(loan);
+
     payments.push(paymentData);
     savePayments();
     saveLoans();
 
     bootstrap.Modal.getInstance(document.getElementById("paymentModal")).hide();
     
+    var message = "Pago registrado exitosamente.";
     if (wasOverdue && paymentType !== "late") {
-        alert("Pago registrado exitosamente. El préstamo ha sido puesto al día.");
+        message = "Pago registrado exitosamente. El préstamo ha sido puesto al día.";
     } else if (paymentType === "late") {
-        alert("Pago con mora registrado exitosamente.");
+        message = "Pago con mora registrado exitosamente.";
     }
+    alert(message);
     
     renderLoans();
     renderPaymentHistory();
@@ -3957,6 +4107,7 @@ function savePayment(e) {
     }
 }
 
+// FUNCIÓN MODIFICADA PARA RENDERIZAR HISTORIAL DE PAGOS CON BOTÓN DE ELIMINAR
 function renderPaymentHistory() {
     var tbody = document.getElementById("paymentHistoryTable");
     if (!tbody) return;
@@ -3964,7 +4115,7 @@ function renderPaymentHistory() {
     tbody.innerHTML = "";
 
     if (payments.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay pagos registrados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay pagos registrados</td></tr>';
         return;
     }
 
@@ -3976,36 +4127,77 @@ function renderPaymentHistory() {
 
         var row =
             "<tr>" +
-            "<td>" +
-            payment.id +
-            "</td>" +
-            "<td>" +
-            (client ? client.firstName + " " + client.lastName : "N/A") +
-            "</td>" +
-            "<td>" +
-            payment.loanId +
-            "</td>" +
-            "<td>RD$ " +
-            formatMoney(payment.amount) +
+            "<td>" + payment.id + "</td>" +
+            "<td>" + (client ? client.firstName + " " + client.lastName : "N/A") + "</td>" +
+            "<td>" + payment.loanId + "</td>" +
+            "<td>RD$ " + formatMoney(payment.amount) +
             (payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : "") +
             "</td>" +
-            '<td class="hide-mobile">' +
-            getPaymentTypeLabel(payment.type) +
-            "</td>" +
+            '<td class="hide-mobile">' + getPaymentTypeLabel(payment.type) + "</td>" +
+            "<td>" + formatDate(payment.date) + "</td>" +
+            '<td class="hide-mobile">' + getPaymentMethodLabel(payment.method) + "</td>" +
             "<td>" +
-            formatDate(payment.date) +
-            "</td>" +
-            '<td class="hide-mobile">' +
-            getPaymentMethodLabel(payment.method) +
-            "</td>" +
-            "<td>" +
-            '<button class="btn btn-sm btn-primary" onclick="generateInvoice(\'' +
-            payment.id +
-            '\')"><i class="fas fa-receipt"></i></button>' +
+            '<button class="btn btn-sm btn-primary me-1 mb-1" onclick="generateInvoice(\'' + payment.id + '\')"><i class="fas fa-receipt"></i></button>' +
+            '<button class="btn btn-sm btn-danger me-1 mb-1" onclick="deletePayment(\'' + payment.id + '\')"><i class="fas fa-trash"></i></button>' +
             "</td>" +
             "</tr>";
         tbody.innerHTML += row;
     });
+}
+
+// NUEVA FUNCIÓN PARA ELIMINAR PAGOS DEL HISTORIAL
+function deletePayment(paymentId) {
+    if (!confirm("¿Está seguro que desea eliminar este pago? Esta acción no se puede deshacer.")) {
+        return;
+    }
+
+    var payment = payments.find(p => p.id === paymentId);
+    if (!payment) {
+        alert("Pago no encontrado");
+        return;
+    }
+
+    var loan = loans.find(l => l.id === payment.loanId);
+    if (loan) {
+        // Reintegrar el monto al préstamo
+        loan.totalPaid = Math.max(0, (loan.totalPaid || 0) - payment.amount);
+        loan.remainingAmount = Math.min(loan.totalAmount, (loan.remainingAmount || 0) + payment.amount);
+        
+        // Revertir contadores según tipo de préstamo
+        if (loan.type === "fixed") {
+            loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
+        } else if (loan.type === "indefinite") {
+            loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
+        } else if (loan.type === "daily") {
+            loan.paidDays = Math.max(0, (loan.paidDays || 0) - 1);
+        }
+        
+        // Si el préstamo estaba marcado como pagado, cambiar a activo
+        if (loan.status === "paid" && loan.remainingAmount > 0.01) {
+            loan.status = "active";
+            delete loan.finishedAt;
+            delete loan.paidOffDate;
+        }
+        
+        // Recalcular próxima fecha de pago
+        loan.nextPaymentDate = calculateNextPaymentDate(loan);
+        
+        saveLoans();
+    }
+
+    // Eliminar el pago
+    payments = payments.filter(p => p.id !== paymentId);
+    savePayments();
+
+    alert("Pago eliminado exitosamente");
+    
+    // Actualizar todas las vistas
+    renderPaymentHistory();
+    renderVoidPayments();
+    renderLoans();
+    renderFinishedLoans();
+    renderOverduePayments();
+    updateDashboard();
 }
 
 function renderOverduePayments() {
@@ -4261,6 +4453,9 @@ function generateClearanceLetter(loanId) {
     html += '<li>• Fecha de Otorgamiento: <strong>' + formatDate(loan.startDate) + '</strong></li>';
     html += '<li>• Fecha de Liquidación: <strong>' + formatDate(finishDate.toISOString()) + '</strong></li>';
     html += '<li>• Tipo de Préstamo: <strong>' + getLoanTypeLabel(loan.type) + '</strong></li>';
+    if (loan.type === "indefinite") {
+        html += '<li>• Frecuencia de Pago: <strong>' + getFrequencyLabel(loan.frequency) + '</strong></li>';
+    }
     html += '</ul>';
     
     html += '<br>';
@@ -4926,12 +5121,21 @@ function generateLoanInvoice(loanId) {
         html += "<tr><th>Número de Cuotas:</th><td>" + loan.installments + "</td></tr>" +
                 "<tr><th>Frecuencia:</th><td>" + loan.frequency.charAt(0).toUpperCase() + loan.frequency.slice(1) + "</td></tr>" +
                 "<tr><th>Monto por Cuota:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.installmentAmount) + "</strong></td></tr>";
+    } else if (loan.type === "indefinite") {
+        html += "<tr><th>Tipo:</th><td>Pago Indefinido</td></tr>" +
+                "<tr><th>Frecuencia:</th><td>" + loan.frequency.charAt(0).toUpperCase() + loan.frequency.slice(1) + "</td></tr>" +
+                "<tr><th>Cálculo de Interés:</th><td>20% mensual sobre el capital</td></tr>";
+        var monthlyInterest = loan.amount * 0.20;
+        if (loan.frequency === "weekly") {
+            html += "<tr><th>Pago Semanal:</th><td class='text-end'><strong>RD$ " + formatMoney(monthlyInterest / 4) + "</strong></td></tr>";
+        } else if (loan.frequency === "biweekly") {
+            html += "<tr><th>Pago Quincenal:</th><td class='text-end'><strong>RD$ " + formatMoney(monthlyInterest / 2) + "</strong></td></tr>";
+        } else {
+            html += "<tr><th>Pago Mensual:</th><td class='text-end'><strong>RD$ " + formatMoney(monthlyInterest) + "</strong></td></tr>";
+        }
     } else if (loan.type === "daily") {
         html += "<tr><th>Días:</th><td>" + loan.days + "</td></tr>" +
                 "<tr><th>Pago Diario:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.dailyPayment) + "</strong></td></tr>";
-    } else {
-        html += "<tr><th>Tipo:</th><td>Pago Indefinido</td></tr>" +
-                "<tr><th>Frecuencia:</th><td>" + loan.frequency.charAt(0).toUpperCase() + loan.frequency.slice(1) + "</td></tr>";
     }
 
     html += "</table>";
