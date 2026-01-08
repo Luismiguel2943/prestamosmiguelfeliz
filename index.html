@@ -250,8 +250,6 @@
             text-align: center;
         }
 
-        /* Resto del CSS permanece igual, solo se actualizan las fuentes en los lugares necesarios */
-
         /* Asegurar que todos los textos usan las nuevas fuentes */
         .btn, .form-control, .form-select, .form-label {
             font-family: var(--font-body);
@@ -449,252 +447,6 @@
             }
         }
 
-        /* Estilos específicos para los títulos de sección en el contenido principal */
-        .main-content h2 {
-            font-family: var(--font-heading);
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 1.5rem;
-            position: relative;
-            display: inline-block;
-        }
-
-        .main-content h2:after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: -8px;
-            width: 60px;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            border-radius: 2px;
-        }
-
-        /* Estilo para los textos dentro de las cards */
-        .card-header {
-            font-family: var(--font-heading);
-            font-weight: 600;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        /* Estilos para las notificaciones */
-        .overdue-notification {
-            font-family: var(--font-body);
-            font-weight: 500;
-        }
-
-        /* Estilos para los mensajes de alerta */
-        .alert {
-            font-family: var(--font-body);
-            border-radius: 10px;
-            border: none;
-            padding: 1rem 1.25rem;
-        }
-
-        /* Estilo para la vista previa de impresión */
-        #printPreview {
-            font-family: 'Courier New', Courier, monospace;
-        }
-
-        /* Estilos para los títulos de los accordions */
-        .accordion-button {
-            font-family: var(--font-body);
-            font-weight: 500;
-        }
-
-        /* Ajustes para los list groups */
-        .list-group-item {
-            font-family: var(--font-body);
-        }
-
-        /* Estilos para los textos en los modales de configuración */
-        #printer-settings h2,
-        #settings h2,
-        #reports h2,
-        #payment-history h2,
-        #void-payments h2,
-        #overdue-payments h2,
-        #payments h2,
-        #finished-loans h2,
-        #loans h2,
-        #clients h2,
-        #dashboard h2 {
-            font-family: var(--font-heading);
-            font-weight: 700;
-            color: #111827;
-        }
-
-        /* Mejorar el contraste y legibilidad */
-        .text-muted {
-            color: #6b7280 !important;
-            font-family: var(--font-body);
-        }
-
-        /* Ajustes para los placeholders */
-        ::placeholder {
-            color: #9ca3af;
-            font-family: var(--font-body);
-        }
-
-        /* Estilos para los tooltips (si se usan) */
-        .tooltip {
-            font-family: var(--font-body);
-        }
-
-        /* Estilos para los popovers (si se usan) */
-        .popover {
-            font-family: var(--font-body);
-        }
-
-        /* Ajustes para los textos pequeños */
-        small, .small {
-            font-family: var(--font-body);
-        }
-
-        /* Estilos para los textos en los footers de modales */
-        .modal-footer {
-            font-family: var(--font-body);
-        }
-
-        /* Mejorar la apariencia de los inputs de búsqueda */
-        .search-box input {
-            font-family: var(--font-body);
-            padding-left: 45px;
-            border-radius: 8px;
-            border: 1px solid #d1d5db;
-        }
-
-        .search-box i {
-            color: #6b7280;
-        }
-
-        /* Estilos para los textos en los botones de acción */
-        .btn-sm {
-            font-size: 0.875rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 6px;
-        }
-
-        /* Ajustes para los textos en los dropdowns */
-        .dropdown-menu {
-            font-family: var(--font-body);
-        }
-
-        .dropdown-item {
-            font-family: var(--font-body);
-        }
-
-        /* Estilos para los textos en los tabs (si se usan) */
-        .nav-tabs .nav-link {
-            font-family: var(--font-body);
-        }
-
-        /* Estilos para los textos en los breadcrumbs (si se usan) */
-        .breadcrumb {
-            font-family: var(--font-body);
-        }
-
-        /* Estilos para los textos en los pagination */
-        .pagination {
-            font-family: var(--font-body);
-        }
-
-        .page-link {
-            font-family: var(--font-body);
-        }
-
-        /* Estilos para los textos en los progress bars */
-        .progress {
-            font-family: var(--font-body);
-        }
-
-        /* Estilos para los textos en los badges de notificación */
-        .notification-badge {
-            font-family: var(--font-body);
-            font-weight: 600;
-        }
-
-        /* Ajustes para los textos en los encabezados de cards */
-        .card-title {
-            font-family: var(--font-heading);
-            font-weight: 600;
-        }
-
-        .card-subtitle {
-            font-family: var(--font-body);
-        }
-
-        /* Estilos para los textos en los list groups */
-        .list-group-item {
-            font-family: var(--font-body);
-        }
-
-        /* Estilos para los textos en los alerts de Bootstrap */
-        .alert-heading {
-            font-family: var(--font-heading);
-            font-weight: 600;
-        }
-
-        /* Ajustes para los textos en los toasts (si se usan) */
-        .toast {
-            font-family: var(--font-body);
-        }
-
-        .toast-header {
-            font-family: var(--font-heading);
-        }
-
-        /* Estilos para los textos en los carousels (si se usan) */
-        .carousel-caption {
-            font-family: var(--font-body);
-        }
-
-        /* Ajustes para los textos en los spinners */
-        .spinner-border, .spinner-grow {
-            /* Los spinners no tienen texto, pero mantengo la estructura */
-        }
-
-        /* Estilos para los textos en los placeholders de imágenes */
-        .placeholder {
-            font-family: var(--font-body);
-        }
-
-        /* Ajustes para los textos en los offcanvas */
-        .offcanvas {
-            font-family: var(--font-body);
-        }
-
-        .offcanvas-title {
-            font-family: var(--font-heading);
-            font-weight: 600;
-        }
-
-        /* Estilos para los textos en los tooltips de validación */
-        .valid-feedback, .invalid-feedback {
-            font-family: var(--font-body);
-        }
-
-        /* Ajustes para los textos en los inputs de rango */
-        .form-range {
-            font-family: var(--font-body);
-        }
-
-        /* Estilos para los textos en los checkboxes y radios personalizados */
-        .form-check-label {
-            font-family: var(--font-body);
-        }
-
-        /* Ajustes para los textos en los inputs de archivo */
-        .form-file-label {
-            font-family: var(--font-body);
-        }
-
-        /* Estilos para los textos en los selects personalizados */
-        .form-select {
-            font-family: var(--font-body);
-        }
-
         /* Mobile Menu Toggle */
         .mobile-menu-toggle {
             display: none;
@@ -780,12 +532,6 @@
             top: 50%;
             transform: translateY(-50%);
             color: #6b7280;
-        }
-
-        /* Modals */
-        .modal-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
         }
 
         /* Logout Button - Responsive */
@@ -1064,19 +810,6 @@
             }
         }
 
-        /* Landscape Mobile */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .sidebar .logo {
-                padding: 10px 0;
-                margin-bottom: 10px;
-            }
-
-            .sidebar .nav-link {
-                padding: 8px 12px;
-                font-size: 0.875rem;
-            }
-        }
-
         /* Large Desktop */
         @media (min-width: 1400px) {
             .main-content {
@@ -1102,11 +835,6 @@
 
         html {
             scroll-behavior: smooth;
-        }
-
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
         }
         
         /* Estilos para animaciones de alertas */
@@ -1152,19 +880,6 @@
             color: white;
             margin-left: 10px;
             cursor: pointer;
-        }
-        
-        /* Estilos para la tabla de pagos vencidos */
-        .table-danger {
-            background-color: rgba(220, 53, 69, 0.1) !important;
-        }
-        
-        .table-warning {
-            background-color: rgba(255, 193, 7, 0.1) !important;
-        }
-        
-        .table-light {
-            background-color: rgba(248, 249, 250, 0.1) !important;
         }
         
         /* Estilos para icono de notificaciones */
@@ -1241,29 +956,6 @@
         
         .register-link:hover {
             text-decoration: underline;
-        }
-        
-        /* Estilos para los modales de registro */
-        #registerModal .modal-body {
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-        
-        #termsModal .modal-body {
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-        
-        #termsModal h6 {
-            color: var(--primary-color);
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        #termsModal p {
-            text-align: justify;
-            margin-bottom: 1rem;
-            line-height: 1.6;
         }
     </style>
 </head>
@@ -1865,22 +1557,6 @@
                                                     <li>Acerca la impresora al dispositivo (máximo 10 metros)</li>
                                                     <li>Reinicia la impresora y vuelve a intentar</li>
                                                 </ol>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header">
-                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#problem2">
-                                                La impresión sale cortada
-                                            </button>
-                                        </h2>
-                                        <div id="problem2" class="accordion-collapse collapse" data-bs-parent="#printerTroubleshooting">
-                                            <div class="accordion-body">
-                                                <ul>
-                                                    <li>Verifica que el tamaño de papel seleccionado coincida con el rollo instalado</li>
-                                                    <li>Ajusta los márgenes en la configuración avanzada</li>
-                                                    <li>Reduce el tamaño de fuente si es necesario</li>
-                                                </ul>
                                             </div>
                                         </div>
                                     </div>
@@ -2567,6 +2243,17 @@ var notifications = {
     showSidebarBadge: true
 };
 
+// Contador único para IDs de préstamo
+var loanIdCounter = 1;
+
+// Función para generar ID único de préstamo
+function generateLoanId() {
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 1000);
+    loanIdCounter++;
+    return `LOAN-${timestamp}-${random}-${loanIdCounter}`;
+}
+
 // Mobile Menu Functions
 function toggleMobileMenu() {
     var sidebar = document.getElementById("sidebar");
@@ -2759,7 +2446,17 @@ async function loadData() {
 
         // Cargar préstamos
         const loansSnapshot = await database.ref(`users/${currentUserId}/loans`).once('value');
-        loans = loansSnapshot.val() || [];
+        const loadedLoans = loansSnapshot.val() || [];
+        loans = loadedLoans;
+        
+        // Actualizar el contador de IDs de préstamo
+        if (loans.length > 0) {
+            const lastLoanId = loans[loans.length - 1].id;
+            const match = lastLoanId.match(/LOAN-\d+-(\d+)/);
+            if (match && match[1]) {
+                loanIdCounter = parseInt(match[1]) + 1;
+            }
+        }
 
         // Cargar pagos
         const paymentsSnapshot = await database.ref(`users/${currentUserId}/payments`).once('value');
@@ -2868,12 +2565,12 @@ function saveThemeToFirebase() {
         .catch(error => console.error("Error saving theme to profile:", error));
 }
 
-// Funciones para alertas y notificaciones - MODIFICADO
+// Funciones para alertas y notificaciones
 function checkOverduePaymentsAlert() {
     var today = new Date();
     var hasOverdue = false;
     var overdueDetails = [];
-    var shouldShowAlert = false; // Nueva variable para controlar
+    var shouldShowAlert = false;
 
     loans.filter(l => l.status === 'active').forEach(loan => {
         var nextPaymentDate = calculateNextPaymentDate(loan);
@@ -3445,7 +3142,7 @@ function updateLoanPreview() {
     document.getElementById("loanPreview").style.display = "block";
 }
 
-// FUNCIÓN MODIFICADA PARA GUARDAR PRÉSTAMOS
+// FUNCIÓN MODIFICADA PARA GUARDAR PRÉSTAMOS - USANDO ID ÚNICO
 function saveLoan(e) {
     e.preventDefault();
 
@@ -3518,7 +3215,7 @@ function saveLoan(e) {
     }
     
     var loanData = {
-        id: loanId || "LOAN-" + Date.now(),
+        id: loanId || generateLoanId(), // USAR LA NUEVA FUNCIÓN PARA ID ÚNICO
         clientId: clientId,
         amount: loanAmount,
         type: loanType,
@@ -4239,17 +3936,8 @@ function renderOverduePayments() {
         var client = clients.find(c => c.id === loan.clientId);
         var clientName = client ? client.firstName + " " + client.lastName : "N/A";
 
-        var urgencyClass = "";
-        if (item.daysOverdue > 30) {
-            urgencyClass = "table-danger";
-        } else if (item.daysOverdue > 15) {
-            urgencyClass = "table-warning";
-        } else {
-            urgencyClass = "table-light";
-        }
-
         var row =
-            "<tr class='" + urgencyClass + "'>" +
+            "<tr>" +
             "<td>" +
             clientName +
             "</td>" +
@@ -4334,7 +4022,7 @@ function searchClientForPayment() {
                 var nextPaymentDate = calculateNextPaymentDate(loan);
                 var nextDate = new Date(nextPaymentDate);
                 var isOverdue = nextPaymentDate && !isNaN(nextDate.getTime()) && nextDate < today;
-                var daysOverdue = isOverdue ? Math.floor((today - nextDate) / (1000 * 60 * 60 * 24)) : 0;
+                var daysOverdue = isOverdue ? Math.floor((today - nextDate) / (1000 * 60 * 60 * 60 * 24)) : 0;
                 var lateFee = calculateLateFee(loan, daysOverdue);
                 
                 html +=
@@ -4727,7 +4415,6 @@ function updatePrinterUI() {
 
 function connectToPrinter() {
     // Simulación de conexión Bluetooth
-    // En un entorno real, aquí se usaría la Web Bluetooth API
     var printerName = document.getElementById("printerName").value;
     
     if (!printerName) {
@@ -5248,6 +4935,7 @@ function clearAllData() {
                             printQR: true,
                             lastConnected: null
                         };
+                        loanIdCounter = 1; // Reiniciar contador
                         
                         renderClients();
                         renderLoans();
@@ -5328,6 +5016,15 @@ function importData() {
                         graceDays: 3,
                         maxLateFee: 30.0
                     };
+                    
+                    // Actualizar contador de IDs de préstamo
+                    if (loans.length > 0) {
+                        const lastLoanId = loans[loans.length - 1].id;
+                        const match = lastLoanId.match(/LOAN-\d+-(\d+)/);
+                        if (match && match[1]) {
+                            loanIdCounter = parseInt(match[1]) + 1;
+                        }
+                    }
                     
                     // Guardar en Firebase
                     saveClients();
@@ -5547,9 +5244,6 @@ function resetPassword() {
     }
     
     // Aquí iría la lógica real para cambiar la contraseña
-    // Nota: En Firebase, necesitarías implementar la recuperación de contraseña real
-    // usando auth.sendPasswordResetEmail() o permitiendo al administrador cambiar la contraseña
-    
     successDiv.textContent = '¡Contraseña restablecida exitosamente!';
     successDiv.style.display = 'block';
     
@@ -5558,22 +5252,6 @@ function resetPassword() {
         bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal')).hide();
         alert('Ahora puede iniciar sesión con su nueva contraseña');
     }, 2000);
-}
-
-function disableNotificationsTemporarily() {
-    notifications.showSidebarBadge = false;
-    var notification = document.getElementById('overdue-notification');
-    if (notification) {
-        notification.remove();
-    }
-    
-    // Reactivar notificaciones después de 1 hora
-    setTimeout(() => {
-        notifications.showSidebarBadge = true;
-        checkOverduePaymentsAlert();
-    }, 3600000); // 1 hora
-    
-    alert('Notificaciones deshabilitadas por 1 hora');
 }
 
 function changeTheme(theme) {
