@@ -957,6 +957,25 @@
         .register-link:hover {
             text-decoration: underline;
         }
+        
+        /* Estilos para mostrar cuotas */
+        .cuotas-info {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+        
+        .progress-cuotas {
+            height: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .cuotas-text {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body class="theme-blue">
@@ -1223,6 +1242,7 @@
                                         <th class="hide-mobile">Tipo</th>
                                         <th class="hide-mobile">Tasa</th>
                                         <th class="hide-mobile">Fecha</th>
+                                        <th>Cuotas</th>
                                         <th>Estado</th>
                                         <th>Acciones</th>
                                     </tr>
@@ -1253,6 +1273,7 @@
                                         <th class="hide-mobile">Tipo</th>
                                         <th class="hide-mobile">Fecha Creación</th>
                                         <th>Fecha Finalización</th>
+                                        <th>Cuotas Pagadas</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -1321,6 +1342,7 @@
                                         <th class="hide-mobile">Tipo</th>
                                         <th>Fecha</th>
                                         <th class="hide-mobile">Método</th>
+                                        <th>Cuotas</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -1354,6 +1376,7 @@
                                         <th>Monto</th>
                                         <th class="hide-mobile">Fecha</th>
                                         <th class="hide-mobile">Método</th>
+                                        <th>Cuotas</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -1485,6 +1508,7 @@
                                     </div>
                                     <div class="mb-2">
                                         <small>Préstamo: LOAN-123456</small><br>
+                                        <small>Cuotas: 15-de-30</small><br>
                                         <small>Tipo: Pago de Cuota</small><br>
                                         <small>Método: Efectivo</small>
                                     </div>
@@ -1500,6 +1524,7 @@
                                     </div>
                                     <div class="mb-2">
                                         <small>Saldo Restante: RD$ 5,000.00</small><br>
+                                        <small>Cuotas Restantes: 15 de 30</small><br>
                                         <small>Próximo Pago: 01/02/2024</small>
                                     </div>
                                     <div class="mb-2">
@@ -3317,7 +3342,7 @@ function renderLoans() {
     var activeLoans = loans.filter(l => l.status === "active");
 
     if (activeLoans.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay préstamos activos</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay préstamos activos</td></tr>';
         return;
     }
 
@@ -3326,6 +3351,16 @@ function renderLoans() {
         var clientName = client ? client.firstName + " " + client.lastName : "Cliente Eliminado";
 
         var statusBadge = '<span class="badge bg-success">Activo</span>';
+        
+        // Calcular cuotas para mostrar
+        var cuotasText = "";
+        if (loan.type === "fixed") {
+            cuotasText = (loan.paidInstallments || 0) + " de " + loan.installments;
+        } else if (loan.type === "daily") {
+            cuotasText = (loan.paidDays || 0) + " de " + loan.days;
+        } else if (loan.type === "indefinite") {
+            cuotasText = (loan.paidInstallments || 0) + " pagos";
+        }
 
         var row =
             "<tr>" +
@@ -3347,6 +3382,7 @@ function renderLoans() {
             '<td class="hide-mobile">' +
             formatDate(loan.startDate) +
             "</td>" +
+            "<td><span class='badge bg-info'>" + cuotasText + "</span></td>" +
             "<td>" +
             statusBadge +
             "</td>" +
@@ -3381,13 +3417,23 @@ function renderFinishedLoans() {
     var finishedLoans = loans.filter(l => l.status === "paid");
 
     if (finishedLoans.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay préstamos finalizados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay préstamos finalizados</td></tr>';
         return;
     }
 
     finishedLoans.forEach((loan) => {
         var client = clients.find((c) => c.id === loan.clientId);
         var clientName = client ? client.firstName + " " + client.lastName : "Cliente Eliminado";
+
+        // Calcular cuotas finales
+        var cuotasText = "";
+        if (loan.type === "fixed") {
+            cuotasText = loan.installments + " de " + loan.installments;
+        } else if (loan.type === "daily") {
+            cuotasText = loan.days + " de " + loan.days;
+        } else if (loan.type === "indefinite") {
+            cuotasText = (loan.paidInstallments || 0) + " pagos totales";
+        }
 
         var row =
             "<tr>" +
@@ -3409,6 +3455,7 @@ function renderFinishedLoans() {
             "<td>" +
             (loan.finishedAt ? formatDate(loan.finishedAt) : "N/A") +
             "</td>" +
+            "<td><span class='badge bg-success'>" + cuotasText + "</span></td>" +
             '<td style="white-space: nowrap;">' +
             '<button class="btn btn-sm btn-info me-1" onclick="viewFinishedLoanDetails(\'' +
             loan.id +
@@ -3671,7 +3718,7 @@ function calculateLateFee(loan, daysLate) {
     return Math.min(calculatedFee, maxFee);
 }
 
-// FUNCIÓN MODIFICADA PARA REGISTRAR PAGOS
+// FUNCIÓN MODIFICADA PARA REGISTRAR PAGOS CON SEGUIMIENTO DE CUOTAS
 function savePayment(e) {
     e.preventDefault();
 
@@ -3724,13 +3771,15 @@ function savePayment(e) {
     loan.totalPaid = (loan.totalPaid || 0) + paymentData.amount;
     loan.remainingAmount = loan.totalAmount - loan.totalPaid;
 
-    // Actualizar contadores según tipo de préstamo
-    if (loan.type === "fixed") {
-        loan.paidInstallments = (loan.paidInstallments || 0) + 1;
-    } else if (loan.type === "indefinite") {
-        loan.paidInstallments = (loan.paidInstallments || 0) + 1;
-    } else if (loan.type === "daily") {
-        loan.paidDays = (loan.paidDays || 0) + 1;
+    // Actualizar contadores de cuotas según tipo de préstamo
+    if (paymentType === "installment") {
+        if (loan.type === "fixed") {
+            loan.paidInstallments = (loan.paidInstallments || 0) + 1;
+        } else if (loan.type === "indefinite") {
+            loan.paidInstallments = (loan.paidInstallments || 0) + 1;
+        } else if (loan.type === "daily") {
+            loan.paidDays = (loan.paidDays || 0) + 1;
+        }
     }
 
     // Calcular si el préstamo fue vencido
@@ -3749,6 +3798,15 @@ function savePayment(e) {
         loan.remainingAmount = 0;
         loan.finishedAt = new Date().toISOString();
         loan.paidOffDate = new Date().toISOString();
+        
+        // Si es un préstamo diario y se completa, asegurar que los días pagados sean igual al total
+        if (loan.type === "daily") {
+            loan.paidDays = loan.days;
+        }
+        // Si es un préstamo fijo y se completa, asegurar que las cuotas pagadas sean igual al total
+        if (loan.type === "fixed") {
+            loan.paidInstallments = loan.installments;
+        }
         
         payments.push(paymentData);
         savePayments();
@@ -3804,7 +3862,7 @@ function savePayment(e) {
     }
 }
 
-// FUNCIÓN MODIFICADA PARA RENDERIZAR HISTORIAL DE PAGOS CON BOTÓN DE ELIMINAR
+// FUNCIÓN MODIFICADA PARA RENDERIZAR HISTORIAL DE PAGOS CON INFORMACIÓN DE CUOTAS
 function renderPaymentHistory() {
     var tbody = document.getElementById("paymentHistoryTable");
     if (!tbody) return;
@@ -3812,7 +3870,7 @@ function renderPaymentHistory() {
     tbody.innerHTML = "";
 
     if (payments.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay pagos registrados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center">No hay pagos registrados</td></tr>';
         return;
     }
 
@@ -3821,6 +3879,18 @@ function renderPaymentHistory() {
     sortedPayments.forEach((payment) => {
         var loan = loans.find((l) => l.id === payment.loanId);
         var client = clients.find((c) => c.id === payment.clientId);
+
+        // Calcular información de cuotas para este pago
+        var cuotasInfo = "";
+        if (loan) {
+            if (loan.type === "fixed") {
+                cuotasInfo = (loan.paidInstallments || 0) + " de " + loan.installments;
+            } else if (loan.type === "daily") {
+                cuotasInfo = (loan.paidDays || 0) + " de " + loan.days;
+            } else if (loan.type === "indefinite") {
+                cuotasInfo = (loan.paidInstallments || 0) + " pagos";
+            }
+        }
 
         var row =
             "<tr>" +
@@ -3833,6 +3903,7 @@ function renderPaymentHistory() {
             '<td class="hide-mobile">' + getPaymentTypeLabel(payment.type) + "</td>" +
             "<td>" + formatDate(payment.date) + "</td>" +
             '<td class="hide-mobile">' + getPaymentMethodLabel(payment.method) + "</td>" +
+            "<td><span class='badge bg-info'>" + cuotasInfo + "</span></td>" +
             "<td>" +
             '<button class="btn btn-sm btn-primary me-1 mb-1" onclick="generateInvoice(\'' + payment.id + '\')"><i class="fas fa-receipt"></i></button>' +
             '<button class="btn btn-sm btn-danger me-1 mb-1" onclick="deletePayment(\'' + payment.id + '\')"><i class="fas fa-trash"></i></button>' +
@@ -3842,7 +3913,7 @@ function renderPaymentHistory() {
     });
 }
 
-// NUEVA FUNCIÓN PARA ELIMINAR PAGOS DEL HISTORIAL
+// NUEVA FUNCIÓN PARA ELIMINAR PAGOS DEL HISTORIAL CON REINTEGRO DE CUOTAS
 function deletePayment(paymentId) {
     if (!confirm("¿Está seguro que desea eliminar este pago? Esta acción no se puede deshacer.")) {
         return;
@@ -3860,13 +3931,15 @@ function deletePayment(paymentId) {
         loan.totalPaid = Math.max(0, (loan.totalPaid || 0) - payment.amount);
         loan.remainingAmount = Math.min(loan.totalAmount, (loan.remainingAmount || 0) + payment.amount);
         
-        // Revertir contadores según tipo de préstamo
-        if (loan.type === "fixed") {
-            loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
-        } else if (loan.type === "indefinite") {
-            loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
-        } else if (loan.type === "daily") {
-            loan.paidDays = Math.max(0, (loan.paidDays || 0) - 1);
+        // Revertir contadores de cuotas según tipo de préstamo
+        if (payment.type === "installment") {
+            if (loan.type === "fixed") {
+                loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
+            } else if (loan.type === "indefinite") {
+                loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
+            } else if (loan.type === "daily") {
+                loan.paidDays = Math.max(0, (loan.paidDays || 0) - 1);
+            }
         }
         
         // Si el préstamo estaba marcado como pagado, cambiar a activo
@@ -4025,6 +4098,16 @@ function searchClientForPayment() {
                 var daysOverdue = isOverdue ? Math.floor((today - nextDate) / (1000 * 60 * 60 * 60 * 24)) : 0;
                 var lateFee = calculateLateFee(loan, daysOverdue);
                 
+                // Calcular información de cuotas
+                var cuotasInfo = "";
+                if (loan.type === "fixed") {
+                    cuotasInfo = (loan.paidInstallments || 0) + " de " + loan.installments;
+                } else if (loan.type === "daily") {
+                    cuotasInfo = (loan.paidDays || 0) + " de " + loan.days;
+                } else if (loan.type === "indefinite") {
+                    cuotasInfo = (loan.paidInstallments || 0) + " pagos";
+                }
+                
                 html +=
                     '<li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">' +
                     "<div>" +
@@ -4033,6 +4116,7 @@ function searchClientForPayment() {
                     "</strong>" +
                     " - Saldo: RD$ " +
                     formatMoney(loan.remainingAmount) +
+                    "<br>Cuotas: <span class='badge bg-info'>" + cuotasInfo + "</span>" +
                     (isOverdue ? '<br><span class="badge bg-danger">Vencido: ' + daysOverdue + ' días</span>' : '') +
                     (lateFee > 0 ? '<br><small class="text-danger">Mora acumulada: RD$ ' + formatMoney(lateFee) + '</small>' : '') +
                     "</div>" +
@@ -4141,7 +4225,15 @@ function generateClearanceLetter(loanId) {
     html += '<li>• Fecha de Otorgamiento: <strong>' + formatDate(loan.startDate) + '</strong></li>';
     html += '<li>• Fecha de Liquidación: <strong>' + formatDate(finishDate.toISOString()) + '</strong></li>';
     html += '<li>• Tipo de Préstamo: <strong>' + getLoanTypeLabel(loan.type) + '</strong></li>';
-    if (loan.type === "indefinite") {
+    
+    // Agregar información de cuotas en la carta de saldo
+    if (loan.type === "fixed") {
+        html += '<li>• Cuotas Pagadas: <strong>' + loan.installments + ' de ' + loan.installments + '</strong></li>';
+        html += '<li>• Frecuencia de Pago: <strong>' + getFrequencyLabel(loan.frequency) + '</strong></li>';
+    } else if (loan.type === "daily") {
+        html += '<li>• Días Pagados: <strong>' + loan.days + ' de ' + loan.days + '</strong></li>';
+    } else if (loan.type === "indefinite") {
+        html += '<li>• Pagos Realizados: <strong>' + (loan.paidInstallments || 0) + '</strong></li>';
         html += '<li>• Frecuencia de Pago: <strong>' + getFrequencyLabel(loan.frequency) + '</strong></li>';
     }
     html += '</ul>';
@@ -4482,6 +4574,7 @@ function testPrinter() {
     }
 }
 
+// FUNCIÓN MODIFICADA PARA GENERAR RECIBO TÉRMICO CON INFORMACIÓN DE CUOTAS
 function generateThermalReceipt(paymentId, isTest = false) {
     var payment, loan, client;
     
@@ -4498,7 +4591,10 @@ function generateThermalReceipt(paymentId, isTest = false) {
         loan = {
             id: "LOAN-TEST-456",
             remainingAmount: 5000.00,
-            nextPaymentDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+            nextPaymentDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+            type: "daily",
+            days: 30,
+            paidDays: 10
         };
         client = {
             firstName: "Juan",
@@ -4517,6 +4613,27 @@ function generateThermalReceipt(paymentId, isTest = false) {
     var address = companyInfo.address || "";
     var phone = companyInfo.phone || "";
     var rnc = companyInfo.rnc || "";
+    
+    // Calcular información de cuotas
+    var cuotasInfo = "";
+    var totalCuotas = 0;
+    var cuotasPagadas = 0;
+    
+    if (loan) {
+        if (loan.type === "fixed") {
+            totalCuotas = loan.installments;
+            cuotasPagadas = loan.paidInstallments || 0;
+            cuotasInfo = cuotasPagadas + "-de-" + totalCuotas;
+        } else if (loan.type === "daily") {
+            totalCuotas = loan.days;
+            cuotasPagadas = loan.paidDays || 0;
+            cuotasInfo = cuotasPagadas + "-de-" + totalCuotas;
+        } else if (loan.type === "indefinite") {
+            totalCuotas = "∞";
+            cuotasPagadas = loan.paidInstallments || 0;
+            cuotasInfo = cuotasPagadas + " pagos";
+        }
+    }
     
     var receipt = "";
     
@@ -4540,6 +4657,10 @@ function generateThermalReceipt(paymentId, isTest = false) {
     receipt += "Cedula: " + (client ? client.cedula : "N/A") + "\n";
     receipt += "--------------------------------\n";
     receipt += "Prestamo: " + payment.loanId + "\n";
+    
+    // INFORMACIÓN DE CUOTAS EN LA FACTURA TÉRMICA - FORMATO ESPECÍFICO
+    receipt += "Cuotas: " + cuotasInfo + "\n";
+    
     receipt += "Tipo: " + getPaymentTypeLabel(payment.type) + "\n";
     receipt += "Metodo: " + getPaymentMethodLabel(payment.method) + "\n";
     receipt += "--------------------------------\n";
@@ -4557,6 +4678,14 @@ function generateThermalReceipt(paymentId, isTest = false) {
     if (loan) {
         receipt += "Saldo Restante:\n";
         receipt += centerText("RD$ " + formatMoney(loan.remainingAmount), printerSettings.paperSize === "50mm" ? 32 : 48) + "\n";
+        
+        // MOSTRAR CUOTAS RESTANTES
+        if (totalCuotas !== "∞") {
+            var cuotasRestantes = totalCuotas - cuotasPagadas;
+            receipt += "Cuotas Restantes:\n";
+            receipt += centerText(cuotasRestantes + " de " + totalCuotas, printerSettings.paperSize === "50mm" ? 32 : 48) + "\n";
+        }
+        
         if (loan.nextPaymentDate) {
             receipt += "Proximo Pago:\n";
             receipt += centerText(formatDate(loan.nextPaymentDate), printerSettings.paperSize === "50mm" ? 32 : 48) + "\n";
@@ -4652,6 +4781,7 @@ function printThermal() {
     }, 500);
 }
 
+// FUNCIÓN MODIFICADA PARA RENDERIZAR PAGOS ANULABLES CON INFORMACIÓN DE CUOTAS
 function renderVoidPayments() {
     var tbody = document.getElementById("voidPaymentsTable");
     if (!tbody) return;
@@ -4659,7 +4789,7 @@ function renderVoidPayments() {
     tbody.innerHTML = "";
 
     if (payments.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay pagos registrados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay pagos registrados</td></tr>';
         return;
     }
 
@@ -4668,6 +4798,18 @@ function renderVoidPayments() {
     sortedPayments.forEach((payment) => {
         var loan = loans.find((l) => l.id === payment.loanId);
         var client = clients.find((c) => c.id === payment.clientId);
+
+        // Calcular información de cuotas
+        var cuotasInfo = "";
+        if (loan) {
+            if (loan.type === "fixed") {
+                cuotasInfo = (loan.paidInstallments || 0) + " de " + loan.installments;
+            } else if (loan.type === "daily") {
+                cuotasInfo = (loan.paidDays || 0) + " de " + loan.days;
+            } else if (loan.type === "indefinite") {
+                cuotasInfo = (loan.paidInstallments || 0) + " pagos";
+            }
+        }
 
         var row =
             "<tr>" +
@@ -4678,6 +4820,7 @@ function renderVoidPayments() {
             (payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : "") + "</td>" +
             '<td class="hide-mobile">' + formatDate(payment.date) + "</td>" +
             '<td class="hide-mobile">' + getPaymentMethodLabel(payment.method) + "</td>" +
+            "<td><span class='badge bg-info'>" + cuotasInfo + "</span></td>" +
             "<td>" +
             '<button class="btn btn-sm btn-danger" onclick="voidPayment(\'' + payment.id + '\')"><i class="fas fa-ban me-1"></i>Anular</button>' +
             "</td>" +
@@ -4704,7 +4847,7 @@ function searchVoidPayments() {
 }
 
 function voidPayment(paymentId) {
-    if (!confirm("¿Está seguro que desea anular este pago? El monto se reintegrará al saldo del préstamo.")) {
+    if (!confirm("¿Está seguro que desea anular este pago? El monto se reintegrará al saldo del préstamo y se revertirán las cuotas pagadas.")) {
         return;
     }
 
@@ -4723,12 +4866,15 @@ function voidPayment(paymentId) {
     loan.totalPaid -= payment.amount;
     loan.remainingAmount += payment.amount;
 
-    if (loan.type === "fixed") {
-        loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
-    } else if (loan.type === "indefinite") {
-        loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
-    } else if (loan.type === "daily") {
-        loan.paidDays = Math.max(0, (loan.paidDays || 0) - 1);
+    // Revertir cuotas solo si era un pago de cuota
+    if (payment.type === "installment") {
+        if (loan.type === "fixed") {
+            loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
+        } else if (loan.type === "indefinite") {
+            loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
+        } else if (loan.type === "daily") {
+            loan.paidDays = Math.max(0, (loan.paidDays || 0) - 1);
+        }
     }
 
     if (loan.status === "paid") {
@@ -4743,7 +4889,7 @@ function voidPayment(paymentId) {
     savePayments();
     saveLoans();
 
-    alert("Pago anulado exitosamente. El monto ha sido reintegrado al préstamo.");
+    alert("Pago anulado exitosamente. El monto ha sido reintegrado al préstamo y las cuotas se han revertido.");
 
     renderVoidPayments();
     renderPaymentHistory();
@@ -4752,6 +4898,7 @@ function voidPayment(paymentId) {
     updateDashboard();
 }
 
+// FUNCIÓN MODIFICADA PARA GENERAR FACTURA CON INFORMACIÓN DE CUOTAS
 function generateLoanInvoice(loanId) {
     var loan = loans.find((l) => l.id === loanId);
     if (!loan) return;
@@ -4779,6 +4926,16 @@ function generateLoanInvoice(loanId) {
         fechaFinal = "Indefinido";
     }
     
+    // Calcular información de cuotas
+    var cuotasInfo = "";
+    if (loan.type === "fixed") {
+        cuotasInfo = "0 de " + loan.installments;
+    } else if (loan.type === "daily") {
+        cuotasInfo = "0 de " + loan.days;
+    } else if (loan.type === "indefinite") {
+        cuotasInfo = "0 pagos";
+    }
+    
     var html = '<div class="text-center mb-4">';
     
     if (companyInfo.logoBase64) {
@@ -4800,6 +4957,7 @@ function generateLoanInvoice(loanId) {
         "<tr><th>Teléfono:</th><td>" + client.phone + "</td></tr>" +
         "<tr><th>Fecha de Inicio:</th><td>" + formatDate(loan.startDate) + "</td></tr>" +
         "<tr><th>Fecha Final Estimada:</th><td>" + fechaFinal + "</td></tr>" +
+        "<tr><th>Progreso de Cuotas:</th><td><span class='cuotas-info'>" + cuotasInfo + "</span></td></tr>" +
         "<tr><th>Cantidad Prestada:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.amount) + "</strong></td></tr>" +
         "<tr><th>Tasa de Interés:</th><td>" + loan.interestRate + "%</td></tr>" +
         "<tr><th>Total a Pagar:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.totalAmount) + "</strong></td></tr>";
@@ -4827,7 +4985,160 @@ function generateLoanInvoice(loanId) {
 
     html += "</table>";
     
+    // Agregar barra de progreso visual
+    if (loan.type === "fixed" || loan.type === "daily") {
+        var total = loan.type === "fixed" ? loan.installments : loan.days;
+        var porcentaje = 0;
+        html += '<div class="mt-4">';
+        html += '<p class="mb-1"><strong>Progreso de Cuotas:</strong></p>';
+        html += '<div class="progress progress-cuotas">';
+        html += '<div class="progress-bar bg-success" role="progressbar" style="width: ' + porcentaje + '%" aria-valuenow="' + porcentaje + '" aria-valuemin="0" aria-valuemax="100"></div>';
+        html += '</div>';
+        html += '<div class="d-flex justify-content-between mt-1">';
+        html += '<small>Inicio</small>';
+        html += '<small>' + cuotasInfo + '</small>';
+        html += '<small>Final</small>';
+        html += '</div>';
+        html += '</div>';
+    }
+    
     html += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle me-2"></i>Préstamo otorgado exitosamente. Conserve esta factura para sus registros.</div>';
+
+    document.getElementById("invoiceContent").innerHTML = html;
+    var modal = new bootstrap.Modal(document.getElementById("invoiceModal"));
+    modal.show();
+}
+
+// FUNCIÓN MODIFICADA PARA GENERAR FACTURA DE PAGO CON INFORMACIÓN DE CUOTAS
+function generateInvoice(paymentId) {
+    var payment = payments.find((p) => p.id === paymentId);
+    if (!payment) {
+        alert("No se encontró el pago");
+        return;
+    }
+
+    var loan = loans.find((l) => l.id === payment.loanId);
+    var client = clients.find((c) => c.id === payment.clientId);
+
+    var companyName = companyInfo.name || "Sistema de Préstamos";
+    var address = companyInfo.address || "";
+    var phone = companyInfo.phone || "";
+    var rnc = companyInfo.rnc || "";
+    
+    // Calcular información de cuotas
+    var cuotasInfo = "";
+    var totalCuotas = 0;
+    var cuotasPagadas = 0;
+    var porcentaje = 0;
+    
+    if (loan) {
+        if (loan.type === "fixed") {
+            totalCuotas = loan.installments;
+            cuotasPagadas = loan.paidInstallments || 0;
+            cuotasInfo = cuotasPagadas + " de " + totalCuotas;
+            porcentaje = totalCuotas > 0 ? (cuotasPagadas / totalCuotas) * 100 : 0;
+        } else if (loan.type === "daily") {
+            totalCuotas = loan.days;
+            cuotasPagadas = loan.paidDays || 0;
+            cuotasInfo = cuotasPagadas + " de " + totalCuotas;
+            porcentaje = totalCuotas > 0 ? (cuotasPagadas / totalCuotas) * 100 : 0;
+        } else if (loan.type === "indefinite") {
+            totalCuotas = "∞";
+            cuotasPagadas = loan.paidInstallments || 0;
+            cuotasInfo = cuotasPagadas + " pagos realizados";
+            porcentaje = 0; // No hay porcentaje para préstamos indefinidos
+        }
+    }
+    
+    var html = '<div class="text-center mb-4">';
+    
+    if (companyInfo.logoBase64) {
+        html += '<img src="' + companyInfo.logoBase64 + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">';
+    } else if (companyInfo.logo) {
+        html += '<img src="' + companyInfo.logo + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">';
+    }
+    
+    html +=
+        "<h3>" +
+        companyName +
+        "</h3>" +
+        "<p>" +
+        address +
+        "</p>" +
+        "<p>Tel: " +
+        phone +
+        " | RNC: " +
+        rnc +
+        "</p>" +
+        "</div>" +
+        '<h4 class="text-center mb-4">RECIBO DE PAGO</h4>' +
+        '<table class="table">' +
+        "<tr><th>Recibo No:</th><td>" +
+        payment.id +
+        "</td></tr>" +
+        "<tr><th>Fecha:</th><td>" +
+        formatDate(payment.date) +
+        "</td></tr>" +
+        "<tr><th>Hora:</th><td>" +
+        new Date(payment.date).toLocaleTimeString('es-DO', {hour: '2-digit', minute: '2-digit'}) +
+        "</td></tr>" +
+        "<tr><th>Cliente:</th><td>" +
+        (client ? client.firstName + " " + client.lastName : "N/A") +
+        "</td></tr>" +
+        "<tr><th>Cédula:</th><td>" +
+        (client ? client.cedula : "N/A") +
+        "</td></tr>" +
+        "<tr><th>Teléfono:</th><td>" +
+        (client ? client.phone : "N/A") +
+        "</td></tr>" +
+        "<tr><th>Préstamo:</th><td>" +
+        payment.loanId +
+        "</td></tr>" +
+        "<tr><th>Progreso de Cuotas:</th><td><span class='cuotas-info'>" + cuotasInfo + "</span></td></tr>" +
+        "<tr><th>Tipo de Pago:</th><td>" +
+        getPaymentTypeLabel(payment.type) +
+        "</td></tr>" +
+        "<tr><th>Método:</th><td>" +
+        getPaymentMethodLabel(payment.method) +
+        "</td></tr>" +
+        '<tr><th class="text-end">Monto Pagado:</th><td class="text-end"><strong>RD$ ' +
+        formatMoney(payment.amount) +
+        "</strong></td></tr>";
+
+    if (payment.lateFee && payment.lateFee > 0) {
+        html +=
+            '<tr><th class="text-end">Incluye Mora:</th><td class="text-end text-danger">RD$ ' +
+            formatMoney(payment.lateFee) +
+            "</td></tr>";
+    }
+
+    if (loan) {
+        html +=
+            '<tr><th class="text-end">Saldo Restante:</th><td class="text-end">RD$ ' +
+            formatMoney(loan.remainingAmount) +
+            "</td></tr>";
+    }
+
+    html += "</table>";
+
+    // Agregar barra de progreso visual si es un préstamo con cuotas definidas
+    if (loan && (loan.type === "fixed" || loan.type === "daily")) {
+        html += '<div class="mt-4">';
+        html += '<p class="mb-1"><strong>Progreso de Cuotas:</strong></p>';
+        html += '<div class="progress progress-cuotas">';
+        html += '<div class="progress-bar bg-success" role="progressbar" style="width: ' + porcentaje + '%" aria-valuenow="' + porcentaje + '" aria-valuemin="0" aria-valuemax="100"></div>';
+        html += '</div>';
+        html += '<div class="d-flex justify-content-between mt-1">';
+        html += '<small>Inicio (0)</small>';
+        html += '<small>' + cuotasInfo + ' (' + Math.round(porcentaje) + '%)</small>';
+        html += '<small>Final (' + totalCuotas + ')</small>';
+        html += '</div>';
+        html += '</div>';
+    }
+
+    if (payment.notes) {
+        html += "<p><strong>Notas:</strong> " + payment.notes + "</p>";
+    }
 
     document.getElementById("invoiceContent").innerHTML = html;
     var modal = new bootstrap.Modal(document.getElementById("invoiceModal"));
@@ -5342,100 +5653,6 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // Functions for reports
-function generateInvoice(paymentId) {
-    var payment = payments.find((p) => p.id === paymentId);
-    if (!payment) {
-        alert("No se encontró el pago");
-        return;
-    }
-
-    var loan = loans.find((l) => l.id === payment.loanId);
-    var client = clients.find((c) => c.id === payment.clientId);
-
-    var companyName = companyInfo.name || "Sistema de Préstamos";
-    var address = companyInfo.address || "";
-    var phone = companyInfo.phone || "";
-    var rnc = companyInfo.rnc || "";
-    
-    var html = '<div class="text-center mb-4">';
-    
-    if (companyInfo.logoBase64) {
-        html += '<img src="' + companyInfo.logoBase64 + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">';
-    } else if (companyInfo.logo) {
-        html += '<img src="' + companyInfo.logo + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">';
-    }
-    
-    html +=
-        "<h3>" +
-        companyName +
-        "</h3>" +
-        "<p>" +
-        address +
-        "</p>" +
-        "<p>Tel: " +
-        phone +
-        " | RNC: " +
-        rnc +
-        "</p>" +
-        "</div>" +
-        '<h4 class="text-center mb-4">RECIBO DE PAGO</h4>' +
-        '<table class="table">' +
-        "<tr><th>Recibo No:</th><td>" +
-        payment.id +
-        "</td></tr>" +
-        "<tr><th>Fecha:</th><td>" +
-        formatDate(payment.date) +
-        "</td></tr>" +
-        "<tr><th>Hora:</th><td>" +
-        new Date(payment.date).toLocaleTimeString('es-DO', {hour: '2-digit', minute: '2-digit'}) +
-        "</td></tr>" +
-        "<tr><th>Cliente:</th><td>" +
-        (client ? client.firstName + " " + client.lastName : "N/A") +
-        "</td></tr>" +
-        "<tr><th>Cédula:</th><td>" +
-        (client ? client.cedula : "N/A") +
-        "</td></tr>" +
-        "<tr><th>Teléfono:</th><td>" +
-        (client ? client.phone : "N/A") +
-        "</td></tr>" +
-        "<tr><th>Préstamo:</th><td>" +
-        payment.loanId +
-        "</td></tr>" +
-        "<tr><th>Tipo de Pago:</th><td>" +
-        getPaymentTypeLabel(payment.type) +
-        "</td></tr>" +
-        "<tr><th>Método:</th><td>" +
-        getPaymentMethodLabel(payment.method) +
-        "</td></tr>" +
-        '<tr><th class="text-end">Monto Pagado:</th><td class="text-end"><strong>RD$ ' +
-        formatMoney(payment.amount) +
-        "</strong></td></tr>";
-
-    if (payment.lateFee && payment.lateFee > 0) {
-        html +=
-            '<tr><th class="text-end">Incluye Mora:</th><td class="text-end text-danger">RD$ ' +
-            formatMoney(payment.lateFee) +
-            "</td></tr>";
-    }
-
-    if (loan) {
-        html +=
-            '<tr><th class="text-end">Saldo Restante:</th><td class="text-end">RD$ ' +
-            formatMoney(loan.remainingAmount) +
-            "</td></tr>";
-    }
-
-    html += "</table>";
-
-    if (payment.notes) {
-        html += "<p><strong>Notas:</strong> " + payment.notes + "</p>";
-    }
-
-    document.getElementById("invoiceContent").innerHTML = html;
-    var modal = new bootstrap.Modal(document.getElementById("invoiceModal"));
-    modal.show();
-}
-
 function generateDailyReport() {
     var now = new Date();
     var today = now.toISOString().split('T')[0];
@@ -5491,15 +5708,27 @@ function generateDailyReport() {
     html += "</div>";
 
     html += '<div class="card mb-3"><div class="card-header bg-primary text-white"><h5>Pagos de Hoy</h5></div><div class="card-body">';
-    html += '<table class="table table-striped"><thead><tr><th>Hora</th><th>Cliente</th><th>Préstamo ID</th><th>Tasa</th><th>Monto</th></tr></thead><tbody>';
+    html += '<table class="table table-striped"><thead><tr><th>Hora</th><th>Cliente</th><th>Préstamo ID</th><th>Tasa</th><th>Monto</th><th>Cuotas</th></tr></thead><tbody>';
 
     if (dailyPayments.length === 0) {
-        html += '<tr><td colspan="5" class="text-center">No hay pagos registrados hoy</td></tr>';
+        html += '<tr><td colspan="6" class="text-center">No hay pagos registrados hoy</td></tr>';
     } else {
         dailyPayments.forEach((payment) => {
             var client = clients.find((c) => c.id === payment.clientId);
             var loan = loans.find((l) => l.id === payment.loanId);
             var paymentTime = new Date(payment.date).toLocaleTimeString('es-DO', {hour: '2-digit', minute: '2-digit'});
+            
+            // Calcular información de cuotas
+            var cuotasInfo = "";
+            if (loan) {
+                if (loan.type === "fixed") {
+                    cuotasInfo = (loan.paidInstallments || 0) + " de " + loan.installments;
+                } else if (loan.type === "daily") {
+                    cuotasInfo = (loan.paidDays || 0) + " de " + loan.days;
+                } else if (loan.type === "indefinite") {
+                    cuotasInfo = (loan.paidInstallments || 0) + " pagos";
+                }
+            }
             
             html +=
                 "<tr><td>" +
@@ -5513,25 +5742,35 @@ function generateDailyReport() {
                 "</td><td>RD$ " +
                 formatMoney(payment.amount) +
                 (payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : "") +
-                "</td></tr>";
+                "</td><td><span class='badge bg-info'>" + cuotasInfo + "</span></td></tr>";
         });
     }
 
     html += "</tbody></table></div></div>";
     
     html += '<div class="card mb-3"><div class="card-header bg-info text-white"><h5>Préstamos Activos</h5></div><div class="card-body">';
-    html += '<table class="table table-striped"><thead><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Fecha Entrega</th><th>Próximo Pago</th></tr></thead><tbody>';
+    html += '<table class="table table-striped"><thead><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Cuotas</th><th>Fecha Entrega</th><th>Próximo Pago</th></tr></thead><tbody>';
     
     var activeLoans = loans.filter((l) => l.status === "active");
     
     if (activeLoans.length === 0) {
-        html += '<tr><td colspan="6" class="text-center">No hay préstamos activos</td></tr>';
+        html += '<tr><td colspan="7" class="text-center">No hay préstamos activos</td></tr>';
     } else {
         activeLoans.forEach((loan) => {
             var client = clients.find((c) => c.id === loan.clientId);
             var nextPaymentDisplay = loan.nextPaymentDate ? formatDate(loan.nextPaymentDate) : "N/A";
             if (!nextPaymentDisplay || nextPaymentDisplay === "Fecha inválida") {
                 nextPaymentDisplay = formatDate(calculateNextPaymentDate(loan));
+            }
+
+            // Calcular información de cuotas
+            var cuotasInfo = "";
+            if (loan.type === "fixed") {
+                cuotasInfo = (loan.paidInstallments || 0) + " de " + loan.installments;
+            } else if (loan.type === "daily") {
+                cuotasInfo = (loan.paidDays || 0) + " de " + loan.days;
+            } else if (loan.type === "indefinite") {
+                cuotasInfo = (loan.paidInstallments || 0) + " pagos";
             }
 
             html +=
@@ -5543,7 +5782,7 @@ function generateDailyReport() {
                 formatMoney(loan.amount) +
                 "</td><td>" +
                 loan.interestRate +
-                "%</td><td>" +
+                "%</td><td><span class='badge bg-info'>" + cuotasInfo + "</span></td><td>" +
                 formatDate(loan.startDate) +
                 "</td><td>" +
                 nextPaymentDisplay +
@@ -5607,14 +5846,26 @@ function generateBiweeklyReport() {
     html += "</div>";
 
     html += '<div class="card mb-3"><div class="card-header bg-primary text-white"><h5>Pagos de las Últimas 2 Semanas</h5></div><div class="card-body">';
-    html += '<table class="table table-striped"><thead><tr><th>Fecha</th><th>Cliente</th><th>Préstamo ID</th><th>Tasa</th><th>Monto</th></tr></thead><tbody>';
+    html += '<table class="table table-striped"><thead><tr><th>Fecha</th><th>Cliente</th><th>Préstamo ID</th><th>Tasa</th><th>Monto</th><th>Cuotas</th></tr></thead><tbody>';
 
     if (biweeklyPayments.length === 0) {
-        html += '<tr><td colspan="5" class="text-center">No hay pagos registrados en este período</td></tr>';
+        html += '<tr><td colspan="6" class="text-center">No hay pagos registrados en este período</td></tr>';
     } else {
         biweeklyPayments.forEach((payment) => {
             var client = clients.find((c) => c.id === payment.clientId);
             var loan = loans.find((l) => l.id === payment.loanId);
+            
+            // Calcular información de cuotas
+            var cuotasInfo = "";
+            if (loan) {
+                if (loan.type === "fixed") {
+                    cuotasInfo = (loan.paidInstallments || 0) + " de " + loan.installments;
+                } else if (loan.type === "daily") {
+                    cuotasInfo = (loan.paidDays || 0) + " de " + loan.days;
+                } else if (loan.type === "indefinite") {
+                    cuotasInfo = (loan.paidInstallments || 0) + " pagos";
+                }
+            }
             
             html +=
                 "<tr><td>" +
@@ -5628,7 +5879,7 @@ function generateBiweeklyReport() {
                 "</td><td>RD$ " +
                 formatMoney(payment.amount) +
                 (payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : "") +
-                "</td></tr>";
+                "</td><td><span class='badge bg-info'>" + cuotasInfo + "</span></td></tr>";
         });
     }
 
@@ -5636,7 +5887,7 @@ function generateBiweeklyReport() {
     
     if (finishedLoansInPeriod > 0) {
         html += '<div class="card mb-3"><div class="card-header bg-success text-white"><h5>Préstamos Finalizados en el Período</h5></div><div class="card-body">';
-        html += '<table class="table table-striped"><thead><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Fecha Entrega</th><th>Fecha Finalización</th></tr></thead><tbody>';
+        html += '<table class="table table-striped"><thead><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Cuotas</th><th>Fecha Entrega</th><th>Fecha Finalización</th></tr></thead><tbody>';
         
         var finishedLoans = loans.filter((l) => {
             if (l.status !== "paid" || !l.paidOffDate) return false;
@@ -5646,6 +5897,17 @@ function generateBiweeklyReport() {
         
         finishedLoans.forEach((loan) => {
             var client = clients.find((c) => c.id === loan.clientId);
+            
+            // Calcular información de cuotas finales
+            var cuotasText = "";
+            if (loan.type === "fixed") {
+                cuotasText = loan.installments + " de " + loan.installments;
+            } else if (loan.type === "daily") {
+                cuotasText = loan.days + " de " + loan.days;
+            } else if (loan.type === "indefinite") {
+                cuotasText = (loan.paidInstallments || 0) + " pagos totales";
+            }
+            
             html +=
                 "<tr><td>" +
                 loan.id +
@@ -5655,7 +5917,7 @@ function generateBiweeklyReport() {
                 formatMoney(loan.amount) +
                 "</td><td>" +
                 loan.interestRate +
-                "%</td><td>" +
+                "%</td><td><span class='badge bg-success'>" + cuotasText + "</span></td><td>" +
                 formatDate(loan.startDate) +
                 "</td><td>" +
                 formatDate(loan.paidOffDate) +
@@ -5733,14 +5995,26 @@ function generateMonthlyReport() {
     html += "</div>";
 
     html += '<div class="card mb-3"><div class="card-header bg-primary text-white"><h5>Pagos del Mes</h5></div><div class="card-body">';
-    html += '<table class="table table-striped"><thead><tr><th>Fecha</th><th>Cliente</th><th>Préstamo ID</th><th>Tasa</th><th>Monto</th></tr></thead><tbody>';
+    html += '<table class="table table-striped"><thead><tr><th>Fecha</th><th>Cliente</th><th>Préstamo ID</th><th>Tasa</th><th>Monto</th><th>Cuotas</th></tr></thead><tbody>';
 
     if (monthlyPayments.length === 0) {
-        html += '<tr><td colspan="5" class="text-center">No hay pagos registrados este mes</td></tr>';
+        html += '<tr><td colspan="6" class="text-center">No hay pagos registrados este mes</td></tr>';
     } else {
         monthlyPayments.forEach((payment) => {
             var client = clients.find((c) => c.id === payment.clientId);
             var loan = loans.find((l) => l.id === payment.loanId);
+            
+            // Calcular información de cuotas
+            var cuotasInfo = "";
+            if (loan) {
+                if (loan.type === "fixed") {
+                    cuotasInfo = (loan.paidInstallments || 0) + " de " + loan.installments;
+                } else if (loan.type === "daily") {
+                    cuotasInfo = (loan.paidDays || 0) + " de " + loan.days;
+                } else if (loan.type === "indefinite") {
+                    cuotasInfo = (loan.paidInstallments || 0) + " pagos";
+                }
+            }
             
             html +=
                 "<tr><td>" +
@@ -5754,7 +6028,7 @@ function generateMonthlyReport() {
                 "</td><td>RD$ " +
                 formatMoney(payment.amount) +
                 (payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : "") +
-                "</td></tr>";
+                "</td><td><span class='badge bg-info'>" + cuotasInfo + "</span></td></tr>";
         });
     }
 
