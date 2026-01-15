@@ -957,32 +957,6 @@
         .register-link:hover {
             text-decoration: underline;
         }
-
-        /* Estilos para las tarjetas de estadísticas de reportes */
-        .stat-card.bg-white {
-            background-color: #fff !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,.05);
-            border: 1px solid #e5e7eb;
-        }
-        .stat-card.border-left-primary { border-left: 5px solid var(--primary-color); }
-        .stat-card.border-left-success { border-left: 5px solid var(--success-color); }
-        .stat-card.border-left-warning { border-left: 5px solid var(--warning-color); }
-        .stat-card.border-left-info { border-left: 5px solid var(--info-color); }
-
-        .stat-card h6 {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #6b7280;
-        }
-        .stat-card h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-        .stat-card i {
-            font-size: 2rem;
-            opacity: 0.6;
-        }
     </style>
 </head>
 <body class="theme-blue">
@@ -1596,67 +1570,6 @@
             <!-- Reports Section -->
             <div id="reports" class="section">
                 <h2 class="mb-4">Reportes del Sistema</h2>
-                
-                <!-- Agregada sección de estadísticas detalladas con tarjetas de resumen -->
-                <div class="row mb-4">
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="stat-card bg-white border-left-primary">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h6 class="text-muted mb-1">Total de Pagos</h6>
-                                    <h3 id="reportTotalPayments" class="text-primary mb-0">0</h3>
-                                    <small class="text-muted">Registrados</small>
-                                </div>
-                                <div>
-                                    <i class="fas fa-receipt text-primary"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="stat-card bg-white border-left-success">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h6 class="text-muted mb-1">Total Recaudado Hoy</h6>
-                                    <h3 id="reportTodayCollection" class="text-success mb-0">RD$ 0</h3>
-                                    <small class="text-muted">Del día actual</small>
-                                </div>
-                                <div>
-                                    <i class="fas fa-money-bill-wave text-success"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="stat-card bg-white border-left-warning">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h6 class="text-muted mb-1">Total Pendiente</h6>
-                                    <h3 id="reportTotalPending" class="text-warning mb-0">RD$ 0</h3>
-                                    <small class="text-muted">Por cobrar</small>
-                                </div>
-                                <div>
-                                    <i class="fas fa-clock text-warning"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="stat-card bg-white border-left-info">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h6 class="text-muted mb-1">Capital Prestado</h6>
-                                    <h3 id="reportTotalCapital" class="text-info mb-0">RD$ 0</h3>
-                                    <small class="text-muted">Activo</small>
-                                </div>
-                                <div>
-                                    <i class="fas fa-coins text-info"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
                 <div class="row">
                     <div class="col-lg-4 col-md-6">
                         <div class="card">
@@ -1672,10 +1585,6 @@
                                 </button>
                                 <button class="btn btn-primary w-100 mb-2" onclick="generateMonthlyReport()">
                                     <i class="fas fa-calendar-alt me-2"></i>Reporte Mensual
-                                </button>
-                                <!-- Agregado botón de exportación a Excel -->
-                                <button class="btn btn-success w-100 mb-2" onclick="exportToExcel()">
-                                    <i class="fas fa-file-excel me-2"></i>Exportar a Excel
                                 </button>
                                 <button class="btn btn-outline-primary w-100" onclick="exportData()">
                                     <i class="fas fa-download me-2"></i>Exportar Datos (JSON)
@@ -2701,7 +2610,7 @@ function checkOverduePaymentsAlert() {
             showOnScreenNotification(overdueDetails.length);
         }
         
-        // Solo mostrar alerta si no se ha mostrado hoy
+        // Solo mostrar alerta popup si no se ha mostrado hoy
         if (!lastAlertDate || lastAlertDate !== todayStr) {
             shouldShowAlert = true;
             localStorage.setItem('lastOverdueAlertDate', todayStr);
@@ -2822,7 +2731,6 @@ function login(e) {
                 updateDashboard();
                 loadCompanyInfo();
                 updatePrinterUI();
-                updateReportStats(); // <-- Llamar a la función para actualizar estadísticas de reportes
                 
                 // Verificar notificaciones inmediatamente
                 checkOverduePaymentsAlert();
@@ -2903,7 +2811,6 @@ function showSection(sectionId) {
             updatePrinterUI();
             break;
         case "reports":
-            updateReportStats(); // <-- Llamar a la función para actualizar estadísticas de reportes
             break;
         case "settings":
             loadCompanyInfo();
@@ -4115,7 +4022,7 @@ function searchClientForPayment() {
                 var nextPaymentDate = calculateNextPaymentDate(loan);
                 var nextDate = new Date(nextPaymentDate);
                 var isOverdue = nextPaymentDate && !isNaN(nextDate.getTime()) && nextDate < today;
-                var daysOverdue = isOverdue ? Math.floor((today - nextDate) / (1000 * 60 * 60 * 24)) : 0;
+                var daysOverdue = isOverdue ? Math.floor((today - nextDate) / (1000 * 60 * 60 * 60 * 24)) : 0;
                 var lateFee = calculateLateFee(loan, daysOverdue);
                 
                 html +=
@@ -4440,7 +4347,7 @@ function generateContract(loanId) {
     }
 
     var contract = contractTemplate;
-    contract = contract.replace(/\{COMPANY_NAME\}/g, companyInfo.name || "[ NOMBRE DE LA EMPRESA]");
+    contract = contract.replace(/\{COMPANY_NAME\}/g, companyInfo.name || "[NOMBRE DE LA EMPRESA]");
     contract = contract.replace(/\{COMPANY_ADDRESS\}/g, companyInfo.address || "[DIRECCIÓN]");
     contract = contract.replace(/\{COMPANY_PHONE\}/g, companyInfo.phone || "[TELÉFONO]");
     contract = contract.replace(/\{COMPANY_RNC\}/g, companyInfo.rnc || "[RNC]");
@@ -4652,7 +4559,7 @@ function generateThermalReceipt(paymentId, isTest = false) {
         receipt += centerText("RD$ " + formatMoney(loan.remainingAmount), printerSettings.paperSize === "50mm" ? 32 : 48) + "\n";
         if (loan.nextPaymentDate) {
             receipt += "Proximo Pago:\n";
-            receipt += centerText("RD$ " + formatMoney(loan.nextPaymentDate), printerSettings.paperSize === "50mm" ? 32 : 48) + "\n";
+            receipt += centerText(formatDate(loan.nextPaymentDate), printerSettings.paperSize === "50mm" ? 32 : 48) + "\n";
         }
         receipt += "--------------------------------\n";
     }
@@ -4687,7 +4594,6 @@ function centerText(text, width) {
     return " ".repeat(padding) + text + " ".repeat(width - text.length - padding);
 }
 
-// FUNCIÓN MODIFICADA PARA IMPRIMIR RECIBOS TÉRMICOS
 function printThermal() {
     var invoiceContentDiv = document.getElementById("invoiceContent");
     if (!invoiceContentDiv) {
@@ -4701,38 +4607,10 @@ function printThermal() {
     }
     
     var invoiceText = invoiceContentDiv.innerText;
-    
-    // BUSCAR EL ID DEL PAGO EN DIFERENTES FORMATOS POSIBLES
-    var paymentIdMatch = null;
-    
-    // Intentar diferentes patrones
-    var patterns = [
-        /Recibo No:\s*(PAY-\d+)/i,           // "Recibo No: PAY-123"
-        /No\. Recibo:\s*(PAY-\d+)/i,         // "No. Recibo: PAY-123"
-        /RECIBO.*?(PAY-\d+)/i,               // "RECIBO DE PAGO PAY-123"
-        /ID.*?(PAY-\d+)/i                    // "ID: PAY-123"
-    ];
-    
-    for (var i = 0; i < patterns.length; i++) {
-        paymentIdMatch = invoiceText.match(patterns[i]);
-        if (paymentIdMatch && paymentIdMatch[1]) {
-            break;
-        }
-    }
-    
-    // Si no se encuentra con los patrones, buscar cualquier texto que comience con PAY-
-    if (!paymentIdMatch || !paymentIdMatch[1]) {
-        var payMatch = invoiceText.match(/(PAY-\w+)/);
-        if (payMatch && payMatch[1]) {
-            paymentIdMatch = payMatch;
-        }
-    }
+    var paymentIdMatch = invoiceText.match(/Recibo No:\s*(PAY-\d+)/);
     
     if (!paymentIdMatch || !paymentIdMatch[1]) {
-        alert("No se pudo identificar el ID del pago para imprimir el recibo térmico. Generando recibo de prueba.");
-        // Generar recibo de prueba como alternativa
-        var thermalContent = generateThermalReceipt(null, true);
-        printThermalContent(thermalContent);
+        alert("No se pudo identificar el ID del pago para imprimir el recibo térmico.");
         return;
     }
     
@@ -4740,15 +4618,10 @@ function printThermal() {
     var thermalContent = generateThermalReceipt(paymentId);
     
     if (!thermalContent) {
-        alert("No se pudo generar el recibo. Generando recibo de prueba.");
-        thermalContent = generateThermalReceipt(null, true);
+        alert("No se pudo generar el recibo");
+        return;
     }
     
-    printThermalContent(thermalContent);
-}
-
-// FUNCIÓN AUXILIAR PARA IMPRIMIR EL CONTENIDO TÉRMICO
-function printThermalContent(thermalContent) {
     var printWindow = window.open("", "_blank", "width=350,height=600");
     printWindow.document.write("<html><head><title>Impresión Térmica</title>");
     printWindow.document.write("<style>");
@@ -4776,7 +4649,6 @@ function printThermalContent(thermalContent) {
     
     setTimeout(function() {
         printWindow.print();
-        printWindow.close();
     }, 500);
 }
 
@@ -4877,7 +4749,6 @@ function voidPayment(paymentId) {
     renderPaymentHistory();
     renderLoans();
     renderFinishedLoans();
-    renderOverduePayments();
     updateDashboard();
 }
 
@@ -5173,7 +5044,6 @@ function importData() {
                     updateDashboard();
                     loadCompanyInfo();
                     updatePrinterUI();
-                    updateReportStats(); // <-- Asegurarse de que las estadísticas de reportes se actualicen
                     
                     alert("Datos importados exitosamente");
                 }
@@ -5443,7 +5313,6 @@ window.addEventListener("DOMContentLoaded", () => {
                 renderOverduePayments();
                 loadCompanyInfo();
                 updatePrinterUI();
-                updateReportStats(); // <-- Llamar a la función para actualizar estadísticas de reportes
                 
                 showSection('dashboard');
                 startPeriodicOverdueCheck();
@@ -5473,6 +5342,100 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // Functions for reports
+function generateInvoice(paymentId) {
+    var payment = payments.find((p) => p.id === paymentId);
+    if (!payment) {
+        alert("No se encontró el pago");
+        return;
+    }
+
+    var loan = loans.find((l) => l.id === payment.loanId);
+    var client = clients.find((c) => c.id === payment.clientId);
+
+    var companyName = companyInfo.name || "Sistema de Préstamos";
+    var address = companyInfo.address || "";
+    var phone = companyInfo.phone || "";
+    var rnc = companyInfo.rnc || "";
+    
+    var html = '<div class="text-center mb-4">';
+    
+    if (companyInfo.logoBase64) {
+        html += '<img src="' + companyInfo.logoBase64 + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">';
+    } else if (companyInfo.logo) {
+        html += '<img src="' + companyInfo.logo + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">';
+    }
+    
+    html +=
+        "<h3>" +
+        companyName +
+        "</h3>" +
+        "<p>" +
+        address +
+        "</p>" +
+        "<p>Tel: " +
+        phone +
+        " | RNC: " +
+        rnc +
+        "</p>" +
+        "</div>" +
+        '<h4 class="text-center mb-4">RECIBO DE PAGO</h4>' +
+        '<table class="table">' +
+        "<tr><th>Recibo No:</th><td>" +
+        payment.id +
+        "</td></tr>" +
+        "<tr><th>Fecha:</th><td>" +
+        formatDate(payment.date) +
+        "</td></tr>" +
+        "<tr><th>Hora:</th><td>" +
+        new Date(payment.date).toLocaleTimeString('es-DO', {hour: '2-digit', minute: '2-digit'}) +
+        "</td></tr>" +
+        "<tr><th>Cliente:</th><td>" +
+        (client ? client.firstName + " " + client.lastName : "N/A") +
+        "</td></tr>" +
+        "<tr><th>Cédula:</th><td>" +
+        (client ? client.cedula : "N/A") +
+        "</td></tr>" +
+        "<tr><th>Teléfono:</th><td>" +
+        (client ? client.phone : "N/A") +
+        "</td></tr>" +
+        "<tr><th>Préstamo:</th><td>" +
+        payment.loanId +
+        "</td></tr>" +
+        "<tr><th>Tipo de Pago:</th><td>" +
+        getPaymentTypeLabel(payment.type) +
+        "</td></tr>" +
+        "<tr><th>Método:</th><td>" +
+        getPaymentMethodLabel(payment.method) +
+        "</td></tr>" +
+        '<tr><th class="text-end">Monto Pagado:</th><td class="text-end"><strong>RD$ ' +
+        formatMoney(payment.amount) +
+        "</strong></td></tr>";
+
+    if (payment.lateFee && payment.lateFee > 0) {
+        html +=
+            '<tr><th class="text-end">Incluye Mora:</th><td class="text-end text-danger">RD$ ' +
+            formatMoney(payment.lateFee) +
+            "</td></tr>";
+    }
+
+    if (loan) {
+        html +=
+            '<tr><th class="text-end">Saldo Restante:</th><td class="text-end">RD$ ' +
+            formatMoney(loan.remainingAmount) +
+            "</td></tr>";
+    }
+
+    html += "</table>";
+
+    if (payment.notes) {
+        html += "<p><strong>Notas:</strong> " + payment.notes + "</p>";
+    }
+
+    document.getElementById("invoiceContent").innerHTML = html;
+    var modal = new bootstrap.Modal(document.getElementById("invoiceModal"));
+    modal.show();
+}
+
 function generateDailyReport() {
     var now = new Date();
     var today = now.toISOString().split('T')[0];
@@ -5484,9 +5447,6 @@ function generateDailyReport() {
 
     var totalCollected = dailyPayments.reduce((sum, p) => sum + p.amount, 0);
     var activeLoansCount = loans.filter((l) => l.status === "active").length;
-    
-    var totalPending = loans.filter((l) => l.status === "active").reduce((sum, l) => sum + l.remainingAmount, 0);
-    var totalCapital = loans.filter((l) => l.status === "active").reduce((sum, l) => sum + l.amount, 0);
     
     var overdueLoansCount = 0;
     loans.filter(l => l.status === 'active').forEach(loan => {
@@ -5517,30 +5477,18 @@ function generateDailyReport() {
 
     html += '<div class="row mb-4">';
     html +=
-        '<div class="col-md-3 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Total Recaudado Hoy</h6><h3 class="text-success">RD$ ' +
+        '<div class="col-md-4 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Total Recaudado Hoy</h6><h3 class="text-success">RD$ ' +
         formatMoney(totalCollected) +
         "</h3></div></div></div>";
     html +=
-        '<div class="col-md-3 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Total Pendiente</h6><h3 class="text-warning">RD$ ' +
-        formatMoney(totalPending) +
+        '<div class="col-md-4 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Préstamos Activos</h6><h3 class="text-primary">' +
+        activeLoansCount +
         "</h3></div></div></div>";
     html +=
-        '<div class="col-md-3 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Capital Prestado</h6><h3 class="text-info">RD$ ' +
-        formatMoney(totalCapital) +
-        "</h3></div></div></div>";
-    html +=
-        '<div class="col-md-3 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Pagos Vencidos</h6><h3 class="text-danger">' +
+        '<div class="col-md-4 col-sm-6 mb-3"><div class="card"><div class="card-body text-center"><h6>Pagos Vencidos</h6><h3 class="text-danger">' +
         overdueLoansCount +
         "</h3></div></div></div>";
     html += "</div>";
-
-    html += '<div class="card mb-3"><div class="card-header bg-success text-white"><h5>Resumen de Pagos del Día</h5></div><div class="card-body">';
-    html += '<div class="row mb-3">';
-    html += '<div class="col-md-4"><strong>Total de Pagos:</strong> ' + dailyPayments.length + '</div>';
-    html += '<div class="col-md-4"><strong>Monto Total:</strong> RD$ ' + formatMoney(totalCollected) + '</div>';
-    var totalLateFees = dailyPayments.reduce((sum, p) => sum + (p.lateFee || 0), 0);
-    html += '<div class="col-md-4"><strong>Moras Cobradas:</strong> RD$ ' + formatMoney(totalLateFees) + '</div>';
-    html += '</div></div></div>';
 
     html += '<div class="card mb-3"><div class="card-header bg-primary text-white"><h5>Pagos de Hoy</h5></div><div class="card-body">';
     html += '<table class="table table-striped"><thead><tr><th>Hora</th><th>Cliente</th><th>Préstamo ID</th><th>Tasa</th><th>Monto</th></tr></thead><tbody>';
@@ -5746,10 +5694,6 @@ function generateMonthlyReport() {
     var totalPending = loans
         .filter((l) => l.status === "active")
         .reduce((sum, l) => sum + l.remainingAmount, 0);
-    
-    var totalCapital = loans
-        .filter((l) => l.status === "active")
-        .reduce((sum, l) => sum + l.amount, 0);
 
     var html = '<div class="container">';
     html += '<div class="text-center mb-4">';
@@ -5814,297 +5758,12 @@ function generateMonthlyReport() {
         });
     }
 
-    html += "</tbody></table></div></div>";
-    
-    html += '<div class="card mb-3"><div class="card-header bg-success text-white"><h5>Préstamos Finalizados en el Mes</h5></div><div class="card-body">';
-    html += '<table class="table table-striped"><thead><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Tasa</th><th>Fecha Entrega</th><th>Fecha Finalización</th></tr></thead><tbody>';
-    
-    var finishedLoans = loans.filter((l) => {
-        if (l.status !== "paid" || !l.paidOffDate) return false;
-        var paidDate = new Date(l.paidOffDate);
-        return paidDate.getMonth() === currentMonth && paidDate.getFullYear() === currentYear;
-    });
-    
-    if (finishedLoans.length === 0) {
-        html += '<tr><td colspan="6" class="text-center">No hay préstamos finalizados este mes</td></tr>';
-    } else {
-        finishedLoans.forEach((loan) => {
-            var client = clients.find((c) => c.id === loan.clientId);
-            html +=
-                "<tr><td>" +
-                loan.id +
-                "</td><td>" +
-                (client ? client.firstName + " " + client.lastName : "N/A") +
-                "</td><td>RD$ " +
-                formatMoney(loan.amount) +
-                "</td><td>" +
-                loan.interestRate +
-                "%</td><td>" +
-                formatDate(loan.startDate) +
-                "</td><td>" +
-                formatDate(loan.paidOffDate) +
-                "</td></tr>";
-        });
-    }
-    
     html += "</tbody></table></div></div></div>";
 
     document.getElementById("reportContent").innerHTML = html;
     var modal = new bootstrap.Modal(document.getElementById("reportModal"));
     modal.show();
 }
-
-function exportToExcel() {
-    var now = new Date();
-    var today = now.toISOString().split('T')[0];
-    
-    // Calcular estadísticas generales
-    var todayPayments = payments.filter((p) => {
-        var paymentDate = new Date(p.date).toISOString().split('T')[0];
-        return paymentDate === today;
-    });
-    
-    var totalPayments = payments.length;
-    var totalCollectedToday = todayPayments.reduce((sum, p) => sum + p.amount, 0);
-    var totalPending = loans.filter((l) => l.status === "active").reduce((sum, l) => sum + l.remainingAmount, 0);
-    var totalCapital = loans.filter((l) => l.status === "active").reduce((sum, l) => sum + l.amount, 0);
-    
-    // Crear CSV con múltiples secciones
-    var csv = '';
-    
-    // Sección 1: Resumen General
-    csv += 'RESUMEN GENERAL DE REPORTES\n';
-    csv += 'Fecha de Exportación,' + new Date().toLocaleString('es-DO') + '\n';
-    csv += 'Empresa,' + (companyInfo.name || 'Sistema de Préstamos') + '\n\n';
-    
-    csv += 'ESTADÍSTICAS PRINCIPALES\n';
-    csv += 'Concepto,Valor\n';
-    csv += 'Total de Pagos Registrados,' + totalPayments + '\n';
-    csv += 'Total Recaudado Hoy,RD$ ' + formatMoney(totalCollectedToday) + '\n';
-    csv += 'Total Pendiente de Cobro,RD$ ' + formatMoney(totalPending) + '\n';
-    csv += 'Capital Prestado Activo,RD$ ' + formatMoney(totalCapital) + '\n';
-    csv += 'Préstamos Activos,' + loans.filter((l) => l.status === "active").length + '\n';
-    csv += 'Préstamos Finalizados,' + loans.filter((l) => l.status === "paid").length + '\n\n';
-    
-    // Sección 2: Pagos del Día
-    csv += 'PAGOS DEL DÍA (' + formatDate(today) + ')\n';
-    csv += 'Hora,Cliente,Cédula,Préstamo ID,Método,Monto,Mora,Total\n';
-    
-    if (todayPayments.length === 0) {
-        csv += 'No hay pagos registrados hoy\n';
-    } else {
-        todayPayments.forEach((payment) => {
-            var client = clients.find((c) => c.id === payment.clientId);
-            var paymentTime = new Date(payment.date).toLocaleTimeString('es-DO', {hour: '2-digit', minute: '2-digit'});
-            var lateFee = payment.lateFee || 0;
-            
-            csv += paymentTime + ',';
-            csv += (client ? client.firstName + ' ' + client.lastName : 'N/A') + ',';
-            csv += (client ? client.cedula : 'N/A') + ',';
-            csv += payment.loanId + ',';
-            csv += getPaymentMethodLabel(payment.method) + ',';
-            csv += 'RD$ ' + formatMoney(payment.amount - lateFee) + ',';
-            csv += 'RD$ ' + formatMoney(lateFee) + ',';
-            csv += 'RD$ ' + formatMoney(payment.amount) + '\n';
-        });
-    }
-    
-    csv += '\n';
-    
-    // Sección 3: Préstamos Activos
-    csv += 'PRÉSTAMOS ACTIVOS\n';
-    csv += 'ID,Cliente,Cédula,Teléfono,Monto Original,Tasa %,Monto a Pagar,Saldo Pendiente,Fecha Entrega,Próximo Pago,Días Activo\n';
-    
-    var activeLoans = loans.filter((l) => l.status === "active");
-    
-    if (activeLoans.length === 0) {
-        csv += 'No hay préstamos activos\n';
-    } else {
-        activeLoans.forEach((loan) => {
-            var client = clients.find((c) => c.id === loan.clientId);
-            var nextPaymentDisplay = loan.nextPaymentDate ? formatDate(loan.nextPaymentDate) : "N/A";
-            if (!nextPaymentDisplay || nextPaymentDisplay === "Fecha inválida") {
-                nextPaymentDisplay = formatDate(calculateNextPaymentDate(loan));
-            }
-            
-            var daysActive = Math.floor((new Date() - new Date(loan.startDate)) / (1000 * 60 * 60 * 24));
-            
-            csv += loan.id + ',';
-            csv += (client ? client.firstName + ' ' + client.lastName : 'N/A') + ',';
-            csv += (client ? client.cedula : 'N/A') + ',';
-            csv += (client ? client.phone : 'N/A') + ',';
-            csv += 'RD$ ' + formatMoney(loan.amount) + ',';
-            csv += loan.interestRate + '%,';
-            csv += 'RD$ ' + formatMoney(loan.totalAmount) + ',';
-            csv += 'RD$ ' + formatMoney(loan.remainingAmount) + ',';
-            csv += formatDate(loan.startDate) + ',';
-            csv += nextPaymentDisplay + ',';
-            csv += daysActive + '\n';
-        });
-    }
-    
-    csv += '\n';
-    
-    // Sección 4: Todos los Pagos (Histórico)
-    csv += 'HISTORIAL COMPLETO DE PAGOS\n';
-    csv += 'Fecha,Hora,Cliente,Préstamo ID,Tipo de Pago,Método,Monto,Mora,Notas\n';
-    
-    payments.forEach((payment) => {
-        var client = clients.find((c) => c.id === payment.clientId);
-        var paymentDate = formatDate(payment.date);
-        var paymentTime = new Date(payment.date).toLocaleTimeString('es-DO', {hour: '2-digit', minute: '2-digit'});
-        var lateFee = payment.lateFee || 0;
-        
-        csv += paymentDate + ',';
-        csv += paymentTime + ',';
-        csv += (client ? client.firstName + ' ' + client.lastName : 'N/A') + ',';
-        csv += payment.loanId + ',';
-        csv += getPaymentTypeLabel(payment.type) + ',';
-        csv += getPaymentMethodLabel(payment.method) + ',';
-        csv += 'RD$ ' + formatMoney(payment.amount) + ',';
-        csv += 'RD$ ' + formatMoney(lateFee) + ',';
-        csv += '"' + (payment.notes || '') + '"\n';
-    });
-    
-    // Crear archivo y descargarlo
-    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    var link = document.createElement('a');
-    var url = URL.createObjectURL(blob);
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'Reporte_Prestamos_' + today + '.csv');
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    showNotification('Reporte exportado exitosamente a Excel', 'success');
-}
-
-function updateReportStats() {
-    var now = new Date();
-    var today = now.toISOString().split('T')[0];
-    
-    // Calcular estadísticas
-    var todayPayments = payments.filter((p) => {
-        var paymentDate = new Date(p.date).toISOString().split('T')[0];
-        return paymentDate === today;
-    });
-    
-    var totalPayments = payments.length;
-    var totalCollectedToday = todayPayments.reduce((sum, p) => sum + p.amount, 0);
-    var totalPending = loans.filter((l) => l.status === "active").reduce((sum, l) => sum + l.remainingAmount, 0);
-    var totalCapital = loans.filter((l) => l.status === "active").reduce((sum, l) => sum + l.amount, 0);
-    
-    // Actualizar elementos del DOM
-    var reportTotalPayments = document.getElementById('reportTotalPayments');
-    var reportTodayCollection = document.getElementById('reportTodayCollection');
-    var reportTotalPending = document.getElementById('reportTotalPending');
-    var reportTotalCapital = document.getElementById('reportTotalCapital');
-    
-    if (reportTotalPayments) reportTotalPayments.textContent = totalPayments;
-    if (reportTodayCollection) reportTodayCollection.textContent = 'RD$ ' + formatMoney(totalCollectedToday);
-    if (reportTotalPending) reportTotalPending.textContent = 'RD$ ' + formatMoney(totalPending);
-    if (reportTotalCapital) reportTotalCapital.textContent = 'RD$ ' + formatMoney(totalCapital);
-}
-
-// Helper function for notifications (if needed elsewhere)
-function showNotification(message, type) {
-    // Basic implementation, can be enhanced with a toast library or custom component
-    var alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-    alertDiv.role = 'alert';
-    alertDiv.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
-    document.body.appendChild(alertDiv);
-    setTimeout(() => {
-        alertDiv.remove();
-    }, 5000);
-}
-
-
-// NUEVA FUNCIÓN PARA GENERAR RECIBO DE PAGO
-function generateInvoice(paymentId) {
-    var payment = payments.find(p => p.id === paymentId);
-    if (!payment) {
-        alert("Pago no encontrado");
-        return;
-    }
-
-    var loan = loans.find(l => l.id === payment.loanId);
-    var client = clients.find(c => c.id === payment.clientId);
-    
-    if (!loan || !client) {
-        alert("No se pudo generar el recibo. Datos incompletos.");
-        return;
-    }
-
-    var companyName = companyInfo.name || "Sistema de Préstamos";
-    var address = companyInfo.address || "";
-    var phone = companyInfo.phone || "";
-    var rnc = companyInfo.rnc || "";
-    
-    var html = '<div class="text-center mb-4">';
-    
-    if (companyInfo.logoBase64) {
-        html += '<img src="' + companyInfo.logoBase64 + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">';
-    } else if (companyInfo.logo) {
-        html += '<img src="' + companyInfo.logo + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">';
-    }
-    
-    html += "<h3>" + companyName + "</h3>" +
-            "<p>" + address + "</p>" +
-            "<p>Tel: " + phone + " | RNC: " + rnc + "</p>" +
-            "</div>" +
-            '<h4 class="text-center mb-4">RECIBO DE PAGO</h4>' +
-            '<table class="table">' +
-            "<tr><th>No. Recibo:</th><td>" + payment.id + "</td></tr>" +
-            "<tr><th>No. Préstamo:</th><td>" + loan.id + "</td></tr>" +
-            "<tr><th>Cliente:</th><td>" + client.firstName + " " + client.lastName + "</td></tr>" +
-            "<tr><th>Cédula:</th><td>" + client.cedula + "</td></tr>" +
-            "<tr><th>Fecha de Pago:</th><td>" + formatDate(payment.date) + "</td></tr>" +
-            "<tr><th>Tipo de Pago:</th><td>" + getPaymentTypeLabel(payment.type) + "</td></tr>" +
-            "<tr><th>Método de Pago:</th><td>" + getPaymentMethodLabel(payment.method) + "</td></tr>";
-    
-    // Mostrar desglose si hay mora
-    if (payment.lateFee && payment.lateFee > 0) {
-        html += "<tr><th>Monto Principal:</th><td class='text-end'>RD$ " + formatMoney(payment.principalAmount || (payment.amount - payment.lateFee)) + "</td></tr>" +
-                "<tr><th>Mora:</th><td class='text-end text-danger'>RD$ " + formatMoney(payment.lateFee) + "</td></tr>";
-    }
-    
-    html += "<tr><th>Total Pagado:</th><td class='text-end'><strong class='text-success'>RD$ " + formatMoney(payment.amount) + "</strong></td></tr>";
-    
-    // Mostrar información del préstamo
-    html += "<tr><th colspan='2' class='bg-light'><strong>Estado del Préstamo</strong></th></tr>" +
-            "<tr><th>Total del Préstamo:</th><td class='text-end'>RD$ " + formatMoney(loan.totalAmount) + "</td></tr>" +
-            "<tr><th>Total Pagado:</th><td class='text-end'>RD$ " + formatMoney(loan.totalPaid) + "</td></tr>" +
-            "<tr><th>Saldo Restante:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.remainingAmount) + "</strong></td></tr>";
-    
-    // Agregar información de progreso según tipo de préstamo
-    if (loan.type === "fixed") {
-        html += "<tr><th>Cuotas Pagadas:</th><td>" + loan.paidInstallments + " de " + loan.installments + "</td></tr>";
-    } else if (loan.type === "daily") {
-        html += "<tr><th>Días Pagados:</th><td>" + loan.paidDays + " de " + loan.days + "</td></tr>";
-    }
-    
-    html += "</table>";
-    
-    // Agregar notas si existen
-    if (payment.notes) {
-        html += '<div class="alert alert-info mt-3"><i class="fas fa-sticky-note me-2"></i><strong>Notas:</strong> ' + payment.notes + '</div>';
-    }
-    
-    html += '<div class="alert alert-success mt-3"><i class="fas fa-check-circle me-2"></i>Pago registrado exitosamente. Conserve este recibo para sus registros.</div>';
-
-    // Mostrar el recibo en el modal
-    document.getElementById("invoiceContent").innerHTML = html;
-    var modal = new bootstrap.Modal(document.getElementById("invoiceModal"));
-    modal.show();
-}
-
     </script>
 </body>
 </html>
