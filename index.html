@@ -221,6 +221,10 @@
             margin-top: 15px;
         }
 
+        .sidebar .logo .notification-icon {
+            cursor: pointer;
+        }
+
         .sidebar .nav-link {
             color: rgba(255,255,255,0.85);
             padding: 14px 16px;
@@ -248,6 +252,86 @@
             font-size: 1.1rem;
             width: 24px;
             text-align: center;
+        }
+
+        /* Estilos mejorados para el menú desplegable de préstamos */
+        .loans-menu-container {
+            margin: 8px 0;
+        }
+
+        .loans-main-link {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .loans-main-link:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+        }
+
+        .loans-main-link i:first-child {
+            margin-right: 12px;
+        }
+
+        .loans-main-link .arrow-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .loans-main-link .arrow-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .loans-submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            margin-left: 12px;
+        }
+
+        .loans-submenu.expanded {
+            max-height: 400px; /* Altura suficiente para mostrar todos los items */
+            transition: max-height 0.5s ease-in;
+        }
+
+        .loans-submenu .nav-link {
+            padding: 12px 16px 12px 44px;
+            margin: 4px 0;
+            font-size: 0.9rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .loans-submenu .nav-link:before {
+            content: '•';
+            position: absolute;
+            left: 20px;
+            color: rgba(255,255,255,0.6);
+            font-size: 1.2rem;
+        }
+
+        .loans-submenu .nav-link i {
+            font-size: 0.9rem;
+            width: 20px;
+            margin-right: 8px;
+        }
+
+        .loans-submenu .nav-link:hover,
+        .loans-submenu .nav-link.active {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .loans-submenu .nav-link.active:before {
+            color: white;
         }
 
         /* Asegurar que todos los textos usan las nuevas fuentes */
@@ -421,6 +505,15 @@
             .sidebar .nav-link {
                 font-size: 0.9rem;
                 padding: 12px 14px;
+            }
+            
+            .loans-submenu .nav-link {
+                font-size: 0.85rem;
+                padding: 10px 16px 10px 40px;
+            }
+            
+            .loans-submenu .nav-link:before {
+                left: 18px;
             }
         }
 
@@ -1037,21 +1130,50 @@
             <div class="logo">
                 <i class="fas fa-hand-holding-usd fa-3x mb-3"></i>
                 <h4 id="companyNameSidebar">Sistema de Préstamos</h4>
-                <div class="notification-icon mt-2">
+                <div class="notification-icon mt-2" onclick="showSection('overdue-payments'); closeMobileMenu();">
                     <i class="fas fa-bell fa-lg notification-bell" id="sidebarNotificationBell"></i>
                     <span class="notification-badge" id="sidebarNotificationBadge" style="display: none;">0</span>
                 </div>
             </div>
             <nav class="nav flex-column">
-                <a class="nav-link active" href="#" onclick="showSection('dashboard'); closeMobileMenu(); return false;">
+                <a class="nav-link" href="#" onclick="showSection('dashboard'); closeMobileMenu(); return false;">
                     <i class="fas fa-home"></i> <span>Inicio</span>
                 </a>
                 <a class="nav-link" href="#" onclick="showSection('clients'); closeMobileMenu(); return false;">
                     <i class="fas fa-users"></i> <span>Ver Clientes</span>
                 </a>
-                <a class="nav-link" href="#" onclick="showSection('loans'); closeMobileMenu(); return false;">
-                    <i class="fas fa-money-bill-wave"></i> <span>Préstamos Activos</span>
-                </a>
+                
+                <!-- Menú desplegable de Préstamos -->
+                <div class="loans-menu-container">
+                    <div class="loans-main-link" onclick="toggleLoansMenu()">
+                        <div>
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>Préstamos</span>
+                        </div>
+                        <i class="fas fa-chevron-down arrow-icon" id="loansArrow"></i>
+                    </div>
+                    <div class="loans-submenu" id="loansSubmenu">
+                        <a class="nav-link" href="#" onclick="showSection('loans'); closeMobileMenu(); return false;">
+                            <i class="fas fa-list"></i> <span>Todos los Préstamos</span>
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('daily-loans'); closeMobileMenu(); return false;">
+                            <i class="fas fa-calendar-day"></i> <span>Préstamos Diarios</span>
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('weekly-loans'); closeMobileMenu(); return false;">
+                            <i class="fas fa-calendar-week"></i> <span>Préstamos Semanales</span>
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('biweekly-loans'); closeMobileMenu(); return false;">
+                            <i class="fas fa-calendar-alt"></i> <span>Préstamos Quincenales</span>
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('monthly-loans'); closeMobileMenu(); return false;">
+                            <i class="fas fa-calendar-check"></i> <span>Préstamos Mensuales</span>
+                        </a>
+                        <a class="nav-link" href="#" onclick="showSection('indefinite-loans'); closeMobileMenu(); return false;">
+                            <i class="fas fa-infinity"></i> <span>Préstamos a Réditos</span>
+                        </a>
+                    </div>
+                </div>
+
                 <a class="nav-link" href="#" onclick="showSection('finished-loans'); closeMobileMenu(); return false;">
                     <i class="fas fa-check-circle"></i> <span>Préstamos Finalizados</span>
                 </a>
@@ -1213,10 +1335,10 @@
                 </div>
             </div>
 
-            <!-- Loans Section -->
+            <!-- Loans Section (All Loans) -->
             <div id="loans" class="section">
                 <div class="mb-4">
-                    <h2 class="mb-3">Préstamos Activos</h2>
+                    <h2 class="mb-3">Todos los Préstamos Activos</h2>
                     <div class="d-flex justify-content-between flex-wrap gap-2">
                         <button class="btn btn-success" onclick="window.print()">
                             <i class="fas fa-list me-2"></i>Imprimir Lista
@@ -1248,6 +1370,211 @@
                                     </tr>
                                 </thead>
                                 <tbody id="loansTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Loans Section -->
+            <div id="daily-loans" class="section">
+                <div class="mb-4">
+                    <h2 class="mb-3">Préstamos Diarios</h2>
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <button class="btn btn-success" onclick="window.print()">
+                            <i class="fas fa-list me-2"></i>Imprimir Lista
+                        </button>
+                        <button class="btn btn-primary" onclick="openLoanModal()">
+                            <i class="fas fa-plus me-2"></i>Nuevo Préstamo Diario
+                        </button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="search-box mb-3">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="dailyLoanSearch" placeholder="Buscar préstamo diario..." onkeyup="searchDailyLoans()">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Monto</th>
+                                        <th class="hide-mobile">Tasa</th>
+                                        <th class="hide-mobile">Fecha</th>
+                                        <th>Días</th>
+                                        <th>Pago Diario</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dailyLoansTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Loans Section -->
+            <div id="weekly-loans" class="section">
+                <div class="mb-4">
+                    <h2 class="mb-3">Préstamos Semanales</h2>
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <button class="btn btn-success" onclick="window.print()">
+                            <i class="fas fa-list me-2"></i>Imprimir Lista
+                        </button>
+                        <button class="btn btn-primary" onclick="openLoanModal()">
+                            <i class="fas fa-plus me-2"></i>Nuevo Préstamo Semanal
+                        </button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="search-box mb-3">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="weeklyLoanSearch" placeholder="Buscar préstamo semanal..." onkeyup="searchWeeklyLoans()">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Monto</th>
+                                        <th class="hide-mobile">Tasa</th>
+                                        <th class="hide-mobile">Fecha</th>
+                                        <th>Cuotas</th>
+                                        <th>Pago Semanal</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="weeklyLoansTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Biweekly Loans Section -->
+            <div id="biweekly-loans" class="section">
+                <div class="mb-4">
+                    <h2 class="mb-3">Préstamos Quincenales</h2>
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <button class="btn btn-success" onclick="window.print()">
+                            <i class="fas fa-list me-2"></i>Imprimir Lista
+                        </button>
+                        <button class="btn btn-primary" onclick="openLoanModal()">
+                            <i class="fas fa-plus me-2"></i>Nuevo Préstamo Quincenal
+                        </button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="search-box mb-3">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="biweeklyLoanSearch" placeholder="Buscar préstamo quincenal..." onkeyup="searchBiweeklyLoans()">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Monto</th>
+                                        <th class="hide-mobile">Tasa</th>
+                                        <th class="hide-mobile">Fecha</th>
+                                        <th>Cuotas</th>
+                                        <th>Pago Quincenal</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="biweeklyLoansTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Loans Section -->
+            <div id="monthly-loans" class="section">
+                <div class="mb-4">
+                    <h2 class="mb-3">Préstamos Mensuales</h2>
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <button class="btn btn-success" onclick="window.print()">
+                            <i class="fas fa-list me-2"></i>Imprimir Lista
+                        </button>
+                        <button class="btn btn-primary" onclick="openLoanModal()">
+                            <i class="fas fa-plus me-2"></i>Nuevo Préstamo Mensual
+                        </button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="search-box mb-3">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="monthlyLoanSearch" placeholder="Buscar préstamo mensual..." onkeyup="searchMonthlyLoans()">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Monto</th>
+                                        <th class="hide-mobile">Tasa</th>
+                                        <th class="hide-mobile">Fecha</th>
+                                        <th>Cuotas</th>
+                                        <th>Pago Mensual</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="monthlyLoansTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Indefinite Loans Section (Réditos) -->
+            <div id="indefinite-loans" class="section">
+                <div class="mb-4">
+                    <h2 class="mb-3">Préstamos a Réditos</h2>
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <button class="btn btn-success" onclick="window.print()">
+                            <i class="fas fa-list me-2"></i>Imprimir Lista
+                        </button>
+                        <button class="btn btn-primary" onclick="openLoanModal()">
+                            <i class="fas fa-plus me-2"></i>Nuevo Préstamo a Réditos
+                        </button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="search-box mb-3">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="indefiniteLoanSearch" placeholder="Buscar préstamo a réditos..." onkeyup="searchIndefiniteLoans()">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Monto</th>
+                                        <th class="hide-mobile">Tasa</th>
+                                        <th class="hide-mobile">Fecha</th>
+                                        <th>Frecuencia</th>
+                                        <th>Pagos Realizados</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="indefiniteLoansTable"></tbody>
                             </table>
                         </div>
                     </div>
@@ -1879,8 +2206,8 @@
                                 <label class="form-label">Tipo de Préstamo *</label>
                                 <select class="form-select" id="loanType" required onchange="toggleLoanType()">
                                     <option value="">Seleccionar tipo...</option>
-                                    <option value="fixed">Plazo Definido</option>
-                                    <option value="indefinite">Plazo Indefinido</option>
+                                    <option value="fixed">Préstamo a Cuotas</option>
+                                    <option value="indefinite">Préstamo a Réditos</option>
                                     <option value="daily">Préstamo Diario</option>
                                 </select>
                             </div>
@@ -2271,12 +2598,34 @@ var notifications = {
 // Contador único para IDs de préstamo
 var loanIdCounter = 1;
 
+// Estado del menú desplegable de préstamos
+var loansMenuExpanded = true; // Por defecto expandido
+
 // Función para generar ID único de préstamo
 function generateLoanId() {
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 1000);
     loanIdCounter++;
     return `LOAN-${timestamp}-${random}-${loanIdCounter}`;
+}
+
+// Función para toggle del menú de préstamos
+function toggleLoansMenu() {
+    var submenu = document.getElementById("loansSubmenu");
+    var arrow = document.getElementById("loansArrow");
+    
+    loansMenuExpanded = !loansMenuExpanded;
+    
+    if (loansMenuExpanded) {
+        submenu.classList.add("expanded");
+        arrow.classList.add("rotated");
+    } else {
+        submenu.classList.remove("expanded");
+        arrow.classList.remove("rotated");
+    }
+    
+    // Guardar estado en localStorage para persistencia
+    localStorage.setItem('loansMenuExpanded', loansMenuExpanded);
 }
 
 // Mobile Menu Functions
@@ -2749,6 +3098,11 @@ function login(e) {
             loadData().then(() => {
                 renderClients();
                 renderLoans();
+                renderDailyLoans();
+                renderWeeklyLoans();
+                renderBiweeklyLoans();
+                renderMonthlyLoans();
+                renderIndefiniteLoans();
                 renderPaymentHistory();
                 renderVoidPayments();
                 renderOverduePayments();
@@ -2756,6 +3110,26 @@ function login(e) {
                 updateDashboard();
                 loadCompanyInfo();
                 updatePrinterUI();
+                
+                // Restaurar estado del menú de préstamos
+                var savedState = localStorage.getItem('loansMenuExpanded');
+                if (savedState !== null) {
+                    loansMenuExpanded = savedState === 'true';
+                    var submenu = document.getElementById("loansSubmenu");
+                    var arrow = document.getElementById("loansArrow");
+                    
+                    if (loansMenuExpanded) {
+                        submenu.classList.add("expanded");
+                        arrow.classList.add("rotated");
+                    } else {
+                        submenu.classList.remove("expanded");
+                        arrow.classList.remove("rotated");
+                    }
+                } else {
+                    // Por defecto expandido
+                    document.getElementById("loansSubmenu").classList.add("expanded");
+                    document.getElementById("loansArrow").classList.add("rotated");
+                }
                 
                 // Verificar notificaciones inmediatamente
                 checkOverduePaymentsAlert();
@@ -2794,13 +3168,20 @@ function showSection(sectionId) {
         activeSection.classList.add("active");
     }
 
+    // Remover clase active de todos los enlaces del menú
     var navLinks = document.querySelectorAll(".sidebar .nav-link");
     navLinks.forEach(function (link) {
         link.classList.remove("active");
     });
-    var activeLink = document.querySelector(`.sidebar .nav-link[onclick*="'${sectionId}'"]`);
-    if (activeLink) {
-        activeLink.classList.add("active");
+    
+    // Activar el enlace correspondiente en el submenú de préstamos
+    if (sectionId === 'loans' || sectionId === 'daily-loans' || sectionId === 'weekly-loans' || 
+        sectionId === 'biweekly-loans' || sectionId === 'monthly-loans' || sectionId === 'indefinite-loans') {
+        var activeLink = document.querySelector(`.sidebar .nav-link[onclick*="'${sectionId}'"]`);
+        if (activeLink) activeLink.classList.add("active");
+    } else {
+        var activeLink = document.querySelector(`.sidebar .nav-link[onclick*="'${sectionId}'"]`);
+        if (activeLink) activeLink.classList.add("active");
     }
 
     switch (sectionId) {
@@ -2812,6 +3193,21 @@ function showSection(sectionId) {
             break;
         case "loans":
             renderLoans();
+            break;
+        case "daily-loans":
+            renderDailyLoans();
+            break;
+        case "weekly-loans":
+            renderWeeklyLoans();
+            break;
+        case "biweekly-loans":
+            renderBiweeklyLoans();
+            break;
+        case "monthly-loans":
+            renderMonthlyLoans();
+            break;
+        case "indefinite-loans":
+            renderIndefiniteLoans();
             break;
         case "finished-loans":
             renderFinishedLoans();
@@ -3300,6 +3696,11 @@ function saveLoan(e) {
     saveLoans();
     bootstrap.Modal.getInstance(document.getElementById("loanModal")).hide();
     renderLoans();
+    renderDailyLoans();
+    renderWeeklyLoans();
+    renderBiweeklyLoans();
+    renderMonthlyLoans();
+    renderIndefiniteLoans();
     renderFinishedLoans();
     updateDashboard();
 
@@ -3324,6 +3725,11 @@ function deleteLoan(loanId) {
         saveLoans();
         savePayments();
         renderLoans();
+        renderDailyLoans();
+        renderWeeklyLoans();
+        renderBiweeklyLoans();
+        renderMonthlyLoans();
+        renderIndefiniteLoans();
         renderFinishedLoans();
         renderPaymentHistory();
         renderVoidPayments();
@@ -3405,6 +3811,273 @@ function renderLoans() {
             "</td>" +
             "</tr>";
         tbody.innerHTML += row;
+    });
+}
+
+// Nueva función para renderizar préstamos diarios
+function renderDailyLoans() {
+    var tbody = document.getElementById("dailyLoansTable");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    var dailyLoans = loans.filter(l => l.status === "active" && l.type === "daily");
+
+    if (dailyLoans.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay préstamos diarios activos</td></tr>';
+        return;
+    }
+
+    dailyLoans.forEach((loan) => {
+        var client = clients.find((c) => c.id === loan.clientId);
+        var clientName = client ? client.firstName + " " + client.lastName : "Cliente Eliminado";
+
+        var statusBadge = '<span class="badge bg-success">Activo</span>';
+        
+        var row =
+            "<tr>" +
+            "<td>" + loan.id + "</td>" +
+            "<td>" + clientName + "</td>" +
+            "<td>RD$ " + formatMoney(loan.amount) + "</td>" +
+            '<td class="hide-mobile">' + loan.interestRate + "%</td>" +
+            '<td class="hide-mobile">' + formatDate(loan.startDate) + "</td>" +
+            "<td><span class='badge bg-info'>" + (loan.paidDays || 0) + " de " + loan.days + "</span></td>" +
+            "<td>RD$ " + formatMoney(loan.dailyPayment) + "</td>" +
+            "<td>" + statusBadge + "</td>" +
+            '<td style="white-space: nowrap;">' +
+            '<button class="btn btn-sm btn-info me-1" onclick="viewLoanDetails(\'' + loan.id + '\')"><i class="fas fa-eye"></i></button>' +
+            '<button class="btn btn-sm btn-warning me-1" onclick="openLoanModal(\'' + loan.id + '\')"><i class="fas fa-edit"></i></button>' +
+            '<button class="btn btn-sm btn-primary me-1" onclick="generateContract(\'' + loan.id + '\')"><i class="fas fa-file-contract"></i></button>' +
+            '<button class="btn btn-sm btn-success me-1" onclick="openPaymentModal(\'' + loan.id + '\')"><i class="fas fa-dollar-sign"></i></button>' +
+            '<button class="btn btn-sm btn-danger" onclick="deleteLoan(\'' + loan.id + '\')"><i class="fas fa-trash"></i></button>' +
+            "</td>" +
+            "</tr>";
+        tbody.innerHTML += row;
+    });
+}
+
+// Nueva función para renderizar préstamos semanales
+function renderWeeklyLoans() {
+    var tbody = document.getElementById("weeklyLoansTable");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    var weeklyLoans = loans.filter(l => l.status === "active" && l.type === "fixed" && l.frequency === "weekly");
+
+    if (weeklyLoans.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay préstamos semanales activos</td></tr>';
+        return;
+    }
+
+    weeklyLoans.forEach((loan) => {
+        var client = clients.find((c) => c.id === loan.clientId);
+        var clientName = client ? client.firstName + " " + client.lastName : "Cliente Eliminado";
+
+        var statusBadge = '<span class="badge bg-success">Activo</span>';
+        
+        var row =
+            "<tr>" +
+            "<td>" + loan.id + "</td>" +
+            "<td>" + clientName + "</td>" +
+            "<td>RD$ " + formatMoney(loan.amount) + "</td>" +
+            '<td class="hide-mobile">' + loan.interestRate + "%</td>" +
+            '<td class="hide-mobile">' + formatDate(loan.startDate) + "</td>" +
+            "<td><span class='badge bg-info'>" + (loan.paidInstallments || 0) + " de " + loan.installments + "</span></td>" +
+            "<td>RD$ " + formatMoney(loan.installmentAmount) + "</td>" +
+            "<td>" + statusBadge + "</td>" +
+            '<td style="white-space: nowrap;">' +
+            '<button class="btn btn-sm btn-info me-1" onclick="viewLoanDetails(\'' + loan.id + '\')"><i class="fas fa-eye"></i></button>' +
+            '<button class="btn btn-sm btn-warning me-1" onclick="openLoanModal(\'' + loan.id + '\')"><i class="fas fa-edit"></i></button>' +
+            '<button class="btn btn-sm btn-primary me-1" onclick="generateContract(\'' + loan.id + '\')"><i class="fas fa-file-contract"></i></button>' +
+            '<button class="btn btn-sm btn-success me-1" onclick="openPaymentModal(\'' + loan.id + '\')"><i class="fas fa-dollar-sign"></i></button>' +
+            '<button class="btn btn-sm btn-danger" onclick="deleteLoan(\'' + loan.id + '\')"><i class="fas fa-trash"></i></button>' +
+            "</td>" +
+            "</tr>";
+        tbody.innerHTML += row;
+    });
+}
+
+// Nueva función para renderizar préstamos quincenales
+function renderBiweeklyLoans() {
+    var tbody = document.getElementById("biweeklyLoansTable");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    var biweeklyLoans = loans.filter(l => l.status === "active" && l.type === "fixed" && l.frequency === "biweekly");
+
+    if (biweeklyLoans.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay préstamos quincenales activos</td></tr>';
+        return;
+    }
+
+    biweeklyLoans.forEach((loan) => {
+        var client = clients.find((c) => c.id === loan.clientId);
+        var clientName = client ? client.firstName + " " + client.lastName : "Cliente Eliminado";
+
+        var statusBadge = '<span class="badge bg-success">Activo</span>';
+        
+        var row =
+            "<tr>" +
+            "<td>" + loan.id + "</td>" +
+            "<td>" + clientName + "</td>" +
+            "<td>RD$ " + formatMoney(loan.amount) + "</td>" +
+            '<td class="hide-mobile">' + loan.interestRate + "%</td>" +
+            '<td class="hide-mobile">' + formatDate(loan.startDate) + "</td>" +
+            "<td><span class='badge bg-info'>" + (loan.paidInstallments || 0) + " de " + loan.installments + "</span></td>" +
+            "<td>RD$ " + formatMoney(loan.installmentAmount) + "</td>" +
+            "<td>" + statusBadge + "</td>" +
+            '<td style="white-space: nowrap;">' +
+            '<button class="btn btn-sm btn-info me-1" onclick="viewLoanDetails(\'' + loan.id + '\')"><i class="fas fa-eye"></i></button>' +
+            '<button class="btn btn-sm btn-warning me-1" onclick="openLoanModal(\'' + loan.id + '\')"><i class="fas fa-edit"></i></button>' +
+            '<button class="btn btn-sm btn-primary me-1" onclick="generateContract(\'' + loan.id + '\')"><i class="fas fa-file-contract"></i></button>' +
+            '<button class="btn btn-sm btn-success me-1" onclick="openPaymentModal(\'' + loan.id + '\')"><i class="fas fa-dollar-sign"></i></button>' +
+            '<button class="btn btn-sm btn-danger" onclick="deleteLoan(\'' + loan.id + '\')"><i class="fas fa-trash"></i></button>' +
+            "</td>" +
+            "</tr>";
+        tbody.innerHTML += row;
+    });
+}
+
+// Nueva función para renderizar préstamos mensuales
+function renderMonthlyLoans() {
+    var tbody = document.getElementById("monthlyLoansTable");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    var monthlyLoans = loans.filter(l => l.status === "active" && l.type === "fixed" && l.frequency === "monthly");
+
+    if (monthlyLoans.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay préstamos mensuales activos</td></tr>';
+        return;
+    }
+
+    monthlyLoans.forEach((loan) => {
+        var client = clients.find((c) => c.id === loan.clientId);
+        var clientName = client ? client.firstName + " " + client.lastName : "Cliente Eliminado";
+
+        var statusBadge = '<span class="badge bg-success">Activo</span>';
+        
+        var row =
+            "<tr>" +
+            "<td>" + loan.id + "</td>" +
+            "<td>" + clientName + "</td>" +
+            "<td>RD$ " + formatMoney(loan.amount) + "</td>" +
+            '<td class="hide-mobile">' + loan.interestRate + "%</td>" +
+            '<td class="hide-mobile">' + formatDate(loan.startDate) + "</td>" +
+            "<td><span class='badge bg-info'>" + (loan.paidInstallments || 0) + " de " + loan.installments + "</span></td>" +
+            "<td>RD$ " + formatMoney(loan.installmentAmount) + "</td>" +
+            "<td>" + statusBadge + "</td>" +
+            '<td style="white-space: nowrap;">' +
+            '<button class="btn btn-sm btn-info me-1" onclick="viewLoanDetails(\'' + loan.id + '\')"><i class="fas fa-eye"></i></button>' +
+            '<button class="btn btn-sm btn-warning me-1" onclick="openLoanModal(\'' + loan.id + '\')"><i class="fas fa-edit"></i></button>' +
+            '<button class="btn btn-sm btn-primary me-1" onclick="generateContract(\'' + loan.id + '\')"><i class="fas fa-file-contract"></i></button>' +
+            '<button class="btn btn-sm btn-success me-1" onclick="openPaymentModal(\'' + loan.id + '\')"><i class="fas fa-dollar-sign"></i></button>' +
+            '<button class="btn btn-sm btn-danger" onclick="deleteLoan(\'' + loan.id + '\')"><i class="fas fa-trash"></i></button>' +
+            "</td>" +
+            "</tr>";
+        tbody.innerHTML += row;
+    });
+}
+
+// Nueva función para renderizar préstamos indefinidos (a réditos)
+function renderIndefiniteLoans() {
+    var tbody = document.getElementById("indefiniteLoansTable");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    var indefiniteLoans = loans.filter(l => l.status === "active" && l.type === "indefinite");
+
+    if (indefiniteLoans.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay préstamos a réditos activos</td></tr>';
+        return;
+    }
+
+    indefiniteLoans.forEach((loan) => {
+        var client = clients.find((c) => c.id === loan.clientId);
+        var clientName = client ? client.firstName + " " + client.lastName : "Cliente Eliminado";
+
+        var statusBadge = '<span class="badge bg-success">Activo</span>';
+        
+        // Calcular pago según frecuencia
+        var monthlyInterest = loan.amount * 0.20;
+        var pagoTexto = "";
+        if (loan.frequency === "weekly") {
+            pagoTexto = "RD$ " + formatMoney(monthlyInterest / 4);
+        } else if (loan.frequency === "biweekly") {
+            pagoTexto = "RD$ " + formatMoney(monthlyInterest / 2);
+        } else {
+            pagoTexto = "RD$ " + formatMoney(monthlyInterest);
+        }
+
+        var row =
+            "<tr>" +
+            "<td>" + loan.id + "</td>" +
+            "<td>" + clientName + "</td>" +
+            "<td>RD$ " + formatMoney(loan.amount) + "</td>" +
+            '<td class="hide-mobile">' + loan.interestRate + "%</td>" +
+            '<td class="hide-mobile">' + formatDate(loan.startDate) + "</td>" +
+            "<td>" + getFrequencyLabel(loan.frequency) + "</td>" +
+            "<td><span class='badge bg-info'>" + (loan.paidInstallments || 0) + " pagos</span></td>" +
+            "<td>" + statusBadge + "</td>" +
+            '<td style="white-space: nowrap;">' +
+            '<button class="btn btn-sm btn-info me-1" onclick="viewLoanDetails(\'' + loan.id + '\')"><i class="fas fa-eye"></i></button>' +
+            '<button class="btn btn-sm btn-warning me-1" onclick="openLoanModal(\'' + loan.id + '\')"><i class="fas fa-edit"></i></button>' +
+            '<button class="btn btn-sm btn-primary me-1" onclick="generateContract(\'' + loan.id + '\')"><i class="fas fa-file-contract"></i></button>' +
+            '<button class="btn btn-sm btn-success me-1" onclick="openPaymentModal(\'' + loan.id + '\')"><i class="fas fa-dollar-sign"></i></button>' +
+            '<button class="btn btn-sm btn-danger" onclick="deleteLoan(\'' + loan.id + '\')"><i class="fas fa-trash"></i></button>' +
+            "</td>" +
+            "</tr>";
+        tbody.innerHTML += row;
+    });
+}
+
+// Funciones de búsqueda para las nuevas secciones
+function searchDailyLoans() {
+    var searchTerm = document.getElementById("dailyLoanSearch").value.toLowerCase();
+    var rows = document.querySelectorAll("#dailyLoansTable tr");
+    rows.forEach((row) => {
+        var text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? "" : "none";
+    });
+}
+
+function searchWeeklyLoans() {
+    var searchTerm = document.getElementById("weeklyLoanSearch").value.toLowerCase();
+    var rows = document.querySelectorAll("#weeklyLoansTable tr");
+    rows.forEach((row) => {
+        var text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? "" : "none";
+    });
+}
+
+function searchBiweeklyLoans() {
+    var searchTerm = document.getElementById("biweeklyLoanSearch").value.toLowerCase();
+    var rows = document.querySelectorAll("#biweeklyLoansTable tr");
+    rows.forEach((row) => {
+        var text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? "" : "none";
+    });
+}
+
+function searchMonthlyLoans() {
+    var searchTerm = document.getElementById("monthlyLoanSearch").value.toLowerCase();
+    var rows = document.querySelectorAll("#monthlyLoansTable tr");
+    rows.forEach((row) => {
+        var text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? "" : "none";
+    });
+}
+
+function searchIndefiniteLoans() {
+    var searchTerm = document.getElementById("indefiniteLoanSearch").value.toLowerCase();
+    var rows = document.querySelectorAll("#indefiniteLoansTable tr");
+    rows.forEach((row) => {
+        var text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? "" : "none";
     });
 }
 
@@ -3500,11 +4173,11 @@ function viewLoanDetails(loanId) {
     details += "Fecha de Inicio: " + formatDate(loan.startDate) + "\n";
 
     if (loan.type === "fixed") {
-        details += "\nTipo: Plazo Definido\n";
+        details += "\nTipo: Préstamo a Cuotas\n";
         details += "Cuotas: " + loan.paidInstallments + " de " + loan.installments + "\n";
         details += "Frecuencia: " + getFrequencyLabel(loan.frequency) + "\n";
     } else if (loan.type === "indefinite") {
-        details += "\nTipo: Plazo Indefinido\n";
+        details += "\nTipo: Préstamo a Réditos\n";
         details += "Frecuencia: " + getFrequencyLabel(loan.frequency) + "\n";
         details += "Pagos realizados: " + loanPayments.length + "\n";
         // Mostrar cálculo de interés para préstamos indefinidos
@@ -3519,6 +4192,7 @@ function viewLoanDetails(loanId) {
     } else if (loan.type === "daily") {
         details += "\nTipo: Préstamo Diario\n";
         details += "Días pagados: " + loan.paidDays + " de " + loan.days + "\n";
+        details += "Pago Diario: RD$ " + formatMoney(loan.dailyPayment) + "\n";
     }
 
     details += "\n=== HISTORIAL DE PAGOS ===\n";
@@ -3817,6 +4491,11 @@ function savePayment(e) {
         alert("¡Préstamo saldado completamente! Se generará una carta de saldo.");
         
         renderLoans();
+        renderDailyLoans();
+        renderWeeklyLoans();
+        renderBiweeklyLoans();
+        renderMonthlyLoans();
+        renderIndefiniteLoans();
         renderFinishedLoans();
         renderPaymentHistory();
         renderVoidPayments();
@@ -3852,6 +4531,11 @@ function savePayment(e) {
     alert(message);
     
     renderLoans();
+    renderDailyLoans();
+    renderWeeklyLoans();
+    renderBiweeklyLoans();
+    renderMonthlyLoans();
+    renderIndefiniteLoans();
     renderPaymentHistory();
     renderVoidPayments();
     renderOverduePayments();
@@ -3965,6 +4649,11 @@ function deletePayment(paymentId) {
     renderPaymentHistory();
     renderVoidPayments();
     renderLoans();
+    renderDailyLoans();
+    renderWeeklyLoans();
+    renderBiweeklyLoans();
+    renderMonthlyLoans();
+    renderIndefiniteLoans();
     renderFinishedLoans();
     renderOverduePayments();
     updateDashboard();
@@ -4894,6 +5583,11 @@ function voidPayment(paymentId) {
     renderVoidPayments();
     renderPaymentHistory();
     renderLoans();
+    renderDailyLoans();
+    renderWeeklyLoans();
+    renderBiweeklyLoans();
+    renderMonthlyLoans();
+    renderIndefiniteLoans();
     renderFinishedLoans();
     updateDashboard();
 }
@@ -4967,7 +5661,7 @@ function generateLoanInvoice(loanId) {
                 "<tr><th>Frecuencia:</th><td>" + loan.frequency.charAt(0).toUpperCase() + loan.frequency.slice(1) + "</td></tr>" +
                 "<tr><th>Monto por Cuota:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.installmentAmount) + "</strong></td></tr>";
     } else if (loan.type === "indefinite") {
-        html += "<tr><th>Tipo:</th><td>Pago Indefinido</td></tr>" +
+        html += "<tr><th>Tipo:</th><td>Préstamo a Réditos</td></tr>" +
                 "<tr><th>Frecuencia:</th><td>" + loan.frequency.charAt(0).toUpperCase() + loan.frequency.slice(1) + "</td></tr>" +
                 "<tr><th>Cálculo de Interés:</th><td>20% mensual sobre el capital</td></tr>";
         var monthlyInterest = loan.amount * 0.20;
@@ -5163,8 +5857,8 @@ function formatDate(dateString) {
 
 function getLoanTypeLabel(type) {
     var labels = {
-        fixed: "Plazo Definido",
-        indefinite: "Plazo Indefinido",
+        fixed: "Préstamo a Cuotas",
+        indefinite: "Préstamo a Réditos",
         daily: "Préstamo Diario",
     };
     return labels[type] || type;
@@ -5250,6 +5944,11 @@ function clearAllData() {
                         
                         renderClients();
                         renderLoans();
+                        renderDailyLoans();
+                        renderWeeklyLoans();
+                        renderBiweeklyLoans();
+                        renderMonthlyLoans();
+                        renderIndefiniteLoans();
                         renderFinishedLoans();
                         renderPaymentHistory();
                         renderVoidPayments();
@@ -5348,6 +6047,11 @@ function importData() {
                     // Actualizar UI
                     renderClients();
                     renderLoans();
+                    renderDailyLoans();
+                    renderWeeklyLoans();
+                    renderBiweeklyLoans();
+                    renderMonthlyLoans();
+                    renderIndefiniteLoans();
                     renderFinishedLoans();
                     renderPaymentHistory();
                     renderVoidPayments();
@@ -5618,12 +6322,33 @@ window.addEventListener("DOMContentLoaded", () => {
                 updateDashboard();
                 renderClients();
                 renderLoans();
+                renderDailyLoans();
+                renderWeeklyLoans();
+                renderBiweeklyLoans();
+                renderMonthlyLoans();
+                renderIndefiniteLoans();
                 renderFinishedLoans();
                 renderPaymentHistory();
                 renderVoidPayments();
                 renderOverduePayments();
                 loadCompanyInfo();
                 updatePrinterUI();
+                
+                // Restaurar estado del menú de préstamos
+                var savedState = localStorage.getItem('loansMenuExpanded');
+                if (savedState !== null) {
+                    loansMenuExpanded = savedState === 'true';
+                    var submenu = document.getElementById("loansSubmenu");
+                    var arrow = document.getElementById("loansArrow");
+                    
+                    if (loansMenuExpanded) {
+                        submenu.classList.add("expanded");
+                        arrow.classList.add("rotated");
+                    } else {
+                        submenu.classList.remove("expanded");
+                        arrow.classList.remove("rotated");
+                    }
+                }
                 
                 showSection('dashboard');
                 startPeriodicOverdueCheck();
