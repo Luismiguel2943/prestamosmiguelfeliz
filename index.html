@@ -1656,6 +1656,10 @@
             <!-- Payment History Section -->
             <div id="payment-history" class="section">
                 <h2 class="mb-4">Historial de Pagos Realizados</h2>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Nota:</strong> Eliminar un pago del historial solo borra el registro, no afecta el saldo del préstamo. Para anular un pago y reintegrar el monto, use la sección "Anular Pagos".
+                </div>
                 <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
@@ -1685,7 +1689,7 @@
                 <h2 class="mb-4">Anular Pagos</h2>
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Precaución:</strong> Al anular un pago, el monto se reintegrará al saldo del préstamo. Esta acción es útil para corregir pagos registrados por error.
+                    <strong>Precaución:</strong> Al anular un pago, el monto se reintegrará al saldo del préstamo y se revertirán las cuotas pagadas. Esta acción es útil para corregir pagos registrados por error.
                 </div>
                 <div class="card">
                     <div class="card-body">
@@ -4589,17 +4593,17 @@ function renderPaymentHistory() {
             '<td class="hide-mobile">' + getPaymentMethodLabel(payment.method) + "</td>" +
             "<td><span class='badge bg-info'>" + cuotasInfo + "</span></td>" +
             "<td>" +
-            '<button class="btn btn-sm btn-primary me-1 mb-1" onclick="generateInvoice(\'' + payment.id + '\')"><i class="fas fa-receipt"></i></button>' +
-            '<button class="btn btn-sm btn-danger me-1 mb-1" onclick="deletePayment(\'' + payment.id + '\')"><i class="fas fa-trash"></i></button>' +
+            '<button class="btn btn-sm btn-primary me-1 mb-1" onclick="generateInvoice(\'' + payment.id + '\')"><i class="fas fa-receipt"></i> Recibo</button>' +
+            '<button class="btn btn-sm btn-danger me-1 mb-1" onclick="deletePayment(\'' + payment.id + '\')"><i class="fas fa-trash"></i> Eliminar</button>' +
             "</td>" +
             "</tr>";
         tbody.innerHTML += row;
     });
 }
 
-// NUEVA FUNCIÓN PARA ELIMINAR PAGOS DEL HISTORIAL CON REINTEGRO DE CUOTAS
+// FUNCIÓN CORREGIDA PARA ELIMINAR PAGOS DEL HISTORIAL SIN AFECTAR PRÉSTAMOS
 function deletePayment(paymentId) {
-    if (!confirm("¿Está seguro que desea eliminar este pago? Esta acción no se puede deshacer.")) {
+    if (!confirm("¿Está seguro que desea eliminar este pago del historial? Esta acción solo eliminará el registro del pago, no afectará el saldo del préstamo.")) {
         return;
     }
 
@@ -4609,41 +4613,14 @@ function deletePayment(paymentId) {
         return;
     }
 
-    var loan = loans.find(l => l.id === payment.loanId);
-    if (loan) {
-        // Reintegrar el monto al préstamo
-        loan.totalPaid = Math.max(0, (loan.totalPaid || 0) - payment.amount);
-        loan.remainingAmount = Math.min(loan.totalAmount, (loan.remainingAmount || 0) + payment.amount);
-        
-        // Revertir contadores de cuotas según tipo de préstamo
-        if (payment.type === "installment") {
-            if (loan.type === "fixed") {
-                loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
-            } else if (loan.type === "indefinite") {
-                loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
-            } else if (loan.type === "daily") {
-                loan.paidDays = Math.max(0, (loan.paidDays || 0) - 1);
-            }
-        }
-        
-        // Si el préstamo estaba marcado como pagado, cambiar a activo
-        if (loan.status === "paid" && loan.remainingAmount > 0.01) {
-            loan.status = "active";
-            delete loan.finishedAt;
-            delete loan.paidOffDate;
-        }
-        
-        // Recalcular próxima fecha de pago
-        loan.nextPaymentDate = calculateNextPaymentDate(loan);
-        
-        saveLoans();
-    }
-
+    // ELIMINAR EL CÓDIGO QUE MODIFICA EL PRÉSTAMO
+    // Simplemente eliminamos el pago sin tocar el préstamo
+    
     // Eliminar el pago
     payments = payments.filter(p => p.id !== paymentId);
     savePayments();
 
-    alert("Pago eliminado exitosamente");
+    alert("Pago eliminado del historial exitosamente. El saldo del préstamo no se ha modificado.");
     
     // Actualizar todas las vistas
     renderPaymentHistory();
