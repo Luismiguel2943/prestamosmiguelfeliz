@@ -1346,7 +1346,7 @@ function sendOverdueWhatsApp(loanId) {
     var reditoAmount = loan.type === "indefinite" ? calculateReditoAmount(loan) : 0;
     var phone = client.whatsapp.replace(/[^\d]/g, '');
     if (phone.length === 10) phone = "1" + phone;
-    var message = "Hola " + client.firstName + " " + client.lastName + " 👋\n\n*Pago Vencido* - Préstamo " + loan.id + "\n\n📋 *Detalles:*\n└ Días de atraso: " + daysOverdue + "\n└ Monto pendiente: RD$ " + formatMoney(loan.remainingAmount) + (reditoAmount > 0 ? "\n└ Rédito pendiente: RD$ " + formatMoney(reditoAmount) : "") + (lateFee > 0 ? "\n└ Mora acumulada: RD$ " + formatMoney(lateFee) : "") + "\n\n⚠️ Realice el pago lo antes posible.\n\n" + (companyInfo.name || "Sistema de Préstamos");
+    var message = "Hola Estimado Cliente " + client.firstName + " " + client.lastName + " 👋\n\n*Tienes un Pago Vencido En Nuestro Cistema * - Préstamo " + loan.id + "\n\n📋 *Detalles:*\n└ Días de atraso: " + daysOverdue + "\n└ Monto pendiente: RD$ " + formatMoney(loan.remainingAmount) + (reditoAmount > 0 ? "\n└ Rédito pendiente: RD$ " + formatMoney(reditoAmount) : "") + (lateFee > 0 ? "\n└ Mora acumulada: RD$ " + formatMoney(lateFee) : "") + "\n\n⚠️ Realice el pago lo antes posible Para evitar Mora Si ya Realizo El pago Obviar Este Mensaje.\n\n" + (companyInfo.name || "Sistema de Préstamos");
     // wa.me abre la app instalada en móvil; WhatsApp Desktop en escritorio
     window.open("https://wa.me/" + phone + "?text=" + encodeURIComponent(message), '_blank');
     showNotification("Recordatorio enviado por WhatsApp", "success");
