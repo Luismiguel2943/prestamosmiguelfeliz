@@ -13,6 +13,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Librerías para PDF y QR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -108,29 +113,6 @@
             border-radius: 2px;
         }
 
-        h3 {
-            font-size: 1.75rem;
-            font-weight: 600;
-        }
-
-        h4 {
-            font-size: 1.5rem;
-            font-weight: 500;
-        }
-
-        h5 {
-            font-size: 1.25rem;
-            font-weight: 500;
-        }
-
-        h6 {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
         /* Login Screen - Responsive */
         .login-container {
             min-height: 100vh;
@@ -221,10 +203,6 @@
             margin-top: 15px;
         }
 
-        .sidebar .logo .notification-icon {
-            cursor: pointer;
-        }
-
         .sidebar .nav-link {
             color: rgba(255,255,255,0.85);
             padding: 14px 16px;
@@ -252,86 +230,6 @@
             font-size: 1.1rem;
             width: 24px;
             text-align: center;
-        }
-
-        /* Estilos mejorados para el menú desplegable de préstamos */
-        .loans-menu-container {
-            margin: 8px 0;
-        }
-
-        .loans-main-link {
-            cursor: pointer;
-            user-select: none;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 16px;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.1);
-            transition: all 0.3s ease;
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        .loans-main-link:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateX(5px);
-        }
-
-        .loans-main-link i:first-child {
-            margin-right: 12px;
-        }
-
-        .loans-main-link .arrow-icon {
-            transition: transform 0.3s ease;
-        }
-
-        .loans-main-link .arrow-icon.rotated {
-            transform: rotate(180deg);
-        }
-
-        .loans-submenu {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease-out;
-            margin-left: 12px;
-        }
-
-        .loans-submenu.expanded {
-            max-height: 400px; /* Altura suficiente para mostrar todos los items */
-            transition: max-height 0.5s ease-in;
-        }
-
-        .loans-submenu .nav-link {
-            padding: 12px 16px 12px 44px;
-            margin: 4px 0;
-            font-size: 0.9rem;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            position: relative;
-        }
-
-        .loans-submenu .nav-link:before {
-            content: '•';
-            position: absolute;
-            left: 20px;
-            color: rgba(255,255,255,0.6);
-            font-size: 1.2rem;
-        }
-
-        .loans-submenu .nav-link i {
-            font-size: 0.9rem;
-            width: 20px;
-            margin-right: 8px;
-        }
-
-        .loans-submenu .nav-link:hover,
-        .loans-submenu .nav-link.active {
-            background: rgba(255,255,255,0.15);
-        }
-
-        .loans-submenu .nav-link.active:before {
-            color: white;
         }
 
         /* Asegurar que todos los textos usan las nuevas fuentes */
@@ -403,15 +301,51 @@
             border-bottom: 2px solid #e5e7eb;
         }
 
-        /* Mejorar las cards de estadísticas */
+        /* === ESTILOS MODERNOS Y COLORIDOS PARA LAS TARJETAS DE ESTADÍSTICAS === */
         .stat-card {
             background: white;
             padding: 24px;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
             margin-bottom: 24px;
-            border-left: 5px solid var(--primary-color);
+            border: none;
+            position: relative;
+            overflow: hidden;
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--stat-color-1, var(--primary-color)), var(--stat-color-2, var(--secondary-color)));
+            z-index: 1;
+        }
+
+        .stat-card .stat-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-card .stat-info {
+            flex: 1;
+        }
+
+        .stat-card h6 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #6b7280;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
         }
 
         .stat-card h3 {
@@ -419,18 +353,102 @@
             font-weight: 700;
             color: var(--dark-color);
             margin-bottom: 0.25rem;
+            line-height: 1.2;
         }
 
-        .stat-card h6 {
-            font-size: clamp(0.875rem, 2vw, 1rem);
-            font-weight: 500;
-            color: #6b7280;
-            letter-spacing: 0.03em;
-        }
-
-        .stat-card i {
+        .stat-card .stat-icon {
             font-size: 2.5rem;
-            opacity: 0.7;
+            color: var(--stat-icon-color, var(--primary-color));
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            background: var(--stat-icon-bg, rgba(37, 99, 235, 0.1));
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(5deg);
+            opacity: 1;
+        }
+
+        .stat-card .stat-trend {
+            margin-top: 15px;
+            font-size: 0.875rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 12px;
+        }
+
+        .stat-card .trend-up {
+            color: var(--success-color);
+        }
+
+        .stat-card .trend-down {
+            color: var(--danger-color);
+        }
+
+        /* Colores personalizados para cada tarjeta */
+        .stat-card.primary {
+            --stat-color-1: #3b82f6;
+            --stat-color-2: #8b5cf6;
+            --stat-icon-color: #3b82f6;
+            --stat-icon-bg: rgba(59, 130, 246, 0.1);
+        }
+
+        .stat-card.success {
+            --stat-color-1: #10b981;
+            --stat-color-2: #34d399;
+            --stat-icon-color: #10b981;
+            --stat-icon-bg: rgba(16, 185, 129, 0.1);
+        }
+
+        .stat-card.warning {
+            --stat-color-1: #f59e0b;
+            --stat-color-2: #fbbf24;
+            --stat-icon-color: #f59e0b;
+            --stat-icon-bg: rgba(245, 158, 11, 0.1);
+        }
+
+        .stat-card.danger {
+            --stat-color-1: #ef4444;
+            --stat-color-2: #f87171;
+            --stat-icon-color: #ef4444;
+            --stat-icon-bg: rgba(239, 68, 68, 0.1);
+        }
+
+        .stat-card.info {
+            --stat-color-1: #06b6d4;
+            --stat-color-2: #22d3ee;
+            --stat-icon-color: #06b6d4;
+            --stat-icon-bg: rgba(6, 182, 212, 0.1);
+        }
+
+        .stat-card.purple {
+            --stat-color-1: #8b5cf6;
+            --stat-color-2: #a78bfa;
+            --stat-icon-color: #8b5cf6;
+            --stat-icon-bg: rgba(139, 92, 246, 0.1);
+        }
+
+        .stat-card.orange {
+            --stat-color-1: #f97316;
+            --stat-color-2: #fb923c;
+            --stat-icon-color: #f97316;
+            --stat-icon-bg: rgba(249, 115, 22, 0.1);
+        }
+
+        .stat-card.teal {
+            --stat-color-1: #14b8a6;
+            --stat-color-2: #2dd4bf;
+            --stat-icon-color: #14b8a6;
+            --stat-icon-bg: rgba(20, 184, 166, 0.1);
         }
 
         /* Mejorar los formularios */
@@ -507,13 +525,14 @@
                 padding: 12px 14px;
             }
             
-            .loans-submenu .nav-link {
-                font-size: 0.85rem;
-                padding: 10px 16px 10px 40px;
+            .stat-card {
+                padding: 18px;
             }
             
-            .loans-submenu .nav-link:before {
-                left: 18px;
+            .stat-card .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 2rem;
             }
         }
 
@@ -627,6 +646,10 @@
             color: #6b7280;
         }
 
+        .search-box input {
+            padding-left: 40px;
+        }
+
         /* Logout Button - Responsive */
         .logout-btn {
             position: fixed;
@@ -635,7 +658,7 @@
             z-index: 1001;
         }
 
-        /* Print Styles */
+        /* Estilos específicos para impresión de facturas */
         @media print {
             .sidebar, .no-print, .mobile-menu-toggle, .logout-btn, .search-box, .btn, button {
                 display: none !important;
@@ -649,63 +672,87 @@
                 visibility: hidden;
             }
             
-            .section.active,
-            .section.active * {
-                visibility: visible;
+            #invoiceModal .modal-content,
+            #invoiceModal .modal-content *,
+            #contractModal .modal-content,
+            #contractModal .modal-content *,
+            #reportModal .modal-content,
+            #reportModal .modal-content *,
+            #clearanceLetterModal .modal-content,
+            #clearanceLetterModal .modal-content * {
+                visibility: visible !important;
             }
             
-            #invoiceModal.show .modal-content,
-            #invoiceModal.show .modal-content *,
-            #contractModal.show .modal-content,
-            #contractModal.show .modal-content *,
-            #reportModal.show .modal-content,
-            #reportModal.show .modal-content *,
-            #clearanceLetterModal.show .modal-content,
-            #clearanceLetterModal.show .modal-content * {
-                visibility: visible;
-            }
-            
-            .section {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100% !important;
-            }
-            
-            .modal-dialog {
-                position: absolute;
-                left: 0;
-                top: 0;
+            #invoiceModal .modal-dialog,
+            #contractModal .modal-dialog,
+            #reportModal .modal-dialog,
+            #clearanceLetterModal .modal-dialog {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
                 margin: 0 !important;
+                padding: 10mm !important;
                 width: 100% !important;
                 max-width: 100% !important;
             }
-            .modal-content {
+            
+            #invoiceModal .modal-content,
+            #contractModal .modal-content,
+            #reportModal .modal-content,
+            #clearanceLetterModal .modal-content {
                 border: none !important;
                 box-shadow: none !important;
                 background: white !important;
+                width: 100% !important;
+                max-width: 100% !important;
             }
-            .modal-header, .modal-footer {
+            
+            #invoiceModal .modal-header,
+            #invoiceModal .modal-footer,
+            #contractModal .modal-header,
+            #contractModal .modal-footer,
+            #reportModal .modal-header,
+            #reportModal .modal-footer,
+            #clearanceLetterModal .modal-header,
+            #clearanceLetterModal .modal-footer {
                 display: none !important;
             }
-            .modal-body {
-                padding: 20px !important;
+            
+            #invoiceModal .modal-body,
+            #contractModal .modal-body,
+            #reportModal .modal-body,
+            #clearanceLetterModal .modal-body {
+                padding: 0 !important;
+                background: white !important;
             }
+            
             table {
-                page-break-inside: auto;
+                page-break-inside: auto !important;
                 width: 100% !important;
             }
+            
             tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
+                page-break-inside: avoid !important;
+                page-break-after: auto !important;
             }
+            
+            thead {
+                display: table-header-group !important;
+            }
+            
+            tfoot {
+                display: table-footer-group !important;
+            }
+            
             body {
                 color: black !important;
             }
+            
             .card {
-                page-break-inside: avoid;
+                page-break-inside: avoid !important;
                 border: 1px solid #dee2e6 !important;
             }
+            
             .bg-primary, .table-dark { background-color: #0d6efd !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .bg-success { background-color: #198754 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .bg-info { background-color: #0dcaf0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -788,10 +835,8 @@
                 margin-bottom: 15px;
             }
 
-            .stat-card .d-flex {
-                flex-direction: column;
-                text-align: center;
-                gap: 10px;
+            .stat-card .stat-content {
+                flex-direction: row;
             }
 
             .btn {
@@ -1069,6 +1114,334 @@
             color: #666;
             margin-top: 5px;
         }
+        
+        /* Estilos para el toast de notificaciones */
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            min-width: 300px;
+            z-index: 9999;
+            animation: slideInRight 0.3s ease;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* ===== NUEVOS ESTILOS PARA LA FACTURA COMPACTA ===== */
+        .compact-invoice {
+            font-family: 'Inter', sans-serif;
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+        }
+        
+        .invoice-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .invoice-header .company-logo {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 3px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .invoice-header .company-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .invoice-header .company-logo i {
+            font-size: 40px;
+            color: var(--primary-color);
+        }
+        
+        .invoice-header h4 {
+            margin: 5px 0;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+        
+        .invoice-header p {
+            margin: 2px 0;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        
+        .invoice-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            backdrop-filter: blur(5px);
+        }
+        
+        .invoice-body {
+            padding: 20px;
+        }
+        
+        .invoice-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-item .label {
+            font-size: 0.7rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        
+        .info-item .value {
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            word-break: break-word;
+        }
+        
+        .invoice-amount-box {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .invoice-amount-box .amount-label {
+            font-size: 0.8rem;
+            color: #4b5563;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .invoice-amount-box .amount-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1.2;
+            margin: 5px 0;
+        }
+        
+        .invoice-amount-box .amount-detail {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        
+        .invoice-details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .invoice-details-table tr {
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .invoice-details-table tr:last-child {
+            border-bottom: none;
+        }
+        
+        .invoice-details-table td {
+            padding: 10px 0;
+            font-size: 0.85rem;
+        }
+        
+        .invoice-details-table td:first-child {
+            color: #6b7280;
+        }
+        
+        .invoice-details-table td:last-child {
+            text-align: right;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        .invoice-progress {
+            margin: 15px 0;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+        
+        .progress-bar-compact {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .invoice-qr {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .qr-container {
+            width: 100px;
+            height: 100px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qr-container img {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .invoice-footer {
+            padding: 15px 20px;
+            background: #f8fafc;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+        }
+        
+        .invoice-footer p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        
+        .invoice-footer .signature {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-top: 5px;
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .share-buttons .btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 0.85rem;
+        }
+        
+        .btn-whatsapp {
+            background-color: #25D366;
+            color: white;
+            border: none;
+        }
+        
+        .btn-whatsapp:hover {
+            background-color: #128C7E;
+            color: white;
+        }
+        
+        .btn-email {
+            background-color: #EA4335;
+            color: white;
+            border: none;
+        }
+        
+        .btn-email:hover {
+            background-color: #B23121;
+            color: white;
+        }
+        
+        .btn-pdf {
+            background-color: #dc2626;
+            color: white;
+            border: none;
+        }
+        
+        .btn-pdf:hover {
+            background-color: #b91c1c;
+            color: white;
+        }
+        
+        /* Variable global para ID de pago actual */
+        .current-payment-id {
+            display: none;
+        }
+        
+        /* Estilos para notificaciones de réditos */
+        .reditos-alert {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+        
+        .reditos-badge {
+            background-color: #f59e0b;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .tasa-modificable {
+            background-color: #e0f2fe;
+            border-left: 4px solid #0284c7;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body class="theme-blue">
@@ -1130,50 +1503,21 @@
             <div class="logo">
                 <i class="fas fa-hand-holding-usd fa-3x mb-3"></i>
                 <h4 id="companyNameSidebar">Sistema de Préstamos</h4>
-                <div class="notification-icon mt-2" onclick="showSection('overdue-payments'); closeMobileMenu();">
+                <div class="notification-icon mt-2">
                     <i class="fas fa-bell fa-lg notification-bell" id="sidebarNotificationBell"></i>
                     <span class="notification-badge" id="sidebarNotificationBadge" style="display: none;">0</span>
                 </div>
             </div>
             <nav class="nav flex-column">
-                <a class="nav-link" href="#" onclick="showSection('dashboard'); closeMobileMenu(); return false;">
+                <a class="nav-link active" href="#" onclick="showSection('dashboard'); closeMobileMenu(); return false;">
                     <i class="fas fa-home"></i> <span>Inicio</span>
                 </a>
                 <a class="nav-link" href="#" onclick="showSection('clients'); closeMobileMenu(); return false;">
                     <i class="fas fa-users"></i> <span>Ver Clientes</span>
                 </a>
-                
-                <!-- Menú desplegable de Préstamos -->
-                <div class="loans-menu-container">
-                    <div class="loans-main-link" onclick="toggleLoansMenu()">
-                        <div>
-                            <i class="fas fa-money-bill-wave"></i>
-                            <span>Préstamos</span>
-                        </div>
-                        <i class="fas fa-chevron-down arrow-icon" id="loansArrow"></i>
-                    </div>
-                    <div class="loans-submenu" id="loansSubmenu">
-                        <a class="nav-link" href="#" onclick="showSection('loans'); closeMobileMenu(); return false;">
-                            <i class="fas fa-list"></i> <span>Todos los Préstamos</span>
-                        </a>
-                        <a class="nav-link" href="#" onclick="showSection('daily-loans'); closeMobileMenu(); return false;">
-                            <i class="fas fa-calendar-day"></i> <span>Préstamos Diarios</span>
-                        </a>
-                        <a class="nav-link" href="#" onclick="showSection('weekly-loans'); closeMobileMenu(); return false;">
-                            <i class="fas fa-calendar-week"></i> <span>Préstamos Semanales</span>
-                        </a>
-                        <a class="nav-link" href="#" onclick="showSection('biweekly-loans'); closeMobileMenu(); return false;">
-                            <i class="fas fa-calendar-alt"></i> <span>Préstamos Quincenales</span>
-                        </a>
-                        <a class="nav-link" href="#" onclick="showSection('monthly-loans'); closeMobileMenu(); return false;">
-                            <i class="fas fa-calendar-check"></i> <span>Préstamos Mensuales</span>
-                        </a>
-                        <a class="nav-link" href="#" onclick="showSection('indefinite-loans'); closeMobileMenu(); return false;">
-                            <i class="fas fa-infinity"></i> <span>Préstamos a Réditos</span>
-                        </a>
-                    </div>
-                </div>
-
+                <a class="nav-link" href="#" onclick="showSection('loans'); closeMobileMenu(); return false;">
+                    <i class="fas fa-money-bill-wave"></i> <span>Préstamos Activos</span>
+                </a>
                 <a class="nav-link" href="#" onclick="showSection('finished-loans'); closeMobileMenu(); return false;">
                     <i class="fas fa-check-circle"></i> <span>Préstamos Finalizados</span>
                 </a>
@@ -1208,91 +1552,154 @@
             <div id="dashboard" class="section active">
                 <h2 class="mb-4">Panel de Control</h2>
                 <div class="row">
-                    <div class="col-12 col-sm-6 col-lg-4">
+                    <!-- Total Clientes - Primary -->
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
                         <div class="stat-card primary">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">Total Clientes</h6>
-                                    <h3 class="mb-0" id="totalClients">0</h3>
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h6>Total Clientes</h6>
+                                    <h3 id="totalClients">0</h3>
+                                    <div class="stat-trend">
+                                        <i class="fas fa-arrow-up trend-up"></i>
+                                        <span>vs. mes anterior</span>
+                                    </div>
                                 </div>
-                                <i class="fas fa-users fa-3x opacity-50"></i>
+                                <div class="stat-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-4">
+                    
+                    <!-- Préstamos Activos - Info -->
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
                         <div class="stat-card info">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">Préstamos Activos</h6>
-                                    <h3 class="mb-0" id="activeLoans">0</h3>
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h6>Préstamos Activos</h6>
+                                    <h3 id="activeLoans">0</h3>
+                                    <div class="stat-trend">
+                                        <i class="fas fa-file-invoice-dollar"></i>
+                                        <span>En curso</span>
+                                    </div>
                                 </div>
-                                <i class="fas fa-file-invoice-dollar fa-3x opacity-50"></i>
+                                <div class="stat-icon">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-4">
+                    
+                    <!-- Capital Prestado - Primary -->
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
                         <div class="stat-card primary">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">Capital Prestado</h6>
-                                    <h3 class="mb-0" id="capitalPrestado">RD$ 0.00</h3>
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h6>Capital Prestado</h6>
+                                    <h3 id="capitalPrestado">RD$ 0.00</h3>
+                                    <div class="stat-trend">
+                                        <i class="fas fa-chart-line trend-up"></i>
+                                        <span>Activo</span>
+                                    </div>
                                 </div>
-                                <i class="fas fa-hand-holding-usd fa-3x opacity-50"></i>
+                                <div class="stat-icon">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-4">
+                    
+                    <!-- Pagos al Día - Success -->
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
                         <div class="stat-card success">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">Pagos al Día</h6>
-                                    <h3 class="mb-0" id="pagosAlDia">0</h3>
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h6>Pagos al Día</h6>
+                                    <h3 id="pagosAlDia">0</h3>
+                                    <div class="stat-trend">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Cliente cumplidos</span>
+                                    </div>
                                 </div>
-                                <i class="fas fa-calendar-check fa-3x opacity-50"></i>
+                                <div class="stat-icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-4">
+                    
+                    <!-- Pagos Pendientes - Warning -->
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
                         <div class="stat-card warning">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">Pagos Pendientes</h6>
-                                    <h3 class="mb-0" id="pendingPayments">RD$ 0.00</h3>
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h6>Pagos Pendientes</h6>
+                                    <h3 id="pendingPayments">RD$ 0.00</h3>
+                                    <div class="stat-trend">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Por cobrar</span>
+                                    </div>
                                 </div>
-                                <i class="fas fa-clock fa-3x opacity-50"></i>
+                                <div class="stat-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-4">
+                    
+                    <!-- Pagos Realizados - Success -->
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
                         <div class="stat-card success">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">Pagos Realizados</h6>
-                                    <h3 class="mb-0" id="completedPayments">RD$ 0.00</h3>
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h6>Pagos Realizados</h6>
+                                    <h3 id="completedPayments">RD$ 0.00</h3>
+                                    <div class="stat-trend">
+                                        <i class="fas fa-arrow-up trend-up"></i>
+                                        <span>Total recaudado</span>
+                                    </div>
                                 </div>
-                                <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                                <div class="stat-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-4">
+                    
+                    <!-- Pagos Vencidos - Danger -->
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
                         <div class="stat-card danger">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">Pagos Vencidos</h6>
-                                    <h3 class="mb-0" id="overduePayments">RD$ 0.00</h3>
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h6>Pagos Vencidos</h6>
+                                    <h3 id="overduePayments">RD$ 0.00</h3>
+                                    <div class="stat-trend">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>Requiere atención</span>
+                                    </div>
                                 </div>
-                                <i class="fas fa-exclamation-triangle fa-3x opacity-50"></i>
+                                <div class="stat-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-4">
-                        <div class="stat-card success">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">Préstamos Finalizados</h6>
-                                    <h3 class="mb-0" id="finishedLoans">0</h3>
+                    
+                    <!-- Préstamos Finalizados - Teal -->
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                        <div class="stat-card teal">
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h6>Préstamos Finalizados</h6>
+                                    <h3 id="finishedLoans">0</h3>
+                                    <div class="stat-trend">
+                                        <i class="fas fa-check-double"></i>
+                                        <span>Completados</span>
+                                    </div>
                                 </div>
-                                <i class="fas fa-check-double fa-3x opacity-50"></i>
+                                <div class="stat-icon">
+                                    <i class="fas fa-check-double"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1321,6 +1728,8 @@
                                         <th>Nombre</th>
                                         <th>Cédula</th>
                                         <th>Teléfono</th>
+                                        <th>Email</th>
+                                        <th>WhatsApp</th>
                                         <th class="hide-mobile">Sexo</th>
                                         <th class="hide-mobile">Dirección</th>
                                         <th class="hide-mobile">Ocupación</th>
@@ -1335,10 +1744,10 @@
                 </div>
             </div>
 
-            <!-- Loans Section (All Loans) -->
+            <!-- Loans Section (Activos) -->
             <div id="loans" class="section">
                 <div class="mb-4">
-                    <h2 class="mb-3">Todos los Préstamos Activos</h2>
+                    <h2 class="mb-3">Préstamos Activos</h2>
                     <div class="d-flex justify-content-between flex-wrap gap-2">
                         <button class="btn btn-success" onclick="window.print()">
                             <i class="fas fa-list me-2"></i>Imprimir Lista
@@ -1370,211 +1779,6 @@
                                     </tr>
                                 </thead>
                                 <tbody id="loansTable"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Daily Loans Section -->
-            <div id="daily-loans" class="section">
-                <div class="mb-4">
-                    <h2 class="mb-3">Préstamos Diarios</h2>
-                    <div class="d-flex justify-content-between flex-wrap gap-2">
-                        <button class="btn btn-success" onclick="window.print()">
-                            <i class="fas fa-list me-2"></i>Imprimir Lista
-                        </button>
-                        <button class="btn btn-primary" onclick="openLoanModal()">
-                            <i class="fas fa-plus me-2"></i>Nuevo Préstamo Diario
-                        </button>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="search-box mb-3">
-                            <i class="fas fa-search"></i>
-                            <input type="text" class="form-control" id="dailyLoanSearch" placeholder="Buscar préstamo diario..." onkeyup="searchDailyLoans()">
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Cliente</th>
-                                        <th>Monto</th>
-                                        <th class="hide-mobile">Tasa</th>
-                                        <th class="hide-mobile">Fecha</th>
-                                        <th>Días</th>
-                                        <th>Pago Diario</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dailyLoansTable"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Weekly Loans Section -->
-            <div id="weekly-loans" class="section">
-                <div class="mb-4">
-                    <h2 class="mb-3">Préstamos Semanales</h2>
-                    <div class="d-flex justify-content-between flex-wrap gap-2">
-                        <button class="btn btn-success" onclick="window.print()">
-                            <i class="fas fa-list me-2"></i>Imprimir Lista
-                        </button>
-                        <button class="btn btn-primary" onclick="openLoanModal()">
-                            <i class="fas fa-plus me-2"></i>Nuevo Préstamo Semanal
-                        </button>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="search-box mb-3">
-                            <i class="fas fa-search"></i>
-                            <input type="text" class="form-control" id="weeklyLoanSearch" placeholder="Buscar préstamo semanal..." onkeyup="searchWeeklyLoans()">
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Cliente</th>
-                                        <th>Monto</th>
-                                        <th class="hide-mobile">Tasa</th>
-                                        <th class="hide-mobile">Fecha</th>
-                                        <th>Cuotas</th>
-                                        <th>Pago Semanal</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="weeklyLoansTable"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Biweekly Loans Section -->
-            <div id="biweekly-loans" class="section">
-                <div class="mb-4">
-                    <h2 class="mb-3">Préstamos Quincenales</h2>
-                    <div class="d-flex justify-content-between flex-wrap gap-2">
-                        <button class="btn btn-success" onclick="window.print()">
-                            <i class="fas fa-list me-2"></i>Imprimir Lista
-                        </button>
-                        <button class="btn btn-primary" onclick="openLoanModal()">
-                            <i class="fas fa-plus me-2"></i>Nuevo Préstamo Quincenal
-                        </button>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="search-box mb-3">
-                            <i class="fas fa-search"></i>
-                            <input type="text" class="form-control" id="biweeklyLoanSearch" placeholder="Buscar préstamo quincenal..." onkeyup="searchBiweeklyLoans()">
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Cliente</th>
-                                        <th>Monto</th>
-                                        <th class="hide-mobile">Tasa</th>
-                                        <th class="hide-mobile">Fecha</th>
-                                        <th>Cuotas</th>
-                                        <th>Pago Quincenal</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="biweeklyLoansTable"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Monthly Loans Section -->
-            <div id="monthly-loans" class="section">
-                <div class="mb-4">
-                    <h2 class="mb-3">Préstamos Mensuales</h2>
-                    <div class="d-flex justify-content-between flex-wrap gap-2">
-                        <button class="btn btn-success" onclick="window.print()">
-                            <i class="fas fa-list me-2"></i>Imprimir Lista
-                        </button>
-                        <button class="btn btn-primary" onclick="openLoanModal()">
-                            <i class="fas fa-plus me-2"></i>Nuevo Préstamo Mensual
-                        </button>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="search-box mb-3">
-                            <i class="fas fa-search"></i>
-                            <input type="text" class="form-control" id="monthlyLoanSearch" placeholder="Buscar préstamo mensual..." onkeyup="searchMonthlyLoans()">
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Cliente</th>
-                                        <th>Monto</th>
-                                        <th class="hide-mobile">Tasa</th>
-                                        <th class="hide-mobile">Fecha</th>
-                                        <th>Cuotas</th>
-                                        <th>Pago Mensual</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="monthlyLoansTable"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Indefinite Loans Section (Réditos) -->
-            <div id="indefinite-loans" class="section">
-                <div class="mb-4">
-                    <h2 class="mb-3">Préstamos a Réditos</h2>
-                    <div class="d-flex justify-content-between flex-wrap gap-2">
-                        <button class="btn btn-success" onclick="window.print()">
-                            <i class="fas fa-list me-2"></i>Imprimir Lista
-                        </button>
-                        <button class="btn btn-primary" onclick="openLoanModal()">
-                            <i class="fas fa-plus me-2"></i>Nuevo Préstamo a Réditos
-                        </button>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="search-box mb-3">
-                            <i class="fas fa-search"></i>
-                            <input type="text" class="form-control" id="indefiniteLoanSearch" placeholder="Buscar préstamo a réditos..." onkeyup="searchIndefiniteLoans()">
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Cliente</th>
-                                        <th>Monto</th>
-                                        <th class="hide-mobile">Tasa</th>
-                                        <th class="hide-mobile">Fecha</th>
-                                        <th>Frecuencia</th>
-                                        <th>Pagos Realizados</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="indefiniteLoansTable"></tbody>
                             </table>
                         </div>
                     </div>
@@ -1642,7 +1846,9 @@
                                         <th>Préstamo</th>
                                         <th>Pendiente</th>
                                         <th class="hide-mobile">Días Vencido</th>
+                                        <th class="hide-mobile">Mora</th>
                                         <th class="hide-mobile">Última Cuota</th>
+                                        <th>Notificaciones</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -1656,10 +1862,6 @@
             <!-- Payment History Section -->
             <div id="payment-history" class="section">
                 <h2 class="mb-4">Historial de Pagos Realizados</h2>
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    <strong>Nota:</strong> Eliminar un pago del historial solo borra el registro, no afecta el saldo del préstamo. Para anular un pago y reintegrar el monto, use la sección "Anular Pagos".
-                </div>
                 <div class="card">
                     <div class="card-body">
                         <div class="table-responsive">
@@ -1680,6 +1882,10 @@
                                 <tbody id="paymentHistoryTable"></tbody>
                             </table>
                         </div>
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Los pagos de préstamos finalizados se eliminan automáticamente del historial.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1689,7 +1895,7 @@
                 <h2 class="mb-4">Anular Pagos</h2>
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Precaución:</strong> Al anular un pago, el monto se reintegrará al saldo del préstamo y se revertirán las cuotas pagadas. Esta acción es útil para corregir pagos registrados por error.
+                    <strong>Precaución:</strong> Al anular un pago, el monto se reintegrará al saldo del préstamo. Esta acción es útil para corregir pagos registrados por error.
                 </div>
                 <div class="card">
                     <div class="card-body">
@@ -2126,7 +2332,7 @@
 
     <!-- Client Modal -->
     <div class="modal fade" id="clientModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Nuevo Cliente</h5>
@@ -2135,43 +2341,64 @@
                 <div class="modal-body">
                     <form id="clientForm">
                         <input type="hidden" id="clientId">
-                        <div class="mb-3">
-                            <label class="form-label">Nombre *</label>
-                            <input type="text" class="form-control" id="clientFirstName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Apellido *</label>
-                            <input type="text" class="form-control" id="clientLastName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Cédula *</label>
-                            <input type="text" class="form-control" id="clientCedula" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Teléfono *</label>
-                            <input type="tel" class="form-control" id="clientPhone" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Sexo</label>
-                            <select class="form-select" id="clientGender">
-                                <option value="">Seleccionar...</option>
-                                <option value="Masculino">Masculino</option>
-                                <option value="Femenino">Femenino</option>
-                                <option value="Otro">Otro</option>
-                                <option value="Prefiero no decir">Prefiero no decir</option>
-                            </select>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre *</label>
+                                    <input type="text" class="form-control" id="clientFirstName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Apellido *</label>
+                                    <input type="text" class="form-control" id="clientLastName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Cédula *</label>
+                                    <input type="text" class="form-control" id="clientCedula" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Teléfono *</label>
+                                    <input type="tel" class="form-control" id="clientPhone" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="clientEmail" placeholder="cliente@ejemplo.com">
+                                    <small class="text-muted">Para enviar notificaciones</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">WhatsApp</label>
+                                    <input type="tel" class="form-control" id="clientWhatsApp" placeholder="Ej: 8095551234">
+                                    <small class="text-muted">Número para WhatsApp (sin espacios ni guiones)</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Sexo</label>
+                                    <select class="form-select" id="clientGender">
+                                        <option value="">Seleccionar...</option>
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Femenino">Femenino</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Dirección *</label>
-                            <textarea class="form-control" id="clientAddress" required></textarea>
+                            <textarea class="form-control" id="clientAddress" required rows="2"></textarea>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Ocupación</label>
-                            <input type="text" class="form-control" id="clientOccupation" placeholder="Ej: Comerciante, Empleado, etc.">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Salario/Ingreso Mensual</label>
-                            <input type="number" class="form-control" id="clientSalary" placeholder="0.00" step="0.01" min="0">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Ocupación</label>
+                                    <input type="text" class="form-control" id="clientOccupation" placeholder="Ej: Comerciante, Empleado">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Salario/Ingreso Mensual</label>
+                                    <input type="number" class="form-control" id="clientSalary" placeholder="0.00" step="0.01" min="0">
+                                </div>
+                            </div>
                         </div>
                         <div class="d-flex gap-2 justify-content-end">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -2183,7 +2410,7 @@
         </div>
     </div>
 
-    <!-- Loan Modal - Modificado para incluir fecha personalizada -->
+    <!-- Loan Modal -->
     <div class="modal fade" id="loanModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
@@ -2248,6 +2475,7 @@
                                     <option value="biweekly">Quincenal</option>
                                     <option value="monthly">Mensual</option>
                                 </select>
+                                <small class="text-muted">Para préstamos a réditos: Solo se pagan los réditos generados</small>
                             </div>
                             <div class="col-md-6 mb-3" id="dailyDaysGroup" style="display:none;">
                                 <label class="form-label">Número de Días *</label>
@@ -2275,7 +2503,7 @@
         </div>
     </div>
 
-    <!-- Payment Modal - Modificado para incluir mora -->
+    <!-- Payment Modal -->
     <div class="modal fade" id="paymentModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
@@ -2341,21 +2569,23 @@
 
     <!-- Invoice Modal -->
     <div class="modal fade" id="invoiceModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Factura</h5>
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 450px;">
+            <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+                <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border: none;">
+                    <h5 class="modal-title text-white">Comprobante de Pago</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body" id="invoiceContent"></div>
-                <div class="modal-footer no-print">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button class="btn btn-success" onclick="printThermal()">
-                        <i class="fas fa-receipt me-2"></i>Imprimir Térmica
-                    </button>
-                    <button class="btn btn-primary" onclick="window.print()">
-                        <i class="fas fa-print me-2"></i>Imprimir Normal
-                    </button>
+                <div class="modal-body p-0" id="invoiceContent"></div>
+                <div class="modal-footer no-print d-flex justify-content-between flex-wrap" style="border-top: 1px solid #e5e7eb;">
+                    <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success" onclick="printThermal()">
+                            <i class="fas fa-receipt"></i>
+                        </button>
+                        <button class="btn btn-primary" onclick="window.print()">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2542,6 +2772,9 @@
         </div>
     </div>
 
+    <!-- Toast de notificación -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;" id="notificationToast"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
 // Firebase Configuration
@@ -2573,6 +2806,14 @@ var currentTheme = "theme-blue";
 var isAuthenticated = false;
 var currentUserId = null;
 
+// Variable para almacenar el ID del pago actual
+var currentPaymentId = null;
+
+// Variables para seguimiento de réditos vencidos
+var reditosVencidos = [];
+var ultimaVerificacionReditos = null;
+var defaultReditoRate = 20; // 20% por defecto
+
 // Configuración de impresora
 var printerSettings = {
     connected: false,
@@ -2602,8 +2843,251 @@ var notifications = {
 // Contador único para IDs de préstamo
 var loanIdCounter = 1;
 
-// Estado del menú desplegable de préstamos
-var loansMenuExpanded = true; // Por defecto expandido
+// ===== NUEVAS FUNCIONES PARA PRÉSTAMOS A RÉDITOS =====
+
+// Función para calcular el monto del rédito según frecuencia
+function calculateReditoAmount(loan) {
+    if (!loan || loan.type !== "indefinite") return 0;
+    
+    var capital = loan.amount;
+    var tasaMensual = loan.interestRate || defaultReditoRate;
+    
+    // Calcular interés mensual
+    var reditoMensual = capital * (tasaMensual / 100);
+    
+    // Ajustar según frecuencia
+    switch (loan.frequency) {
+        case 'weekly':
+            return reditoMensual / 4; // Semanal: 1/4 del mensual
+        case 'biweekly':
+            return reditoMensual / 2; // Quincenal: 1/2 del mensual
+        case 'monthly':
+        default:
+            return reditoMensual; // Mensual: completo
+    }
+}
+
+// Función para verificar réditos vencidos
+function checkReditosVencidos() {
+    var today = new Date();
+    var reditosVencidosList = [];
+    var reditosPorVencerList = [];
+
+    loans.filter(l => l.status === 'active' && l.type === 'indefinite').forEach(loan => {
+        var nextPaymentDate = calculateNextPaymentDate(loan);
+        
+        if (nextPaymentDate && loan.remainingAmount > 0) {
+            var nextDate = new Date(nextPaymentDate);
+            var client = clients.find(c => c.id === loan.clientId);
+            var reditoAmount = calculateReditoAmount(loan);
+            
+            if (!isNaN(nextDate.getTime())) {
+                var daysUntilDue = Math.floor((nextDate - today) / (1000 * 60 * 60 * 24));
+                var daysOverdue = daysUntilDue < 0 ? Math.abs(daysUntilDue) : 0;
+                
+                var reditoInfo = {
+                    loanId: loan.id,
+                    clientId: loan.clientId,
+                    clientName: client ? client.firstName + " " + client.lastName : "N/A",
+                    clientPhone: client ? client.phone : "",
+                    clientWhatsApp: client ? client.whatsapp : "",
+                    clientEmail: client ? client.email : "",
+                    reditoAmount: reditoAmount,
+                    capitalRestante: loan.remainingAmount,
+                    nextPaymentDate: nextPaymentDate,
+                    frequency: loan.frequency,
+                    daysUntilDue: daysUntilDue,
+                    daysOverdue: daysOverdue
+                };
+
+                if (daysUntilDue < 0) {
+                    // Rédito vencido
+                    reditosVencidosList.push(reditoInfo);
+                } else if (daysUntilDue <= 3) {
+                    // Rédito por vencer en los próximos 3 días
+                    reditosPorVencerList.push(reditoInfo);
+                }
+            }
+        }
+    });
+
+    // Actualizar variable global
+    reditosVencidos = reditosVencidosList;
+
+    return {
+        vencidos: reditosVencidosList,
+        porVencer: reditosPorVencerList
+    };
+}
+
+// Función para mostrar notificación de réditos vencidos
+function mostrarAlertaReditosVencidos() {
+    var resultado = checkReditosVencidos();
+    
+    if (resultado.vencidos.length > 0) {
+        var mensaje = "⚠️ ALERTA: RÉDITOS VENCIDOS ⚠️\n\n";
+        mensaje += "Los siguientes préstamos a réditos tienen pagos vencidos:\n\n";
+        
+        resultado.vencidos.forEach((redito, index) => {
+            mensaje += `${index + 1}. ${redito.clientName}\n`;
+            mensaje += `   Préstamo: ${redito.loanId}\n`;
+            mensaje += `   Días vencido: ${redito.daysOverdue}\n`;
+            mensaje += `   Rédito pendiente: RD$ ${formatMoney(redito.reditoAmount)}\n`;
+            mensaje += `   Capital restante: RD$ ${formatMoney(redito.capitalRestante)}\n`;
+            mensaje += `   Frecuencia: ${getFrequencyLabel(redito.frequency)}\n\n`;
+        });
+        
+        mensaje += "Por favor, realice el cobro lo antes posible para evitar la acumulación de mora.";
+        
+        // Mostrar alerta
+        setTimeout(function() {
+            alert(mensaje);
+        }, 1500);
+        
+        // Mostrar notificación en pantalla
+        mostrarNotificacionReditos(resultado.vencidos);
+        
+        // Actualizar badge de notificaciones
+        notifications.overdueCount += resultado.vencidos.length;
+        updateNotificationBadges();
+    }
+    
+    if (resultado.porVencer.length > 0) {
+        mostrarNotificacionRecordatorio(resultado.porVencer);
+    }
+}
+
+// Función para mostrar notificación flotante de réditos vencidos
+function mostrarNotificacionReditos(reditos) {
+    var notification = document.createElement('div');
+    notification.id = 'reditos-notification';
+    notification.className = 'overdue-notification';
+    notification.style.background = 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)';
+    
+    var listaReditos = reditos.map(r => 
+        `• ${r.clientName}: RD$ ${formatMoney(r.reditoAmount)} (${r.daysOverdue} días)`
+    ).join('<br>');
+    
+    notification.innerHTML = `
+        <div style="display: flex; align-items: flex-start;">
+            <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+            <div style="flex: 1;">
+                <strong style="font-size: 1.1rem;">¡Réditos Vencidos!</strong>
+                <p style="margin: 5px 0; font-size: 0.9rem;">
+                    ${reditos.length} préstamo(s) con réditos vencidos:
+                </p>
+                <p style="margin: 5px 0; font-size: 0.85rem; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 5px;">
+                    ${listaReditos}
+                </p>
+                <button onclick="irAPagosVencidos()" style="background: white; color: #dc2626; border: none; padding: 5px 15px; border-radius: 20px; margin-top: 8px; font-weight: bold; cursor: pointer;">
+                    <i class="fas fa-eye me-1"></i>Ver detalles
+                </button>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: white; margin-left: 10px;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    var existing = document.getElementById('reditos-notification');
+    if (existing) existing.remove();
+    
+    document.body.appendChild(notification);
+    
+    // Auto-ocultar después de 30 segundos
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+            notification.style.transform = 'translateX(100%)';
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                if (notification.parentNode) notification.remove();
+            }, 300);
+        }
+    }, 30000);
+}
+
+// Función para mostrar recordatorio de réditos por vencer
+function mostrarNotificacionRecordatorio(reditos) {
+    var notification = document.createElement('div');
+    notification.id = 'recordatorio-notification';
+    notification.className = 'overdue-notification';
+    notification.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+    
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center;">
+            <i class="fas fa-clock fa-2x me-3"></i>
+            <div style="flex: 1;">
+                <strong>Recordatorio de Réditos</strong>
+                <p style="margin: 5px 0; font-size: 0.9rem;">
+                    ${reditos.length} préstamo(s) tienen réditos por vencer en los próximos días
+                </p>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: white;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    var existing = document.getElementById('recordatorio-notification');
+    if (existing) existing.remove();
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) notification.remove();
+    }, 10000);
+}
+
+// Función para ir a la sección de pagos vencidos
+function irAPagosVencidos() {
+    showSection('overdue-payments');
+    var notification = document.getElementById('reditos-notification');
+    if (notification) notification.remove();
+}
+
+// Función para enviar recordatorio específico para réditos vencidos
+function sendReditoReminder(loanId) {
+    var loan = loans.find(l => l.id === loanId);
+    if (!loan || loan.type !== "indefinite") return;
+    
+    var client = clients.find(c => c.id === loan.clientId);
+    if (!client) return;
+    
+    var reditoAmount = calculateReditoAmount(loan);
+    var daysOverdue = calculateDaysOverdue(loan);
+    
+    var mensaje = "Estimado/a " + client.firstName + " " + client.lastName + ",\n\n";
+    mensaje += "Le recordamos que tiene un RÉDITO VENCIDO en su préstamo a réditos.\n\n";
+    mensaje += "Detalles:\n";
+    mensaje += "──────────────\n";
+    mensaje += "Préstamo: " + loan.id + "\n";
+    mensaje += "Días vencido: " + daysOverdue + " días\n";
+    mensaje += "Rédito pendiente: RD$ " + formatMoney(reditoAmount) + "\n";
+    mensaje += "Capital restante: RD$ " + formatMoney(loan.remainingAmount) + "\n";
+    mensaje += "Frecuencia: " + getFrequencyLabel(loan.frequency) + "\n";
+    mensaje += "──────────────\n\n";
+    mensaje += "Por favor, realice el pago lo antes posible para evitar cargos adicionales.\n\n";
+    mensaje += "Atentamente,\n";
+    mensaje += companyInfo.name || "Sistema de Préstamos";
+    
+    // Enviar por WhatsApp si tiene número
+    if (client.whatsapp) {
+        var phoneNumber = client.whatsapp.replace(/[^\d]/g, '');
+        if (phoneNumber.length === 10) phoneNumber = "1" + phoneNumber;
+        var whatsappLink = "https://wa.me/" + phoneNumber + "?text=" + encodeURIComponent(mensaje);
+        window.open(whatsappLink, '_blank');
+    }
+    
+    // Enviar por email si tiene correo
+    if (client.email) {
+        var subject = "Recordatorio de Rédito Vencido - Préstamo " + loan.id;
+        var mailtoLink = "mailto:" + client.email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(mensaje);
+        window.location.href = mailtoLink;
+    }
+    
+    showNotification("Recordatorio enviado al cliente", "success");
+}
 
 // Función para generar ID único de préstamo
 function generateLoanId() {
@@ -2611,25 +3095,6 @@ function generateLoanId() {
     const random = Math.floor(Math.random() * 1000);
     loanIdCounter++;
     return `LOAN-${timestamp}-${random}-${loanIdCounter}`;
-}
-
-// Función para toggle del menú de préstamos
-function toggleLoansMenu() {
-    var submenu = document.getElementById("loansSubmenu");
-    var arrow = document.getElementById("loansArrow");
-    
-    loansMenuExpanded = !loansMenuExpanded;
-    
-    if (loansMenuExpanded) {
-        submenu.classList.add("expanded");
-        arrow.classList.add("rotated");
-    } else {
-        submenu.classList.remove("expanded");
-        arrow.classList.remove("rotated");
-    }
-    
-    // Guardar estado en localStorage para persistencia
-    localStorage.setItem('loansMenuExpanded', loansMenuExpanded);
 }
 
 // Mobile Menu Functions
@@ -2947,7 +3412,9 @@ function saveThemeToFirebase() {
 function checkOverduePaymentsAlert() {
     var today = new Date();
     var hasOverdue = false;
+    var hasReditosVencidos = false;
     var overdueDetails = [];
+    var reditosVencidosDetails = [];
     var shouldShowAlert = false;
 
     loans.filter(l => l.status === 'active').forEach(loan => {
@@ -2960,32 +3427,59 @@ function checkOverduePaymentsAlert() {
                 var daysOverdue = Math.floor((today - nextDate) / (1000 * 60 * 60 * 24));
                 var client = clients.find(c => c.id === loan.clientId);
                 
-                overdueDetails.push({
-                    cliente: client ? client.firstName + " " + client.lastName : "N/A",
-                    prestamo: loan.id,
-                    tipo: getLoanTypeLabel(loan.type),
-                    frecuencia: loan.frequency || 'diario',
-                    dias: daysOverdue,
-                    saldo: formatMoney(loan.remainingAmount),
-                    proximoPago: formatDate(nextPaymentDate)
-                });
+                // Verificar si es préstamo a réditos
+                if (loan.type === "indefinite") {
+                    hasReditosVencidos = true;
+                    reditosVencidosDetails.push({
+                        cliente: client ? client.firstName + " " + client.lastName : "N/A",
+                        prestamo: loan.id,
+                        tipo: "Préstamo a Réditos",
+                        frecuencia: loan.frequency || 'mensual',
+                        dias: daysOverdue,
+                        capital: formatMoney(loan.amount),
+                        saldo: formatMoney(loan.remainingAmount),
+                        proximoPago: formatDate(nextPaymentDate),
+                        montoPendiente: calculateReditoAmount(loan)
+                    });
+                    
+                    // Guardar en variable global para acceso rápido
+                    reditosVencidos.push({
+                        loanId: loan.id,
+                        clientId: loan.clientId,
+                        daysOverdue: daysOverdue,
+                        reditoAmount: calculateReditoAmount(loan)
+                    });
+                } else {
+                    overdueDetails.push({
+                        cliente: client ? client.firstName + " " + client.lastName : "N/A",
+                        prestamo: loan.id,
+                        tipo: getLoanTypeLabel(loan.type),
+                        frecuencia: loan.frequency || 'diario',
+                        dias: daysOverdue,
+                        saldo: formatMoney(loan.remainingAmount),
+                        proximoPago: formatDate(nextPaymentDate)
+                    });
+                }
             }
         }
     });
 
-    // Actualizar contador de notificaciones
-    notifications.overdueCount = overdueDetails.length;
+    // Limpiar y actualizar array de réditos vencidos
+    reditosVencidos = reditosVencidosDetails;
+
+    // Actualizar contador de notificaciones (incluye todos los vencidos)
+    notifications.overdueCount = overdueDetails.length + reditosVencidosDetails.length;
     updateNotificationBadges();
 
     // Solo mostrar alerta si es la primera vez o si no se ha mostrado hoy
     var lastAlertDate = localStorage.getItem('lastOverdueAlertDate');
     var todayStr = today.toISOString().split('T')[0];
     
-    if (hasOverdue && notifications.showSidebarBadge) {
+    if ((hasOverdue || hasReditosVencidos) && notifications.showSidebarBadge) {
         // Mostrar notificación en pantalla solo si no hay una ya visible
         var existingNotification = document.getElementById('overdue-notification');
-        if (!existingNotification && overdueDetails.length > 0) {
-            showOnScreenNotification(overdueDetails.length);
+        if (!existingNotification && (overdueDetails.length > 0 || reditosVencidosDetails.length > 0)) {
+            showOnScreenNotification(overdueDetails.length + reditosVencidosDetails.length);
         }
         
         // Solo mostrar alerta popup si no se ha mostrado hoy
@@ -2998,8 +3492,16 @@ function checkOverduePaymentsAlert() {
         var activeSection = document.querySelector('.section.active');
         if (shouldShowAlert && (!activeSection || activeSection.id !== 'overdue-payments')) {
             var message = "⚠️ ALERTA: PAGOS VENCIDOS ⚠️\n\n";
-            message += "Se encontraron " + overdueDetails.length + " préstamo(s) con pagos vencidos.\n\n";
-            message += "Consulte la sección 'Pagos Vencidos' para más detalles.\n\n";
+            message += "Se encontraron " + (overdueDetails.length + reditosVencidosDetails.length) + " préstamo(s) con pagos vencidos.\n\n";
+            
+            if (reditosVencidosDetails.length > 0) {
+                message += "Préstamos a Réditos vencidos: " + reditosVencidosDetails.length + "\n";
+            }
+            if (overdueDetails.length > 0) {
+                message += "Otros préstamos vencidos: " + overdueDetails.length + "\n";
+            }
+            
+            message += "\nConsulte la sección 'Pagos Vencidos' para más detalles.\n\n";
             message += "Esta alerta solo se mostrará una vez al día.";
             
             setTimeout(function() {
@@ -3073,11 +3575,13 @@ function startPeriodicOverdueCheck() {
     // Verificar cada minuto si hay pagos vencidos
     setInterval(() => {
         checkOverduePaymentsAlert();
+        mostrarAlertaReditosVencidos(); // Nueva función para réditos
     }, 60000); // 1 minuto
     
     // Verificar inmediatamente al cargar
     setTimeout(() => {
         checkOverduePaymentsAlert();
+        mostrarAlertaReditosVencidos();
     }, 3000);
 }
 
@@ -3102,11 +3606,6 @@ function login(e) {
             loadData().then(() => {
                 renderClients();
                 renderLoans();
-                renderDailyLoans();
-                renderWeeklyLoans();
-                renderBiweeklyLoans();
-                renderMonthlyLoans();
-                renderIndefiniteLoans();
                 renderPaymentHistory();
                 renderVoidPayments();
                 renderOverduePayments();
@@ -3115,28 +3614,9 @@ function login(e) {
                 loadCompanyInfo();
                 updatePrinterUI();
                 
-                // Restaurar estado del menú de préstamos
-                var savedState = localStorage.getItem('loansMenuExpanded');
-                if (savedState !== null) {
-                    loansMenuExpanded = savedState === 'true';
-                    var submenu = document.getElementById("loansSubmenu");
-                    var arrow = document.getElementById("loansArrow");
-                    
-                    if (loansMenuExpanded) {
-                        submenu.classList.add("expanded");
-                        arrow.classList.add("rotated");
-                    } else {
-                        submenu.classList.remove("expanded");
-                        arrow.classList.remove("rotated");
-                    }
-                } else {
-                    // Por defecto expandido
-                    document.getElementById("loansSubmenu").classList.add("expanded");
-                    document.getElementById("loansArrow").classList.add("rotated");
-                }
-                
                 // Verificar notificaciones inmediatamente
                 checkOverduePaymentsAlert();
+                mostrarAlertaReditosVencidos(); // Verificar réditos
                 startPeriodicOverdueCheck();
             });
         })
@@ -3172,20 +3652,13 @@ function showSection(sectionId) {
         activeSection.classList.add("active");
     }
 
-    // Remover clase active de todos los enlaces del menú
     var navLinks = document.querySelectorAll(".sidebar .nav-link");
     navLinks.forEach(function (link) {
         link.classList.remove("active");
     });
-    
-    // Activar el enlace correspondiente en el submenú de préstamos
-    if (sectionId === 'loans' || sectionId === 'daily-loans' || sectionId === 'weekly-loans' || 
-        sectionId === 'biweekly-loans' || sectionId === 'monthly-loans' || sectionId === 'indefinite-loans') {
-        var activeLink = document.querySelector(`.sidebar .nav-link[onclick*="'${sectionId}'"]`);
-        if (activeLink) activeLink.classList.add("active");
-    } else {
-        var activeLink = document.querySelector(`.sidebar .nav-link[onclick*="'${sectionId}'"]`);
-        if (activeLink) activeLink.classList.add("active");
+    var activeLink = document.querySelector(`.sidebar .nav-link[onclick*="'${sectionId}'"]`);
+    if (activeLink) {
+        activeLink.classList.add("active");
     }
 
     switch (sectionId) {
@@ -3198,21 +3671,6 @@ function showSection(sectionId) {
         case "loans":
             renderLoans();
             break;
-        case "daily-loans":
-            renderDailyLoans();
-            break;
-        case "weekly-loans":
-            renderWeeklyLoans();
-            break;
-        case "biweekly-loans":
-            renderBiweeklyLoans();
-            break;
-        case "monthly-loans":
-            renderMonthlyLoans();
-            break;
-        case "indefinite-loans":
-            renderIndefiniteLoans();
-            break;
         case "finished-loans":
             renderFinishedLoans();
             break;
@@ -3224,6 +3682,7 @@ function showSection(sectionId) {
             clearOverdueNotifications();
             setTimeout(() => {
                 checkOverduePaymentsAlert();
+                mostrarAlertaReditosVencidos();
             }, 500);
             break;
         case "payment-history":
@@ -3294,6 +3753,7 @@ function updateDashboard() {
     
     // Actualizar notificaciones
     checkOverduePaymentsAlert();
+    mostrarAlertaReditosVencidos();
 }
 
 // Client Functions
@@ -3309,6 +3769,8 @@ function openClientModal(clientId = null) {
             document.getElementById("clientLastName").value = client.lastName;
             document.getElementById("clientCedula").value = client.cedula;
             document.getElementById("clientPhone").value = client.phone;
+            document.getElementById("clientEmail").value = client.email || "";
+            document.getElementById("clientWhatsApp").value = client.whatsapp || "";
             document.getElementById("clientGender").value = client.gender || "";
             document.getElementById("clientAddress").value = client.address;
             document.getElementById("clientOccupation").value = client.occupation || "";
@@ -3337,6 +3799,8 @@ function saveClient(e) {
         lastName: document.getElementById("clientLastName").value,
         cedula: document.getElementById("clientCedula").value,
         phone: document.getElementById("clientPhone").value,
+        email: document.getElementById("clientEmail").value,
+        whatsapp: document.getElementById("clientWhatsApp").value,
         gender: document.getElementById("clientGender").value,
         address: document.getElementById("clientAddress").value,
         occupation: document.getElementById("clientOccupation").value || "",
@@ -3375,6 +3839,8 @@ function renderClients() {
             "<td>" + client.firstName + " " + client.lastName + "</td>" +
             "<td>" + client.cedula + "</td>" +
             "<td>" + client.phone + "</td>" +
+            "<td>" + (client.email || "N/A") + "</td>" +
+            "<td>" + (client.whatsapp || "N/A") + "</td>" +
             '<td class="hide-mobile">' + (client.gender || "N/A") + "</td>" +
             '<td class="hide-mobile">' + client.address + "</td>" +
             '<td class="hide-mobile">' + (client.occupation || "N/A") + "</td>" +
@@ -3411,7 +3877,7 @@ function deleteClient(clientId) {
     }
 }
 
-// Loan Functions - Modificado para incluir fecha
+// Loan Functions
 function openLoanModal(loanId = null) {
     var modal = new bootstrap.Modal(document.getElementById("loanModal"));
     document.getElementById("loanForm").reset();
@@ -3451,6 +3917,8 @@ function openLoanModal(loanId = null) {
                 document.getElementById("loanFrequency").value = loan.frequency;
             } else if (loan.type === "indefinite") {
                 document.getElementById("indefiniteFrequency").value = loan.frequency;
+                // Mostrar mensaje de ayuda para tasa modificable
+                mostrarAyudaTasaRedito();
             } else if (loan.type === "daily") {
                 document.getElementById("loanDailyDays").value = loan.days;
                 document.getElementById("loanDailyPayment").value = loan.dailyPayment;
@@ -3463,9 +3931,28 @@ function openLoanModal(loanId = null) {
     } else {
         document.querySelector("#loanModal .modal-title").textContent = "Nuevo Préstamo";
         document.getElementById("loanSubmitText").textContent = "Crear Préstamo";
+        // Establecer tasa por defecto para réditos
+        document.getElementById("loanInterestRate").value = defaultReditoRate;
     }
 
     modal.show();
+}
+
+// Función para mostrar ayuda sobre tasa de réditos
+function mostrarAyudaTasaRedito() {
+    var ayudaHTML = `
+        <div class="alert alert-info mt-2 p-2 small">
+            <i class="fas fa-info-circle me-1"></i>
+            <strong>Tasa de Réditos:</strong> Puede modificar esta tasa según sea necesario.
+            El cálculo automático se ajustará a la nueva tasa.
+        </div>
+    `;
+    
+    var preview = document.getElementById("loanPreview");
+    if (preview) {
+        // Insertar después del preview
+        preview.insertAdjacentHTML('afterend', ayudaHTML);
+    }
 }
 
 function toggleLoanType() {
@@ -3487,6 +3974,11 @@ function toggleLoanType() {
         frequencyGroup.style.display = "block";
     } else if (type === "indefinite") {
         indefiniteFrequencyGroup.style.display = "block";
+        // Establecer tasa por defecto si está vacía
+        var tasaInput = document.getElementById("loanInterestRate");
+        if (!tasaInput.value || tasaInput.value === "0") {
+            tasaInput.value = defaultReditoRate;
+        }
     } else if (type === "daily") {
         dailyDaysGroup.style.display = "block";
         dailyPaymentGroup.style.display = "block";
@@ -3510,27 +4002,28 @@ function updateLoanPreview() {
     var preview = "<strong>Vista Previa:</strong><br>";
     preview += "Capital: RD$ " + formatMoney(amount) + "<br>";
     
-    // MODIFICACIÓN PARA PRÉSTAMOS INDEFINIDOS
+    // MODIFICACIÓN PARA PRÉSTAMOS A RÉDITOS
     if (type === "indefinite") {
-        preview += "Interés Mensual: 20% sobre el capital<br>";
+        preview += "<span class='badge bg-warning text-dark mb-2'>Tasa de Réditos Modificable: " + rate + "% mensual</span><br>";
+        preview += "Interés Mensual: " + rate + "% sobre el capital<br>";
         preview += "Total Interés: RD$ " + formatMoney(totalInterest) + "<br>";
         preview += "Monto Total a Pagar: RD$ " + formatMoney(totalAmount) + "<br>";
         
         var frequency = document.getElementById("indefiniteFrequency").value;
-        var monthlyInterest = amount * 0.20; // 20% mensual
+        var monthlyInterest = amount * (rate / 100);
         
         if (frequency === "weekly") {
-            // Semanal: Un cuarto del interés mensual
             var weeklyPayment = monthlyInterest / 4;
-            preview += "Pago Semanal (solo interés): RD$ " + formatMoney(weeklyPayment);
+            preview += "Pago Semanal (solo réditos): RD$ " + formatMoney(weeklyPayment);
         } else if (frequency === "biweekly") {
-            // Quincenal: La mitad del interés mensual
             var biweeklyPayment = monthlyInterest / 2;
-            preview += "Pago Quincenal (solo interés): RD$ " + formatMoney(biweeklyPayment);
+            preview += "Pago Quincenal (solo réditos): RD$ " + formatMoney(biweeklyPayment);
         } else if (frequency === "monthly") {
-            // Mensual: Todo el interés
-            preview += "Pago Mensual (solo interés): RD$ " + formatMoney(monthlyInterest);
+            preview += "Pago Mensual (solo réditos): RD$ " + formatMoney(monthlyInterest);
         }
+        
+        // Agregar nota sobre modificación de tasa
+        preview += "<br><small class='text-muted'><i class='fas fa-edit'></i> Puede modificar la tasa en cualquier momento</small>";
     } else {
         // Para otros tipos de préstamos, mantener el cálculo actual
         preview += "Interés Total: RD$ " + formatMoney(totalInterest) + "<br>";
@@ -3552,7 +4045,7 @@ function updateLoanPreview() {
     } else if (type === "indefinite") {
         var frequency = document.getElementById("indefiniteFrequency").value;
         preview += "<br>Frecuencia: " + getFrequencyLabel(frequency) + "<br>";
-        preview += "<small>Se pagarán solo los intereses hasta saldar el capital</small>";
+        preview += "<small>Se pagarán solo los réditos hasta saldar el capital</small>";
     } else if (type === "daily") {
         var days = Number.parseInt(document.getElementById("loanDailyDays").value) || 0;
         if (days > 0) {
@@ -3603,15 +4096,7 @@ function saveLoan(e) {
         return;
     }
     
-    // VALIDACIÓN PARA PRÉSTAMOS INDEFINIDOS
     var loanType = document.getElementById("loanType").value;
-    
-    if (loanType === "indefinite" && interestRate !== 20) {
-        if (!confirm("Para préstamos indefinidos, la tasa recomendada es 20% mensual. ¿Desea continuar con " + interestRate + "%?")) {
-            document.getElementById("loanInterestRate").value = "20";
-            return;
-        }
-    }
     
     // Validaciones específicas por tipo de préstamo
     if (loanType === "fixed") {
@@ -3700,11 +4185,6 @@ function saveLoan(e) {
     saveLoans();
     bootstrap.Modal.getInstance(document.getElementById("loanModal")).hide();
     renderLoans();
-    renderDailyLoans();
-    renderWeeklyLoans();
-    renderBiweeklyLoans();
-    renderMonthlyLoans();
-    renderIndefiniteLoans();
     renderFinishedLoans();
     updateDashboard();
 
@@ -3720,6 +4200,11 @@ function saveLoan(e) {
     } else {
         alert("Préstamo actualizado exitosamente");
     }
+    
+    // Verificar réditos después de guardar
+    setTimeout(() => {
+        mostrarAlertaReditosVencidos();
+    }, 1000);
 }
 
 function deleteLoan(loanId) {
@@ -3729,11 +4214,6 @@ function deleteLoan(loanId) {
         saveLoans();
         savePayments();
         renderLoans();
-        renderDailyLoans();
-        renderWeeklyLoans();
-        renderBiweeklyLoans();
-        renderMonthlyLoans();
-        renderIndefiniteLoans();
         renderFinishedLoans();
         renderPaymentHistory();
         renderVoidPayments();
@@ -3771,6 +4251,11 @@ function renderLoans() {
         } else if (loan.type === "indefinite") {
             cuotasText = (loan.paidInstallments || 0) + " pagos";
         }
+        
+        // Badge especial para réditos
+        var tipoBadge = loan.type === "indefinite" ? 
+            '<span class="badge bg-warning text-dark">Rédito</span>' : 
+            getLoanTypeLabel(loan.type);
 
         var row =
             "<tr>" +
@@ -3784,7 +4269,7 @@ function renderLoans() {
             formatMoney(loan.amount) +
             "</td>" +
             '<td class="hide-mobile">' +
-            getLoanTypeLabel(loan.type) +
+            tipoBadge +
             "</td>" +
             '<td class="hide-mobile">' +
             loan.interestRate +
@@ -3818,273 +4303,7 @@ function renderLoans() {
     });
 }
 
-// Nueva función para renderizar préstamos diarios
-function renderDailyLoans() {
-    var tbody = document.getElementById("dailyLoansTable");
-    if (!tbody) return;
-
-    tbody.innerHTML = "";
-
-    var dailyLoans = loans.filter(l => l.status === "active" && l.type === "daily");
-
-    if (dailyLoans.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay préstamos diarios activos</td></tr>';
-        return;
-    }
-
-    dailyLoans.forEach((loan) => {
-        var client = clients.find((c) => c.id === loan.clientId);
-        var clientName = client ? client.firstName + " " + client.lastName : "Cliente Eliminado";
-
-        var statusBadge = '<span class="badge bg-success">Activo</span>';
-        
-        var row =
-            "<tr>" +
-            "<td>" + loan.id + "</td>" +
-            "<td>" + clientName + "</td>" +
-            "<td>RD$ " + formatMoney(loan.amount) + "</td>" +
-            '<td class="hide-mobile">' + loan.interestRate + "%</td>" +
-            '<td class="hide-mobile">' + formatDate(loan.startDate) + "</td>" +
-            "<td><span class='badge bg-info'>" + (loan.paidDays || 0) + " de " + loan.days + "</span></td>" +
-            "<td>RD$ " + formatMoney(loan.dailyPayment) + "</td>" +
-            "<td>" + statusBadge + "</td>" +
-            '<td style="white-space: nowrap;">' +
-            '<button class="btn btn-sm btn-info me-1" onclick="viewLoanDetails(\'' + loan.id + '\')"><i class="fas fa-eye"></i></button>' +
-            '<button class="btn btn-sm btn-warning me-1" onclick="openLoanModal(\'' + loan.id + '\')"><i class="fas fa-edit"></i></button>' +
-            '<button class="btn btn-sm btn-primary me-1" onclick="generateContract(\'' + loan.id + '\')"><i class="fas fa-file-contract"></i></button>' +
-            '<button class="btn btn-sm btn-success me-1" onclick="openPaymentModal(\'' + loan.id + '\')"><i class="fas fa-dollar-sign"></i></button>' +
-            '<button class="btn btn-sm btn-danger" onclick="deleteLoan(\'' + loan.id + '\')"><i class="fas fa-trash"></i></button>' +
-            "</td>" +
-            "</tr>";
-        tbody.innerHTML += row;
-    });
-}
-
-// Nueva función para renderizar préstamos semanales
-function renderWeeklyLoans() {
-    var tbody = document.getElementById("weeklyLoansTable");
-    if (!tbody) return;
-
-    tbody.innerHTML = "";
-
-    var weeklyLoans = loans.filter(l => l.status === "active" && l.type === "fixed" && l.frequency === "weekly");
-
-    if (weeklyLoans.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay préstamos semanales activos</td></tr>';
-        return;
-    }
-
-    weeklyLoans.forEach((loan) => {
-        var client = clients.find((c) => c.id === loan.clientId);
-        var clientName = client ? client.firstName + " " + client.lastName : "Cliente Eliminado";
-
-        var statusBadge = '<span class="badge bg-success">Activo</span>';
-        
-        var row =
-            "<tr>" +
-            "<td>" + loan.id + "</td>" +
-            "<td>" + clientName + "</td>" +
-            "<td>RD$ " + formatMoney(loan.amount) + "</td>" +
-            '<td class="hide-mobile">' + loan.interestRate + "%</td>" +
-            '<td class="hide-mobile">' + formatDate(loan.startDate) + "</td>" +
-            "<td><span class='badge bg-info'>" + (loan.paidInstallments || 0) + " de " + loan.installments + "</span></td>" +
-            "<td>RD$ " + formatMoney(loan.installmentAmount) + "</td>" +
-            "<td>" + statusBadge + "</td>" +
-            '<td style="white-space: nowrap;">' +
-            '<button class="btn btn-sm btn-info me-1" onclick="viewLoanDetails(\'' + loan.id + '\')"><i class="fas fa-eye"></i></button>' +
-            '<button class="btn btn-sm btn-warning me-1" onclick="openLoanModal(\'' + loan.id + '\')"><i class="fas fa-edit"></i></button>' +
-            '<button class="btn btn-sm btn-primary me-1" onclick="generateContract(\'' + loan.id + '\')"><i class="fas fa-file-contract"></i></button>' +
-            '<button class="btn btn-sm btn-success me-1" onclick="openPaymentModal(\'' + loan.id + '\')"><i class="fas fa-dollar-sign"></i></button>' +
-            '<button class="btn btn-sm btn-danger" onclick="deleteLoan(\'' + loan.id + '\')"><i class="fas fa-trash"></i></button>' +
-            "</td>" +
-            "</tr>";
-        tbody.innerHTML += row;
-    });
-}
-
-// Nueva función para renderizar préstamos quincenales
-function renderBiweeklyLoans() {
-    var tbody = document.getElementById("biweeklyLoansTable");
-    if (!tbody) return;
-
-    tbody.innerHTML = "";
-
-    var biweeklyLoans = loans.filter(l => l.status === "active" && l.type === "fixed" && l.frequency === "biweekly");
-
-    if (biweeklyLoans.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay préstamos quincenales activos</td></tr>';
-        return;
-    }
-
-    biweeklyLoans.forEach((loan) => {
-        var client = clients.find((c) => c.id === loan.clientId);
-        var clientName = client ? client.firstName + " " + client.lastName : "Cliente Eliminado";
-
-        var statusBadge = '<span class="badge bg-success">Activo</span>';
-        
-        var row =
-            "<tr>" +
-            "<td>" + loan.id + "</td>" +
-            "<td>" + clientName + "</td>" +
-            "<td>RD$ " + formatMoney(loan.amount) + "</td>" +
-            '<td class="hide-mobile">' + loan.interestRate + "%</td>" +
-            '<td class="hide-mobile">' + formatDate(loan.startDate) + "</td>" +
-            "<td><span class='badge bg-info'>" + (loan.paidInstallments || 0) + " de " + loan.installments + "</span></td>" +
-            "<td>RD$ " + formatMoney(loan.installmentAmount) + "</td>" +
-            "<td>" + statusBadge + "</td>" +
-            '<td style="white-space: nowrap;">' +
-            '<button class="btn btn-sm btn-info me-1" onclick="viewLoanDetails(\'' + loan.id + '\')"><i class="fas fa-eye"></i></button>' +
-            '<button class="btn btn-sm btn-warning me-1" onclick="openLoanModal(\'' + loan.id + '\')"><i class="fas fa-edit"></i></button>' +
-            '<button class="btn btn-sm btn-primary me-1" onclick="generateContract(\'' + loan.id + '\')"><i class="fas fa-file-contract"></i></button>' +
-            '<button class="btn btn-sm btn-success me-1" onclick="openPaymentModal(\'' + loan.id + '\')"><i class="fas fa-dollar-sign"></i></button>' +
-            '<button class="btn btn-sm btn-danger" onclick="deleteLoan(\'' + loan.id + '\')"><i class="fas fa-trash"></i></button>' +
-            "</td>" +
-            "</tr>";
-        tbody.innerHTML += row;
-    });
-}
-
-// Nueva función para renderizar préstamos mensuales
-function renderMonthlyLoans() {
-    var tbody = document.getElementById("monthlyLoansTable");
-    if (!tbody) return;
-
-    tbody.innerHTML = "";
-
-    var monthlyLoans = loans.filter(l => l.status === "active" && l.type === "fixed" && l.frequency === "monthly");
-
-    if (monthlyLoans.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay préstamos mensuales activos</td></tr>';
-        return;
-    }
-
-    monthlyLoans.forEach((loan) => {
-        var client = clients.find((c) => c.id === loan.clientId);
-        var clientName = client ? client.firstName + " " + client.lastName : "Cliente Eliminado";
-
-        var statusBadge = '<span class="badge bg-success">Activo</span>';
-        
-        var row =
-            "<tr>" +
-            "<td>" + loan.id + "</td>" +
-            "<td>" + clientName + "</td>" +
-            "<td>RD$ " + formatMoney(loan.amount) + "</td>" +
-            '<td class="hide-mobile">' + loan.interestRate + "%</td>" +
-            '<td class="hide-mobile">' + formatDate(loan.startDate) + "</td>" +
-            "<td><span class='badge bg-info'>" + (loan.paidInstallments || 0) + " de " + loan.installments + "</span></td>" +
-            "<td>RD$ " + formatMoney(loan.installmentAmount) + "</td>" +
-            "<td>" + statusBadge + "</td>" +
-            '<td style="white-space: nowrap;">' +
-            '<button class="btn btn-sm btn-info me-1" onclick="viewLoanDetails(\'' + loan.id + '\')"><i class="fas fa-eye"></i></button>' +
-            '<button class="btn btn-sm btn-warning me-1" onclick="openLoanModal(\'' + loan.id + '\')"><i class="fas fa-edit"></i></button>' +
-            '<button class="btn btn-sm btn-primary me-1" onclick="generateContract(\'' + loan.id + '\')"><i class="fas fa-file-contract"></i></button>' +
-            '<button class="btn btn-sm btn-success me-1" onclick="openPaymentModal(\'' + loan.id + '\')"><i class="fas fa-dollar-sign"></i></button>' +
-            '<button class="btn btn-sm btn-danger" onclick="deleteLoan(\'' + loan.id + '\')"><i class="fas fa-trash"></i></button>' +
-            "</td>" +
-            "</tr>";
-        tbody.innerHTML += row;
-    });
-}
-
-// Nueva función para renderizar préstamos indefinidos (a réditos)
-function renderIndefiniteLoans() {
-    var tbody = document.getElementById("indefiniteLoansTable");
-    if (!tbody) return;
-
-    tbody.innerHTML = "";
-
-    var indefiniteLoans = loans.filter(l => l.status === "active" && l.type === "indefinite");
-
-    if (indefiniteLoans.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay préstamos a réditos activos</td></tr>';
-        return;
-    }
-
-    indefiniteLoans.forEach((loan) => {
-        var client = clients.find((c) => c.id === loan.clientId);
-        var clientName = client ? client.firstName + " " + client.lastName : "Cliente Eliminado";
-
-        var statusBadge = '<span class="badge bg-success">Activo</span>';
-        
-        // Calcular pago según frecuencia
-        var monthlyInterest = loan.amount * 0.20;
-        var pagoTexto = "";
-        if (loan.frequency === "weekly") {
-            pagoTexto = "RD$ " + formatMoney(monthlyInterest / 4);
-        } else if (loan.frequency === "biweekly") {
-            pagoTexto = "RD$ " + formatMoney(monthlyInterest / 2);
-        } else {
-            pagoTexto = "RD$ " + formatMoney(monthlyInterest);
-        }
-
-        var row =
-            "<tr>" +
-            "<td>" + loan.id + "</td>" +
-            "<td>" + clientName + "</td>" +
-            "<td>RD$ " + formatMoney(loan.amount) + "</td>" +
-            '<td class="hide-mobile">' + loan.interestRate + "%</td>" +
-            '<td class="hide-mobile">' + formatDate(loan.startDate) + "</td>" +
-            "<td>" + getFrequencyLabel(loan.frequency) + "</td>" +
-            "<td><span class='badge bg-info'>" + (loan.paidInstallments || 0) + " pagos</span></td>" +
-            "<td>" + statusBadge + "</td>" +
-            '<td style="white-space: nowrap;">' +
-            '<button class="btn btn-sm btn-info me-1" onclick="viewLoanDetails(\'' + loan.id + '\')"><i class="fas fa-eye"></i></button>' +
-            '<button class="btn btn-sm btn-warning me-1" onclick="openLoanModal(\'' + loan.id + '\')"><i class="fas fa-edit"></i></button>' +
-            '<button class="btn btn-sm btn-primary me-1" onclick="generateContract(\'' + loan.id + '\')"><i class="fas fa-file-contract"></i></button>' +
-            '<button class="btn btn-sm btn-success me-1" onclick="openPaymentModal(\'' + loan.id + '\')"><i class="fas fa-dollar-sign"></i></button>' +
-            '<button class="btn btn-sm btn-danger" onclick="deleteLoan(\'' + loan.id + '\')"><i class="fas fa-trash"></i></button>' +
-            "</td>" +
-            "</tr>";
-        tbody.innerHTML += row;
-    });
-}
-
-// Funciones de búsqueda para las nuevas secciones
-function searchDailyLoans() {
-    var searchTerm = document.getElementById("dailyLoanSearch").value.toLowerCase();
-    var rows = document.querySelectorAll("#dailyLoansTable tr");
-    rows.forEach((row) => {
-        var text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? "" : "none";
-    });
-}
-
-function searchWeeklyLoans() {
-    var searchTerm = document.getElementById("weeklyLoanSearch").value.toLowerCase();
-    var rows = document.querySelectorAll("#weeklyLoansTable tr");
-    rows.forEach((row) => {
-        var text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? "" : "none";
-    });
-}
-
-function searchBiweeklyLoans() {
-    var searchTerm = document.getElementById("biweeklyLoanSearch").value.toLowerCase();
-    var rows = document.querySelectorAll("#biweeklyLoansTable tr");
-    rows.forEach((row) => {
-        var text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? "" : "none";
-    });
-}
-
-function searchMonthlyLoans() {
-    var searchTerm = document.getElementById("monthlyLoanSearch").value.toLowerCase();
-    var rows = document.querySelectorAll("#monthlyLoansTable tr");
-    rows.forEach((row) => {
-        var text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? "" : "none";
-    });
-}
-
-function searchIndefiniteLoans() {
-    var searchTerm = document.getElementById("indefiniteLoanSearch").value.toLowerCase();
-    var rows = document.querySelectorAll("#indefiniteLoansTable tr");
-    rows.forEach((row) => {
-        var text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? "" : "none";
-    });
-}
-
+// FUNCIÓN MODIFICADA PARA RENDERIZAR PRÉSTAMOS FINALIZADOS CON BOTÓN DE FACTURA FINAL
 function renderFinishedLoans() {
     var tbody = document.getElementById("finishedLoansTable");
     if (!tbody) return;
@@ -4137,6 +4356,9 @@ function renderFinishedLoans() {
             '<button class="btn btn-sm btn-info me-1" onclick="viewFinishedLoanDetails(\'' +
             loan.id +
             '\')"><i class="fas fa-eye"></i></button>' +
+            '<button class="btn btn-sm btn-primary me-1" onclick="generateFinalLoanInvoice(\'' +
+            loan.id +
+            '\')"><i class="fas fa-file-invoice"></i> Ver Factura Final</button>' +
             '<button class="btn btn-sm btn-success me-1" onclick="generateClearanceLetter(\'' +
             loan.id +
             '\')"><i class="fas fa-file-alt"></i> Carta de Saldo</button>' +
@@ -4184,19 +4406,18 @@ function viewLoanDetails(loanId) {
         details += "\nTipo: Préstamo a Réditos\n";
         details += "Frecuencia: " + getFrequencyLabel(loan.frequency) + "\n";
         details += "Pagos realizados: " + loanPayments.length + "\n";
-        // Mostrar cálculo de interés para préstamos indefinidos
-        var monthlyInterest = loan.amount * 0.20;
+        // Mostrar cálculo de interés para préstamos a réditos
+        var monthlyInterest = loan.amount * (loan.interestRate / 100);
         if (loan.frequency === "weekly") {
-            details += "Pago semanal (solo interés): RD$ " + formatMoney(monthlyInterest / 4) + "\n";
+            details += "Pago semanal (solo réditos): RD$ " + formatMoney(monthlyInterest / 4) + "\n";
         } else if (loan.frequency === "biweekly") {
-            details += "Pago quincenal (solo interés): RD$ " + formatMoney(monthlyInterest / 2) + "\n";
+            details += "Pago quincenal (solo réditos): RD$ " + formatMoney(monthlyInterest / 2) + "\n";
         } else {
-            details += "Pago mensual (solo interés): RD$ " + formatMoney(monthlyInterest) + "\n";
+            details += "Pago mensual (solo réditos): RD$ " + formatMoney(monthlyInterest) + "\n";
         }
     } else if (loan.type === "daily") {
         details += "\nTipo: Préstamo Diario\n";
         details += "Días pagados: " + loan.paidDays + " de " + loan.days + "\n";
-        details += "Pago Diario: RD$ " + formatMoney(loan.dailyPayment) + "\n";
     }
 
     details += "\n=== HISTORIAL DE PAGOS ===\n";
@@ -4258,7 +4479,7 @@ function viewFinishedLoanDetails(loanId) {
     alert(details);
 }
 
-// Payment Functions - Modificado para incluir mora y préstamos indefinidos
+// Payment Functions - Modificado para incluir mora y préstamos a réditos
 function openPaymentModal(loanId) {
     var loan = loans.find((l) => l.id === loanId);
     if (!loan) return;
@@ -4302,17 +4523,17 @@ function updatePaymentAmount() {
             if (loan.type === "fixed") {
                 suggestedAmount = loan.installmentAmount || (loan.totalAmount / (loan.installments || 1));
             } else if (loan.type === "indefinite") {
-                // MODIFICACIÓN: Para préstamos indefinidos, el pago es solo el interés según frecuencia
-                var monthlyInterest = loan.amount * 0.20; // 20% mensual
+                // MODIFICACIÓN: Para préstamos a réditos, el pago es solo el interés según frecuencia
+                var monthlyInterest = loan.amount * (loan.interestRate / 100);
                 if (loan.frequency === "weekly") {
                     suggestedAmount = monthlyInterest / 4; // Semanal: 1/4
-                    typeHelp.textContent = "Pago semanal del interés (20% mensual dividido en 4)";
+                    typeHelp.textContent = "Pago semanal de los réditos (" + loan.interestRate + "% mensual dividido en 4)";
                 } else if (loan.frequency === "biweekly") {
                     suggestedAmount = monthlyInterest / 2; // Quincenal: 1/2
-                    typeHelp.textContent = "Pago quincenal del interés (20% mensual dividido en 2)";
+                    typeHelp.textContent = "Pago quincenal de los réditos (" + loan.interestRate + "% mensual dividido en 2)";
                 } else {
                     suggestedAmount = monthlyInterest; // Mensual: completo
-                    typeHelp.textContent = "Pago mensual del interés (20% sobre el capital)";
+                    typeHelp.textContent = "Pago mensual de los réditos (" + loan.interestRate + "% sobre el capital)";
                 }
             } else if (loan.type === "daily") {
                 suggestedAmount = loan.dailyPayment;
@@ -4323,10 +4544,10 @@ function updatePaymentAmount() {
             lateFeeSection.style.display = "none";
             break;
         case "interest":
-            // MODIFICACIÓN: Para préstamos indefinidos, mostrar el cálculo correcto
+            // MODIFICACIÓN: Para préstamos a réditos, mostrar el cálculo correcto
             if (loan.type === "indefinite") {
-                var monthlyInterest = loan.amount * 0.20;
-                typeHelp.textContent = "Interés mensual completo: 20% sobre el capital";
+                var monthlyInterest = loan.amount * (loan.interestRate / 100);
+                typeHelp.textContent = "Pago de réditos mensuales: " + loan.interestRate + "% sobre el capital";
                 suggestedAmount = monthlyInterest;
             } else {
                 suggestedAmount = loan.amount * (loan.interestRate / 100);
@@ -4367,7 +4588,7 @@ function updatePaymentAmount() {
             if (loan.type === "fixed") {
                 suggestedAmount = (loan.installmentAmount || (loan.totalAmount / (loan.installments || 1))) + calculatedLateFee;
             } else if (loan.type === "indefinite") {
-                var monthlyInterest = loan.amount * 0.20;
+                var monthlyInterest = loan.amount * (loan.interestRate / 100);
                 if (loan.frequency === "weekly") {
                     suggestedAmount = (monthlyInterest / 4) + calculatedLateFee;
                 } else if (loan.frequency === "biweekly") {
@@ -4394,6 +4615,154 @@ function calculateLateFee(loan, daysLate) {
     var maxFee = (loan.remainingAmount * lateFeeSettings.maxLateFee) / 100;
     
     return Math.min(calculatedFee, maxFee);
+}
+
+// NUEVA FUNCIÓN: Generar factura final del préstamo con historial de cuotas
+function generateFinalLoanInvoice(loanId) {
+    var loan = loans.find((l) => l.id === loanId);
+    if (!loan) {
+        alert("No se encontró el préstamo");
+        return;
+    }
+
+    var client = clients.find((c) => c.id === loan.clientId);
+    if (!client) {
+        alert("No se encontró el cliente");
+        return;
+    }
+
+    var companyName = companyInfo.name || "Sistema de Préstamos";
+    var address = companyInfo.address || "";
+    var phone = companyInfo.phone || "";
+    var rnc = companyInfo.rnc || "";
+
+    // Obtener todos los pagos de este préstamo (aunque estén eliminados del historial, los tenemos en loanPayments)
+    var loanPayments = payments.filter((p) => p.loanId === loanId);
+    
+    // Ordenar pagos por fecha
+    loanPayments.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    var html = '<div class="container-fluid" style="padding: 20px; max-width: 1200px; margin: 0 auto;">';
+    html += '<div class="text-center mb-4">';
+
+    if (companyInfo.logoBase64) {
+        html += '<img src="' + companyInfo.logoBase64 + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">';
+    } else if (companyInfo.logo) {
+        html += '<img src="' + companyInfo.logo + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">';
+    }
+
+    html +=
+        "<h2>" +
+        companyName +
+        "</h2>" +
+        "<p>" +
+        address +
+        "</p>" +
+        "<p>Tel: " +
+        phone +
+        " | RNC: " +
+        rnc +
+        "</p>" +
+        "</div>" +
+        '<h3 class="text-center mb-4" style="color: #10b981;">FACTURA FINAL DE PRÉSTAMO</h3>' +
+        '<h4 class="text-center mb-4 text-success">LIQUIDADO</h4>' +
+        '<div class="row">' +
+        '<div class="col-md-12">' +
+        '<table class="table table-bordered" style="width: 100%; margin-bottom: 20px;">' +
+        "<tr><th style='width: 30%; background-color: #f8f9fa;'>No. Préstamo:</th><td><strong>" + loan.id + "</strong></td></tr>" +
+        "<tr><th style='background-color: #f8f9fa;'>Cliente:</th><td>" + client.firstName + " " + client.lastName + "</td></tr>" +
+        "<tr><th style='background-color: #f8f9fa;'>Cédula:</th><td>" + client.cedula + "</td></tr>" +
+        "<tr><th style='background-color: #f8f9fa;'>Teléfono:</th><td>" + client.phone + "</td></tr>" +
+        "<tr><th style='background-color: #f8f9fa;'>Fecha de Inicio:</th><td>" + formatDate(loan.startDate) + "</td></tr>" +
+        "<tr><th style='background-color: #f8f9fa;'>Fecha de Finalización:</th><td>" + (loan.finishedAt ? formatDate(loan.finishedAt) : formatDate(new Date())) + "</td></tr>" +
+        "<tr><th style='background-color: #f8f9fa;'>Monto del Préstamo:</th><td><strong>RD$ " + formatMoney(loan.amount) + "</strong></td></tr>" +
+        "<tr><th style='background-color: #f8f9fa;'>Tasa de Interés:</th><td>" + loan.interestRate + "%</td></tr>" +
+        "<tr><th style='background-color: #f8f9fa;'>Total a Pagar:</th><td><strong>RD$ " + formatMoney(loan.totalAmount) + "</strong></td></tr>" +
+        "<tr><th style='background-color: #f8f9fa;'>Total Pagado:</th><td class='text-success'><strong>RD$ " + formatMoney(loan.totalPaid) + "</strong></td></tr>";
+
+    if (loan.type === "fixed") {
+        html += "<tr><th style='background-color: #f8f9fa;'>Número de Cuotas:</th><td>" + loan.installments + "</td></tr>" +
+                "<tr><th style='background-color: #f8f9fa;'>Frecuencia:</th><td>" + getFrequencyLabel(loan.frequency) + "</td></tr>" +
+                "<tr><th style='background-color: #f8f9fa;'>Monto por Cuota:</th><td>RD$ " + formatMoney(loan.installmentAmount) + "</td></tr>";
+    } else if (loan.type === "indefinite") {
+        html += "<tr><th style='background-color: #f8f9fa;'>Frecuencia:</th><td>" + getFrequencyLabel(loan.frequency) + "</td></tr>" +
+                "<tr><th style='background-color: #f8f9fa;'>Rédito por período:</th><td>RD$ " + formatMoney(calculateReditoAmount(loan)) + "</td></tr>";
+    } else if (loan.type === "daily") {
+        html += "<tr><th style='background-color: #f8f9fa;'>Días:</th><td>" + loan.days + "</td></tr>" +
+                "<tr><th style='background-color: #f8f9fa;'>Pago Diario:</th><td>RD$ " + formatMoney(loan.dailyPayment) + "</td></tr>";
+    }
+
+    html += "</table>";
+    html += "</div>";
+    html += "</div>";
+
+    // Historial detallado de cuotas
+    html += '<h4 class="mt-4 mb-3">HISTORIAL DE PAGOS</h4>';
+    
+    if (loanPayments.length === 0) {
+        html += '<p class="text-center">No hay pagos registrados para este préstamo.</p>';
+    } else {
+        html += '<div class="table-responsive">';
+        html += '<table class="table table-striped table-bordered" style="width: 100%;">';
+        html += '<thead class="table-dark">';
+        html += '<tr>';
+        html += '<th>#</th>';
+        html += '<th>Fecha</th>';
+        html += '<th>Monto</th>';
+        html += '<th>Tipo de Pago</th>';
+        html += '<th>Método</th>';
+        html += '<th>Mora</th>';
+        html += '</tr>';
+        html += '</thead>';
+        html += '<tbody>';
+
+        loanPayments.forEach((payment, index) => {
+            var numeroCuota = index + 1;
+            html += '<tr>';
+            html += '<td style="text-align: center;">' + numeroCuota + '</td>';
+            html += '<td>' + formatDate(payment.date) + '</td>';
+            html += '<td style="text-align: right;"><strong>RD$ ' + formatMoney(payment.amount) + '</strong></td>';
+            html += '<td>' + getPaymentTypeLabel(payment.type) + '</td>';
+            html += '<td>' + getPaymentMethodLabel(payment.method) + '</td>';
+            html += '<td style="text-align: right;">' + (payment.lateFee ? 'RD$ ' + formatMoney(payment.lateFee) : '-') + '</td>';
+            html += '</tr>';
+        });
+
+        html += '</tbody>';
+        html += '<tfoot>';
+        html += '<tr class="table-success">';
+        html += '<td colspan="2" style="text-align: right;"><strong>TOTAL:</strong></td>';
+        html += '<td style="text-align: right;"><strong>RD$ ' + formatMoney(loan.totalPaid) + '</strong></td>';
+        html += '<td colspan="3"></td>';
+        html += '</tr>';
+        html += '</tfoot>';
+        html += '</table>';
+        html += '</div>';
+    }
+
+    html += '<div class="alert alert-success mt-4" style="padding: 15px; border-radius: 5px;">';
+    html += '<i class="fas fa-check-circle me-2"></i>';
+    html += '<strong>ESTADO:</strong> Este préstamo ha sido liquidado en su totalidad. No existen pagos pendientes.';
+    html += '</div>';
+
+    html += '<div class="row mt-4">';
+    html += '<div class="col-6">';
+    html += '<p style="border-top: 1px solid #000; width: 80%; margin-top: 50px; padding-top: 5px;">';
+    html += '<strong>Firma del Cliente</strong>';
+    html += '</p>';
+    html += '</div>';
+    html += '<div class="col-6">';
+    html += '<p style="border-top: 1px solid #000; width: 80%; margin-top: 50px; padding-top: 5px; float: right;">';
+    html += '<strong>Firma del Prestamista</strong>';
+    html += '</p>';
+    html += '</div>';
+    html += '</div>';
+
+    html += '</div>';
+
+    document.getElementById("invoiceContent").innerHTML = html;
+    var modal = new bootstrap.Modal(document.getElementById("invoiceModal"));
+    modal.show();
 }
 
 // FUNCIÓN MODIFICADA PARA REGISTRAR PAGOS CON SEGUIMIENTO DE CUOTAS
@@ -4450,7 +4819,7 @@ function savePayment(e) {
     loan.remainingAmount = loan.totalAmount - loan.totalPaid;
 
     // Actualizar contadores de cuotas según tipo de préstamo
-    if (paymentType === "installment") {
+    if (paymentType === "installment" || paymentType === "late") {
         if (loan.type === "fixed") {
             loan.paidInstallments = (loan.paidInstallments || 0) + 1;
         } else if (loan.type === "indefinite") {
@@ -4486,32 +4855,35 @@ function savePayment(e) {
             loan.paidInstallments = loan.installments;
         }
         
+        // Guardar el pago actual
         payments.push(paymentData);
-        savePayments();
+        
+        // Guardar cambios antes de generar la factura
         saveLoans();
+        savePayments();
 
         bootstrap.Modal.getInstance(document.getElementById("paymentModal")).hide();
         
-        alert("¡Préstamo saldado completamente! Se generará una carta de saldo.");
-        
+        // Actualizar todas las vistas
         renderLoans();
-        renderDailyLoans();
-        renderWeeklyLoans();
-        renderBiweeklyLoans();
-        renderMonthlyLoans();
-        renderIndefiniteLoans();
         renderFinishedLoans();
         renderPaymentHistory();
         renderVoidPayments();
         renderOverduePayments();
         updateDashboard();
 
-        if (confirm("¿Desea generar un recibo para este pago?")) {
-            generateInvoice(paymentData.id);
+        alert("¡Préstamo saldado completamente!\n\nNOTA: Los pagos de este préstamo han sido eliminados del historial de pagos realizados.");
+
+        // Preguntar si desea generar la factura final
+        if (confirm("¿Desea generar la factura final con el historial completo de cuotas?")) {
+            generateFinalLoanInvoice(loanId);
         }
         
+        // Preguntar si desea generar la carta de saldo
         setTimeout(() => {
-            generateClearanceLetter(loanId);
+            if (confirm("¿Desea generar la carta de saldo para este préstamo?")) {
+                generateClearanceLetter(loanId);
+            }
         }, 500);
         
         return;
@@ -4535,11 +4907,6 @@ function savePayment(e) {
     alert(message);
     
     renderLoans();
-    renderDailyLoans();
-    renderWeeklyLoans();
-    renderBiweeklyLoans();
-    renderMonthlyLoans();
-    renderIndefiniteLoans();
     renderPaymentHistory();
     renderVoidPayments();
     renderOverduePayments();
@@ -4548,6 +4915,11 @@ function savePayment(e) {
     if (confirm("¿Desea generar un recibo para este pago?")) {
         generateInvoice(paymentData.id);
     }
+    
+    // Verificar réditos después del pago
+    setTimeout(() => {
+        mostrarAlertaReditosVencidos();
+    }, 1000);
 }
 
 // FUNCIÓN MODIFICADA PARA RENDERIZAR HISTORIAL DE PAGOS CON INFORMACIÓN DE CUOTAS
@@ -4594,48 +4966,135 @@ function renderPaymentHistory() {
             "<td><span class='badge bg-info'>" + cuotasInfo + "</span></td>" +
             "<td>" +
             '<button class="btn btn-sm btn-primary me-1 mb-1" onclick="generateInvoice(\'' + payment.id + '\')"><i class="fas fa-receipt"></i> Recibo</button>' +
-            '<button class="btn btn-sm btn-danger me-1 mb-1" onclick="deletePayment(\'' + payment.id + '\')"><i class="fas fa-trash"></i> Eliminar</button>' +
             "</td>" +
             "</tr>";
         tbody.innerHTML += row;
     });
 }
 
-// FUNCIÓN CORREGIDA PARA ELIMINAR PAGOS DEL HISTORIAL SIN AFECTAR PRÉSTAMOS
-function deletePayment(paymentId) {
-    if (!confirm("¿Está seguro que desea eliminar este pago del historial? Esta acción solo eliminará el registro del pago, no afectará el saldo del préstamo.")) {
+// FUNCIÓN MODIFICADA PARA RENDERIZAR PAGOS ANULABLES CON INFORMACIÓN DE CUOTAS
+function renderVoidPayments() {
+    var tbody = document.getElementById("voidPaymentsTable");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    if (payments.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay pagos registrados</td></tr>';
         return;
     }
 
-    var payment = payments.find(p => p.id === paymentId);
-    if (!payment) {
-        alert("Pago no encontrado");
-        return;
-    }
+    var sortedPayments = [...payments].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // ELIMINAR EL CÓDIGO QUE MODIFICA EL PRÉSTAMO
-    // Simplemente eliminamos el pago sin tocar el préstamo
-    
-    // Eliminar el pago
-    payments = payments.filter(p => p.id !== paymentId);
-    savePayments();
+    sortedPayments.forEach((payment) => {
+        var loan = loans.find((l) => l.id === payment.loanId);
+        var client = clients.find((c) => c.id === payment.clientId);
 
-    alert("Pago eliminado del historial exitosamente. El saldo del préstamo no se ha modificado.");
-    
-    // Actualizar todas las vistas
-    renderPaymentHistory();
-    renderVoidPayments();
-    renderLoans();
-    renderDailyLoans();
-    renderWeeklyLoans();
-    renderBiweeklyLoans();
-    renderMonthlyLoans();
-    renderIndefiniteLoans();
-    renderFinishedLoans();
-    renderOverduePayments();
-    updateDashboard();
+        // Calcular información de cuotas
+        var cuotasInfo = "";
+        if (loan) {
+            if (loan.type === "fixed") {
+                cuotasInfo = (loan.paidInstallments || 0) + " de " + loan.installments;
+            } else if (loan.type === "daily") {
+                cuotasInfo = (loan.paidDays || 0) + " de " + loan.days;
+            } else if (loan.type === "indefinite") {
+                cuotasInfo = (loan.paidInstallments || 0) + " pagos";
+            }
+        }
+
+        var row =
+            "<tr>" +
+            "<td>" + payment.id + "</td>" +
+            "<td>" + (client ? client.firstName + " " + client.lastName : "N/A") + "</td>" +
+            "<td>" + payment.loanId + "</td>" +
+            "<td>RD$ " + formatMoney(payment.amount) +
+            (payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : "") + "</td>" +
+            '<td class="hide-mobile">' + formatDate(payment.date) + "</td>" +
+            '<td class="hide-mobile">' + getPaymentMethodLabel(payment.method) + "</td>" +
+            "<td><span class='badge bg-info'>" + cuotasInfo + "</span></td>" +
+            "<td>" +
+            '<button class="btn btn-sm btn-danger" onclick="voidPayment(\'' + payment.id + '\')"><i class="fas fa-ban me-1"></i>Anular</button>' +
+            "</td>" +
+            "</tr>";
+        tbody.innerHTML += row;
+    });
 }
 
+function searchVoidPayments() {
+    var searchTerm = document.getElementById("voidPaymentSearch").value.toLowerCase();
+    var tbody = document.getElementById("voidPaymentsTable");
+    var rows = tbody.getElementsByTagName("tr");
+
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        var text = row.textContent.toLowerCase();
+        
+        if (text.includes(searchTerm)) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    }
+}
+
+function voidPayment(paymentId) {
+    if (!confirm("¿Está seguro que desea anular este pago? El monto se reintegrará al saldo del préstamo y se revertirán las cuotas pagadas.")) {
+        return;
+    }
+
+    var payment = payments.find((p) => p.id === paymentId);
+    if (!payment) {
+        alert("Pago no encontrado.");
+        return;
+    }
+
+    var loan = loans.find((l) => l.id === payment.loanId);
+    if (!loan) {
+        alert("Préstamo asociado no encontrado.");
+        return;
+    }
+
+    loan.totalPaid -= payment.amount;
+    loan.remainingAmount += payment.amount;
+
+    // Revertir cuotas solo si era un pago de cuota o un pago con mora
+    if (payment.type === "installment" || payment.type === "late") {
+        if (loan.type === "fixed") {
+            loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
+        } else if (loan.type === "indefinite") {
+            loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
+        } else if (loan.type === "daily") {
+            loan.paidDays = Math.max(0, (loan.paidDays || 0) - 1);
+        }
+    }
+
+    if (loan.status === "paid") {
+        loan.status = "active";
+        delete loan.finishedAt;
+        delete loan.paidOffDate;
+        loan.nextPaymentDate = calculateNextPaymentDate(loan);
+    }
+
+    payments = payments.filter((p) => p.id !== paymentId);
+
+    savePayments();
+    saveLoans();
+
+    alert("Pago anulado exitosamente. El monto ha sido reintegrado al préstamo y las cuotas se han revertido.");
+
+    renderVoidPayments();
+    renderPaymentHistory();
+    renderLoans();
+    renderFinishedLoans();
+    updateDashboard();
+    
+    // Verificar réditos después de anular
+    setTimeout(() => {
+        mostrarAlertaReditosVencidos();
+    }, 1000);
+}
+
+// FUNCIÓN MODIFICADA PARA RENDERIZAR PAGOS VENCIDOS CON BOTONES DE NOTIFICACIÓN
 function renderOverduePayments() {
     var tbody = document.getElementById("overduePaymentsTable");
     if (!tbody) return;
@@ -4653,18 +5112,21 @@ function renderOverduePayments() {
             if (!isNaN(nextDate.getTime()) && nextDate < today) {
                 var daysOverdue = Math.floor((today - nextDate) / (1000 * 60 * 60 * 24));
                 var lateFee = calculateLateFee(loan, daysOverdue);
+                var reditoAmount = loan.type === "indefinite" ? calculateReditoAmount(loan) : 0;
+                
                 overdueLoans.push({
                     loan: loan,
                     daysOverdue: daysOverdue,
                     nextPaymentDate: nextPaymentDate,
-                    lateFee: lateFee
+                    lateFee: lateFee,
+                    reditoAmount: reditoAmount
                 });
             }
         }
     });
 
     if (overdueLoans.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay pagos vencidos</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay pagos vencidos</td></tr>';
         return;
     }
 
@@ -4674,29 +5136,50 @@ function renderOverduePayments() {
         var loan = item.loan;
         var client = clients.find(c => c.id === loan.clientId);
         var clientName = client ? client.firstName + " " + client.lastName : "N/A";
+        
+        // Determinar si es rédito vencido para mostrar badge especial
+        var esReditoVencido = loan.type === "indefinite";
+        var badgeTipo = esReditoVencido ? 
+            '<span class="badge bg-warning text-dark me-1"><i class="fas fa-percent"></i> Rédito</span>' : 
+            '<span class="badge bg-info me-1"><i class="fas fa-calendar"></i> Cuota</span>';
+        
+        // Verificar si el cliente tiene email o whatsapp para habilitar botones
+        var hasEmail = client && client.email && client.email.trim() !== "";
+        var hasWhatsApp = client && client.whatsapp && client.whatsapp.trim() !== "";
 
         var row =
             "<tr>" +
             "<td>" +
-            clientName +
+            badgeTipo + " " + clientName +
             "</td>" +
             "<td>" +
             loan.id +
             "</td>" +
             "<td>RD$ " +
             formatMoney(loan.remainingAmount) +
+            (esReditoVencido ? "<br><small class='text-primary'>Rédito: RD$ " + formatMoney(item.reditoAmount) + "</small>" : "") +
             (item.lateFee > 0 ? "<br><small class='text-danger'>+ Mora: RD$ " + formatMoney(item.lateFee) + "</small>" : "") +
             "</td>" +
             '<td class="hide-mobile">' +
             '<span class="badge bg-danger">' + item.daysOverdue + " días</span>" +
             "</td>" +
             '<td class="hide-mobile">' +
+            (item.lateFee > 0 ? "RD$ " + formatMoney(item.lateFee) : "N/A") +
+            "</td>" +
+            '<td class="hide-mobile">' +
             formatDate(item.nextPaymentDate) +
+            "</td>" +
+            "<td>" +
+            '<div class="btn-group btn-group-sm" role="group">' +
+            (hasEmail ? '<button class="btn btn-outline-info" onclick="sendOverdueEmail(\'' + loan.id + '\')" title="Enviar recordatorio por email"><i class="fas fa-envelope"></i></button>' : '') +
+            (hasWhatsApp ? '<button class="btn btn-outline-success" onclick="sendOverdueWhatsApp(\'' + loan.id + '\')" title="Enviar recordatorio por WhatsApp"><i class="fab fa-whatsapp"></i></button>' : '') +
+            (esReditoVencido ? '<button class="btn btn-outline-warning" onclick="sendReditoReminder(\'' + loan.id + '\')" title="Enviar recordatorio de rédito"><i class="fas fa-exclamation-triangle"></i></button>' : '') +
+            '</div>' +
             "</td>" +
             "<td>" +
             '<button class="btn btn-sm btn-danger me-1" onclick="openPaymentModal(\'' +
             loan.id +
-            '\')"><i class="fas fa-dollar-sign"></i> Pagar</button>' +
+            '\')"><i class="fas fa-dollar-sign"></i> ' + (esReditoVencido ? 'Pagar Rédito' : 'Pagar') + '</button>' +
             '<button class="btn btn-sm btn-warning" onclick="viewLoanDetails(\'' +
             loan.id +
             '\')"><i class="fas fa-eye"></i></button>' +
@@ -4704,6 +5187,136 @@ function renderOverduePayments() {
             "</tr>";
         tbody.innerHTML += row;
     });
+}
+
+// FUNCIÓN PARA ENVIAR RECORDATORIO POR EMAIL
+function sendOverdueEmail(loanId) {
+    var loan = loans.find(l => l.id === loanId);
+    if (!loan) {
+        showNotification("Préstamo no encontrado", "danger");
+        return;
+    }
+    
+    var client = clients.find(c => c.id === loan.clientId);
+    if (!client || !client.email) {
+        showNotification("El cliente no tiene email registrado", "warning");
+        return;
+    }
+    
+    var daysOverdue = calculateDaysOverdue(loan);
+    var lateFee = calculateLateFee(loan, daysOverdue);
+    var reditoAmount = loan.type === "indefinite" ? calculateReditoAmount(loan) : 0;
+    
+    var subject = "Recordatorio de Pago Vencido - Préstamo " + loan.id;
+    var body = 
+        "Estimado/a " + client.firstName + " " + client.lastName + ",\n\n" +
+        "Le recordamos que tiene un pago vencido en nuestro sistema.\n\n" +
+        "Detalles del préstamo:\n" +
+        "------------------------\n" +
+        "Número de Préstamo: " + loan.id + "\n" +
+        "Días de atraso: " + daysOverdue + " días\n" +
+        "Monto pendiente: RD$ " + formatMoney(loan.remainingAmount) + "\n" +
+        (reditoAmount > 0 ? "Rédito pendiente: RD$ " + formatMoney(reditoAmount) + "\n" : "") +
+        (lateFee > 0 ? "Mora acumulada: RD$ " + formatMoney(lateFee) + "\n" : "") +
+        "Fecha del próximo pago: " + formatDate(loan.nextPaymentDate) + "\n\n" +
+        "Le solicitamos realizar el pago lo antes posible para evitar la acumulación de más intereses moratorios.\n\n" +
+        "Puede realizar su pago en nuestras oficinas o mediante transferencia bancaria.\n\n" +
+        "Atentamente,\n" +
+        (companyInfo.name || "Sistema de Préstamos");
+    
+    // Crear enlace mailto
+    var mailtoLink = "mailto:" + encodeURIComponent(client.email) + 
+                    "?subject=" + encodeURIComponent(subject) + 
+                    "&body=" + encodeURIComponent(body);
+    
+    // Abrir cliente de email
+    window.location.href = mailtoLink;
+    
+    showNotification("Recordatorio enviado por email a " + client.email, "success");
+}
+
+// FUNCIÓN PARA ENVIAR RECORDATORIO POR WHATSAPP
+function sendOverdueWhatsApp(loanId) {
+    var loan = loans.find(l => l.id === loanId);
+    if (!loan) {
+        showNotification("Préstamo no encontrado", "danger");
+        return;
+    }
+    
+    var client = clients.find(c => c.id === loan.clientId);
+    if (!client || !client.whatsapp) {
+        showNotification("El cliente no tiene WhatsApp registrado", "warning");
+        return;
+    }
+    
+    var daysOverdue = calculateDaysOverdue(loan);
+    var lateFee = calculateLateFee(loan, daysOverdue);
+    var reditoAmount = loan.type === "indefinite" ? calculateReditoAmount(loan) : 0;
+    
+    // Limpiar el número de teléfono (eliminar espacios, guiones, etc.)
+    var phoneNumber = client.whatsapp.replace(/[^\d]/g, '');
+    
+    // Asegurar formato internacional (asumiendo República Dominicana)
+    if (phoneNumber.length === 10) {
+        phoneNumber = "1" + phoneNumber; // Código de país para RD
+    }
+    
+    var message = 
+        "Hola " + client.firstName + " " + client.lastName + " 👋\n\n" +
+        "Le recordamos que tiene un *pago vencido* en nuestro sistema.\n\n" +
+        "📋 *Detalles del préstamo:*\n" +
+        "└ Número: " + loan.id + "\n" +
+        "└ Días de atraso: " + daysOverdue + " días\n" +
+        "└ Monto pendiente: RD$ " + formatMoney(loan.remainingAmount) + "\n" +
+        (reditoAmount > 0 ? "└ Rédito pendiente: RD$ " + formatMoney(reditoAmount) + "\n" : "") +
+        (lateFee > 0 ? "└ Mora acumulada: RD$ " + formatMoney(lateFee) + "\n" : "") +
+        "└ Próximo pago: " + formatDate(loan.nextPaymentDate) + "\n\n" +
+        "⚠️ Le solicitamos realizar el pago lo antes posible para evitar más intereses.\n\n" +
+        "Puede realizar su pago en nuestras oficinas o por transferencia.\n\n" +
+        "¡Gracias por su atención! 🙌";
+    
+    // Crear enlace de WhatsApp
+    var whatsappLink = "https://wa.me/" + phoneNumber + "?text=" + encodeURIComponent(message);
+    
+    // Abrir WhatsApp
+    window.open(whatsappLink, '_blank');
+    
+    showNotification("Recordatorio enviado por WhatsApp al " + client.whatsapp, "success");
+}
+
+// FUNCIÓN AUXILIAR PARA CALCULAR DÍAS DE ATRASO
+function calculateDaysOverdue(loan) {
+    var today = new Date();
+    var nextPaymentDate = new Date(loan.nextPaymentDate || calculateNextPaymentDate(loan));
+    var daysLate = Math.max(0, Math.floor((today - nextPaymentDate) / (1000 * 60 * 60 * 24)));
+    return daysLate;
+}
+
+// FUNCIÓN PARA MOSTRAR NOTIFICACIONES TEMPORALES
+function showNotification(message, type = "info") {
+    var toastContainer = document.getElementById("notificationToast");
+    
+    var toast = document.createElement("div");
+    toast.className = "toast align-items-center text-white bg-" + type + " border-0 show";
+    toast.setAttribute("role", "alert");
+    toast.setAttribute("aria-live", "assertive");
+    toast.setAttribute("aria-atomic", "true");
+    
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    // Eliminar después de 5 segundos
+    setTimeout(() => {
+        toast.remove();
+    }, 5000);
 }
 
 function searchClientForPayment() {
@@ -4763,6 +5376,7 @@ function searchClientForPayment() {
                 var isOverdue = nextPaymentDate && !isNaN(nextDate.getTime()) && nextDate < today;
                 var daysOverdue = isOverdue ? Math.floor((today - nextDate) / (1000 * 60 * 60 * 60 * 24)) : 0;
                 var lateFee = calculateLateFee(loan, daysOverdue);
+                var reditoAmount = loan.type === "indefinite" ? calculateReditoAmount(loan) : 0;
                 
                 // Calcular información de cuotas
                 var cuotasInfo = "";
@@ -4782,6 +5396,7 @@ function searchClientForPayment() {
                     "</strong>" +
                     " - Saldo: RD$ " +
                     formatMoney(loan.remainingAmount) +
+                    (loan.type === "indefinite" ? "<br>Rédito: RD$ " + formatMoney(reditoAmount) : "") +
                     "<br>Cuotas: <span class='badge bg-info'>" + cuotasInfo + "</span>" +
                     (isOverdue ? '<br><span class="badge bg-danger">Vencido: ' + daysOverdue + ' días</span>' : '') +
                     (lateFee > 0 ? '<br><small class="text-danger">Mora acumulada: RD$ ' + formatMoney(lateFee) + '</small>' : '') +
@@ -5080,7 +5695,7 @@ function generateAndPrintContract(loanId) {
     } else if (loan.type === "daily") {
         contract = contract.replace(/\{LOAN_TERM\}/g, `${loan.days} días`);
     } else {
-        contract = contract.replace(/\{LOAN_TERM\}/g, `Indefinido (${loan.frequency})`);
+        contract = contract.replace(/\{LOAN_TERM\}/g, `Réditos (${loan.frequency})`);
     }
 
     document.getElementById("contractContent").innerHTML = contract;
@@ -5117,7 +5732,7 @@ function generateContract(loanId) {
     contract = contract.replace(/\{LOAN_INTEREST\}/g, loan.interestRate);
     contract = contract.replace(/\{LOAN_TOTAL\}/g, loan.totalAmount.toLocaleString("es-DO", { style: "currency", currency: "DOP" }));
     contract = contract.replace(/\{LOAN_DATE\}/g, formatDate(loan.startDate || loan.createdAt));
-    contract = contract.replace(/\{LOAN_TERM\}/g, loan.type === "fixed" ? loan.installments + " cuotas" : (loan.type === "daily" ? loan.days + " días" : "Indefinido"));
+    contract = contract.replace(/\{LOAN_TERM\}/g, loan.type === "fixed" ? loan.installments + " cuotas" : (loan.type === "daily" ? loan.days + " días" : "Réditos"));
 
     document.getElementById("contractContent").innerHTML = contract;
     var modal = new bootstrap.Modal(document.getElementById("contractModal"));
@@ -5389,10 +6004,10 @@ function centerText(text, width) {
     return " ".repeat(padding) + text + " ".repeat(width - text.length - padding);
 }
 
+// FUNCIÓN CORREGIDA PARA IMPRIMIR TÉRMICA
 function printThermal() {
-    var invoiceContentDiv = document.getElementById("invoiceContent");
-    if (!invoiceContentDiv) {
-        alert("No se encontró el contenido de la factura.");
+    if (!currentPaymentId) {
+        alert("No se pudo identificar el ID del pago.");
         return;
     }
     
@@ -5401,16 +6016,7 @@ function printThermal() {
         return;
     }
     
-    var invoiceText = invoiceContentDiv.innerText;
-    var paymentIdMatch = invoiceText.match(/Recibo No:\s*(PAY-\d+)/);
-    
-    if (!paymentIdMatch || !paymentIdMatch[1]) {
-        alert("No se pudo identificar el ID del pago para imprimir el recibo térmico.");
-        return;
-    }
-    
-    var paymentId = paymentIdMatch[1];
-    var thermalContent = generateThermalReceipt(paymentId);
+    var thermalContent = generateThermalReceipt(currentPaymentId);
     
     if (!thermalContent) {
         alert("No se pudo generar el recibo");
@@ -5447,246 +6053,310 @@ function printThermal() {
     }, 500);
 }
 
-// FUNCIÓN MODIFICADA PARA RENDERIZAR PAGOS ANULABLES CON INFORMACIÓN DE CUOTAS
-function renderVoidPayments() {
-    var tbody = document.getElementById("voidPaymentsTable");
-    if (!tbody) return;
+// FUNCIÓN PARA GENERAR CÓDIGO QR
+function generateQRCode(paymentData) {
+    var qrData = {
+        id: paymentData.id,
+        monto: paymentData.amount,
+        fecha: paymentData.date,
+        cliente: paymentData.clientId,
+        prestamo: paymentData.loanId
+    };
+    
+    return JSON.stringify(qrData);
+}
 
-    tbody.innerHTML = "";
-
-    if (payments.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay pagos registrados</td></tr>';
-        return;
+// FUNCIÓN CORREGIDA PARA DESCARGAR PDF
+function downloadPDF(paymentId) {
+    var payment = payments.find(p => p.id === paymentId);
+    if (!payment) return;
+    
+    var loan = loans.find(l => l.id === payment.loanId);
+    var client = clients.find(c => c.id === payment.clientId);
+    
+    // Crear contenido para PDF
+    var content = document.createElement('div');
+    content.style.padding = '20px';
+    content.style.maxWidth = '400px';
+    content.style.margin = '0 auto';
+    content.style.background = 'white';
+    content.style.fontFamily = 'Inter, sans-serif';
+    
+    // Header
+    var header = document.createElement('div');
+    header.style.textAlign = 'center';
+    header.style.marginBottom = '20px';
+    header.style.padding = '20px';
+    header.style.background = 'linear-gradient(135deg, ' + getComputedStyle(document.body).getPropertyValue('--primary-color') + ', ' + getComputedStyle(document.body).getPropertyValue('--secondary-color') + ')';
+    header.style.color = 'white';
+    header.style.borderRadius = '10px';
+    
+    var title = document.createElement('h3');
+    title.style.margin = '0';
+    title.style.fontWeight = 'bold';
+    title.textContent = companyInfo.name || 'Sistema de Préstamos';
+    header.appendChild(title);
+    
+    if (companyInfo.phone) {
+        var phone = document.createElement('p');
+        phone.style.margin = '5px 0 0';
+        phone.style.fontSize = '12px';
+        phone.style.opacity = '0.9';
+        phone.textContent = 'Tel: ' + companyInfo.phone;
+        header.appendChild(phone);
     }
-
-    var sortedPayments = [...payments].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    sortedPayments.forEach((payment) => {
-        var loan = loans.find((l) => l.id === payment.loanId);
-        var client = clients.find((c) => c.id === payment.clientId);
-
-        // Calcular información de cuotas
-        var cuotasInfo = "";
-        if (loan) {
-            if (loan.type === "fixed") {
-                cuotasInfo = (loan.paidInstallments || 0) + " de " + loan.installments;
-            } else if (loan.type === "daily") {
-                cuotasInfo = (loan.paidDays || 0) + " de " + loan.days;
-            } else if (loan.type === "indefinite") {
-                cuotasInfo = (loan.paidInstallments || 0) + " pagos";
-            }
+    
+    content.appendChild(header);
+    
+    // Información del pago
+    var infoDiv = document.createElement('div');
+    infoDiv.style.background = '#f8fafc';
+    infoDiv.style.padding = '15px';
+    infoDiv.style.borderRadius = '10px';
+    infoDiv.style.marginBottom = '15px';
+    
+    infoDiv.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+                <div style="font-size: 11px; color: #666;">RECIBO No.</div>
+                <div style="font-weight: bold; font-size: 14px;">${payment.id}</div>
+            </div>
+            <div>
+                <div style="font-size: 11px; color: #666;">FECHA</div>
+                <div style="font-weight: bold; font-size: 14px;">${formatDate(payment.date)}</div>
+            </div>
+            <div>
+                <div style="font-size: 11px; color: #666;">CLIENTE</div>
+                <div style="font-weight: bold; font-size: 14px;">${client ? client.firstName + ' ' + client.lastName : 'N/A'}</div>
+            </div>
+            <div>
+                <div style="font-size: 11px; color: #666;">CÉDULA</div>
+                <div style="font-weight: bold; font-size: 14px;">${client ? client.cedula : 'N/A'}</div>
+            </div>
+        </div>
+    `;
+    content.appendChild(infoDiv);
+    
+    // Monto
+    var amountDiv = document.createElement('div');
+    amountDiv.style.background = 'linear-gradient(135deg, #f3f4f6, #e5e7eb)';
+    amountDiv.style.padding = '15px';
+    amountDiv.style.borderRadius = '10px';
+    amountDiv.style.textAlign = 'center';
+    amountDiv.style.marginBottom = '15px';
+    
+    amountDiv.innerHTML = `
+        <div style="font-size: 12px; color: #666;">MONTO PAGADO</div>
+        <div style="font-size: 28px; font-weight: bold; color: ${getComputedStyle(document.body).getPropertyValue('--primary-color')}">RD$ ${formatMoney(payment.amount)}</div>
+        <div style="font-size: 12px; color: #666;">${getPaymentMethodLabel(payment.method)} - ${getPaymentTypeLabel(payment.type)}</div>
+    `;
+    content.appendChild(amountDiv);
+    
+    // Detalles
+    var detailsDiv = document.createElement('div');
+    detailsDiv.style.marginBottom = '15px';
+    
+    var table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    
+    var rows = [
+        { label: 'Préstamo No.', value: payment.loanId },
+        { label: 'Cuotas', value: loan ? (loan.type === 'fixed' ? (loan.paidInstallments || 0) + ' de ' + loan.installments : (loan.type === 'daily' ? (loan.paidDays || 0) + ' de ' + loan.days : (loan.paidInstallments || 0) + ' pagos')) : 'N/A' }
+    ];
+    
+    if (payment.lateFee && payment.lateFee > 0) {
+        rows.push({ label: 'Mora aplicada', value: 'RD$ ' + formatMoney(payment.lateFee), color: 'red' });
+    }
+    
+    if (loan) {
+        rows.push({ label: 'Saldo restante', value: 'RD$ ' + formatMoney(loan.remainingAmount), bold: true });
+        if (loan.nextPaymentDate) {
+            rows.push({ label: 'Próximo pago', value: formatDate(loan.nextPaymentDate) });
         }
-
-        var row =
-            "<tr>" +
-            "<td>" + payment.id + "</td>" +
-            "<td>" + (client ? client.firstName + " " + client.lastName : "N/A") + "</td>" +
-            "<td>" + payment.loanId + "</td>" +
-            "<td>RD$ " + formatMoney(payment.amount) +
-            (payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : "") + "</td>" +
-            '<td class="hide-mobile">' + formatDate(payment.date) + "</td>" +
-            '<td class="hide-mobile">' + getPaymentMethodLabel(payment.method) + "</td>" +
-            "<td><span class='badge bg-info'>" + cuotasInfo + "</span></td>" +
-            "<td>" +
-            '<button class="btn btn-sm btn-danger" onclick="voidPayment(\'' + payment.id + '\')"><i class="fas fa-ban me-1"></i>Anular</button>' +
-            "</td>" +
-            "</tr>";
-        tbody.innerHTML += row;
+    }
+    
+    rows.forEach(row => {
+        var tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid #e5e7eb';
+        
+        var td1 = document.createElement('td');
+        td1.style.padding = '8px 0';
+        td1.style.color = '#666';
+        td1.style.fontSize = '13px';
+        td1.textContent = row.label;
+        
+        var td2 = document.createElement('td');
+        td2.style.padding = '8px 0';
+        td2.style.textAlign = 'right';
+        td2.style.fontSize = '13px';
+        if (row.bold) td2.style.fontWeight = 'bold';
+        if (row.color) td2.style.color = row.color;
+        td2.innerHTML = row.value;
+        
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        table.appendChild(tr);
+    });
+    
+    detailsDiv.appendChild(table);
+    content.appendChild(detailsDiv);
+    
+    // Footer
+    var footer = document.createElement('div');
+    footer.style.textAlign = 'center';
+    footer.style.marginTop = '20px';
+    footer.style.paddingTop = '15px';
+    footer.style.borderTop = '1px solid #e5e7eb';
+    footer.style.color = '#666';
+    footer.style.fontSize = '12px';
+    
+    footer.innerHTML = `
+        <p style="margin: 0;">¡Gracias por su pago!</p>
+        <p style="margin: 5px 0 0; font-family: 'Courier New', monospace; color: ${getComputedStyle(document.body).getPropertyValue('--primary-color')};">${companyInfo.name || ''}</p>
+        <p style="margin: 5px 0 0; font-size: 10px;">RNC: ${companyInfo.rnc || ''}</p>
+    `;
+    content.appendChild(footer);
+    
+    // Generar PDF
+    html2canvas(content, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        logging: false
+    }).then(canvas => {
+        var imgData = canvas.toDataURL('image/png');
+        var pdf = new jspdf.jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: [80, 150] // Tamaño personalizado tipo recibo
+        });
+        
+        var pdfWidth = pdf.internal.pageSize.getWidth();
+        var pdfHeight = pdf.internal.pageSize.getHeight();
+        var imgWidth = canvas.width;
+        var imgHeight = canvas.height;
+        var ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+        var width = imgWidth * ratio;
+        var height = imgHeight * ratio;
+        
+        pdf.addImage(imgData, 'PNG', (pdfWidth - width) / 2, 0, width, height);
+        pdf.save('recibo-' + paymentId + '.pdf');
     });
 }
 
-function searchVoidPayments() {
-    var searchTerm = document.getElementById("voidPaymentSearch").value.toLowerCase();
-    var tbody = document.getElementById("voidPaymentsTable");
-    var rows = tbody.getElementsByTagName("tr");
-
-    for (var i = 0; i < rows.length; i++) {
-        var row = rows[i];
-        var text = row.textContent.toLowerCase();
-        
-        if (text.includes(searchTerm)) {
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
-        }
-    }
-}
-
-function voidPayment(paymentId) {
-    if (!confirm("¿Está seguro que desea anular este pago? El monto se reintegrará al saldo del préstamo y se revertirán las cuotas pagadas.")) {
-        return;
-    }
-
-    var payment = payments.find((p) => p.id === paymentId);
-    if (!payment) {
-        alert("Pago no encontrado.");
-        return;
-    }
-
-    var loan = loans.find((l) => l.id === payment.loanId);
-    if (!loan) {
-        alert("Préstamo asociado no encontrado.");
-        return;
-    }
-
-    loan.totalPaid -= payment.amount;
-    loan.remainingAmount += payment.amount;
-
-    // Revertir cuotas solo si era un pago de cuota
-    if (payment.type === "installment") {
-        if (loan.type === "fixed") {
-            loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
-        } else if (loan.type === "indefinite") {
-            loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
-        } else if (loan.type === "daily") {
-            loan.paidDays = Math.max(0, (loan.paidDays || 0) - 1);
-        }
-    }
-
-    if (loan.status === "paid") {
-        loan.status = "active";
-        delete loan.finishedAt;
-        delete loan.paidOffDate;
-        loan.nextPaymentDate = calculateNextPaymentDate(loan);
-    }
-
-    payments = payments.filter((p) => p.id !== paymentId);
-
-    savePayments();
-    saveLoans();
-
-    alert("Pago anulado exitosamente. El monto ha sido reintegrado al préstamo y las cuotas se han revertido.");
-
-    renderVoidPayments();
-    renderPaymentHistory();
-    renderLoans();
-    renderDailyLoans();
-    renderWeeklyLoans();
-    renderBiweeklyLoans();
-    renderMonthlyLoans();
-    renderIndefiniteLoans();
-    renderFinishedLoans();
-    updateDashboard();
-}
-
-// FUNCIÓN MODIFICADA PARA GENERAR FACTURA CON INFORMACIÓN DE CUOTAS
-function generateLoanInvoice(loanId) {
-    var loan = loans.find((l) => l.id === loanId);
-    if (!loan) return;
-
-    var client = clients.find((c) => c.id === loan.clientId);
-    if (!client) return;
-
-    var companyName = companyInfo.name || "Sistema de Préstamos";
-    var address = companyInfo.address || "";
-    var phone = companyInfo.phone || "";
-    var rnc = companyInfo.rnc || "";
+// FUNCIÓN CORREGIDA PARA ENVIAR POR WHATSAPP
+function shareViaWhatsApp(paymentId) {
+    var payment = payments.find(p => p.id === paymentId);
+    if (!payment) return;
     
-    var fechaFinal = "";
-    if (loan.type === "fixed") {
-        var diasPorFrecuencia = { 'weekly': 7, 'biweekly': 14, 'monthly': 30 };
-        var dias = (diasPorFrecuencia[loan.frequency] || 30) * loan.installments;
-        var fechaFinalDate = new Date(loan.startDate);
-        fechaFinalDate.setDate(fechaFinalDate.getDate() + dias);
-        fechaFinal = formatDate(fechaFinalDate.toISOString());
-    } else if (loan.type === "daily") {
-        var fechaFinalDate = new Date(loan.startDate);
-        fechaFinalDate.setDate(fechaFinalDate.getDate() + loan.days);
-        fechaFinal = formatDate(fechaFinalDate.toISOString());
+    var loan = loans.find(l => l.id === payment.loanId);
+    var client = clients.find(c => c.id === payment.clientId);
+    
+    var message = "🧾 *COMPROBANTE DE PAGO*\n\n";
+    message += "┌─────────────────────\n";
+    message += "│ " + (client ? client.firstName + " " + client.lastName : "Cliente") + "\n";
+    message += "│ Cédula: " + (client ? client.cedula : "N/A") + "\n";
+    message += "├─────────────────────\n";
+    message += "│ Recibo: " + payment.id + "\n";
+    message += "│ Fecha: " + formatDate(payment.date) + "\n";
+    message += "│ Hora: " + new Date(payment.date).toLocaleTimeString('es-DO') + "\n";
+    message += "├─────────────────────\n";
+    message += "│ Préstamo: " + payment.loanId + "\n";
+    message += "│ Cuotas: " + (loan ? (loan.type === 'fixed' ? (loan.paidInstallments || 0) + ' de ' + loan.installments : (loan.type === 'daily' ? (loan.paidDays || 0) + ' de ' + loan.days : (loan.paidInstallments || 0) + ' pagos')) : 'N/A') + "\n";
+    message += "│ Tipo: " + getPaymentTypeLabel(payment.type) + "\n";
+    message += "│ Método: " + getPaymentMethodLabel(payment.method) + "\n";
+    message += "├─────────────────────\n";
+    message += "│ 💰 *MONTO: RD$ " + formatMoney(payment.amount) + "*\n";
+    
+    if (payment.lateFee && payment.lateFee > 0) {
+        message += "│ Mora incluida: RD$ " + formatMoney(payment.lateFee) + "\n";
+    }
+    
+    message += "├─────────────────────\n";
+    message += "│ Saldo restante: RD$ " + (loan ? formatMoney(loan.remainingAmount) : "0.00") + "\n";
+    if (loan && loan.nextPaymentDate) {
+        message += "│ Próximo pago: " + formatDate(loan.nextPaymentDate) + "\n";
+    }
+    message += "└─────────────────────\n\n";
+    message += "🙌 *¡Gracias por su pago!*";
+    
+    // Buscar número de WhatsApp del cliente
+    var phoneNumber = "";
+    if (client && client.whatsapp) {
+        phoneNumber = client.whatsapp.replace(/[^\d]/g, '');
+        if (phoneNumber.length === 10) {
+            phoneNumber = "1" + phoneNumber;
+        }
+    }
+    
+    if (phoneNumber) {
+        var whatsappLink = "https://wa.me/" + phoneNumber + "?text=" + encodeURIComponent(message);
+        window.open(whatsappLink, '_blank');
     } else {
-        fechaFinal = "Indefinido";
+        // Si no encuentra número, abrir WhatsApp Web sin número específico
+        var whatsappLink = "https://web.whatsapp.com/send?text=" + encodeURIComponent(message);
+        window.open(whatsappLink, '_blank');
     }
-    
-    // Calcular información de cuotas
-    var cuotasInfo = "";
-    if (loan.type === "fixed") {
-        cuotasInfo = "0 de " + loan.installments;
-    } else if (loan.type === "daily") {
-        cuotasInfo = "0 de " + loan.days;
-    } else if (loan.type === "indefinite") {
-        cuotasInfo = "0 pagos";
-    }
-    
-    var html = '<div class="text-center mb-4">';
-    
-    if (companyInfo.logoBase64) {
-        html += '<img src="' + companyInfo.logoBase64 + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">';
-    } else if (companyInfo.logo) {
-        html += '<img src="' + companyInfo.logo + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">';
-    }
-    
-    html +=
-        "<h3>" + companyName + "</h3>" +
-        "<p>" + address + "</p>" +
-        "<p>Tel: " + phone + " | RNC: " + rnc + "</p>" +
-        "</div>" +
-        '<h4 class="text-center mb-4">FACTURA DE PRÉSTAMO</h4>' +
-        '<table class="table">' +
-        "<tr><th>No. Préstamo:</th><td>" + loan.id + "</td></tr>" +
-        "<tr><th>Cliente:</th><td>" + client.firstName + " " + client.lastName + "</td></tr>" +
-        "<tr><th>Cédula:</th><td>" + client.cedula + "</td></tr>" +
-        "<tr><th>Teléfono:</th><td>" + client.phone + "</td></tr>" +
-        "<tr><th>Fecha de Inicio:</th><td>" + formatDate(loan.startDate) + "</td></tr>" +
-        "<tr><th>Fecha Final Estimada:</th><td>" + fechaFinal + "</td></tr>" +
-        "<tr><th>Progreso de Cuotas:</th><td><span class='cuotas-info'>" + cuotasInfo + "</span></td></tr>" +
-        "<tr><th>Cantidad Prestada:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.amount) + "</strong></td></tr>" +
-        "<tr><th>Tasa de Interés:</th><td>" + loan.interestRate + "%</td></tr>" +
-        "<tr><th>Total a Pagar:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.totalAmount) + "</strong></td></tr>";
-
-    if (loan.type === "fixed") {
-        html += "<tr><th>Número de Cuotas:</th><td>" + loan.installments + "</td></tr>" +
-                "<tr><th>Frecuencia:</th><td>" + loan.frequency.charAt(0).toUpperCase() + loan.frequency.slice(1) + "</td></tr>" +
-                "<tr><th>Monto por Cuota:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.installmentAmount) + "</strong></td></tr>";
-    } else if (loan.type === "indefinite") {
-        html += "<tr><th>Tipo:</th><td>Préstamo a Réditos</td></tr>" +
-                "<tr><th>Frecuencia:</th><td>" + loan.frequency.charAt(0).toUpperCase() + loan.frequency.slice(1) + "</td></tr>" +
-                "<tr><th>Cálculo de Interés:</th><td>20% mensual sobre el capital</td></tr>";
-        var monthlyInterest = loan.amount * 0.20;
-        if (loan.frequency === "weekly") {
-            html += "<tr><th>Pago Semanal:</th><td class='text-end'><strong>RD$ " + formatMoney(monthlyInterest / 4) + "</strong></td></tr>";
-        } else if (loan.frequency === "biweekly") {
-            html += "<tr><th>Pago Quincenal:</th><td class='text-end'><strong>RD$ " + formatMoney(monthlyInterest / 2) + "</strong></td></tr>";
-        } else {
-            html += "<tr><th>Pago Mensual:</th><td class='text-end'><strong>RD$ " + formatMoney(monthlyInterest) + "</strong></td></tr>";
-        }
-    } else if (loan.type === "daily") {
-        html += "<tr><th>Días:</th><td>" + loan.days + "</td></tr>" +
-                "<tr><th>Pago Diario:</th><td class='text-end'><strong>RD$ " + formatMoney(loan.dailyPayment) + "</strong></td></tr>";
-    }
-
-    html += "</table>";
-    
-    // Agregar barra de progreso visual
-    if (loan.type === "fixed" || loan.type === "daily") {
-        var total = loan.type === "fixed" ? loan.installments : loan.days;
-        var porcentaje = 0;
-        html += '<div class="mt-4">';
-        html += '<p class="mb-1"><strong>Progreso de Cuotas:</strong></p>';
-        html += '<div class="progress progress-cuotas">';
-        html += '<div class="progress-bar bg-success" role="progressbar" style="width: ' + porcentaje + '%" aria-valuenow="' + porcentaje + '" aria-valuemin="0" aria-valuemax="100"></div>';
-        html += '</div>';
-        html += '<div class="d-flex justify-content-between mt-1">';
-        html += '<small>Inicio</small>';
-        html += '<small>' + cuotasInfo + '</small>';
-        html += '<small>Final</small>';
-        html += '</div>';
-        html += '</div>';
-    }
-    
-    html += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle me-2"></i>Préstamo otorgado exitosamente. Conserve esta factura para sus registros.</div>';
-
-    document.getElementById("invoiceContent").innerHTML = html;
-    var modal = new bootstrap.Modal(document.getElementById("invoiceModal"));
-    modal.show();
 }
 
-// FUNCIÓN MODIFICADA PARA GENERAR FACTURA DE PAGO CON INFORMACIÓN DE CUOTAS
+// FUNCIÓN CORREGIDA PARA ENVIAR POR EMAIL
+function shareViaEmail(paymentId) {
+    var payment = payments.find(p => p.id === paymentId);
+    if (!payment) return;
+    
+    var loan = loans.find(l => l.id === payment.loanId);
+    var client = clients.find(c => c.id === payment.clientId);
+    
+    var subject = "Comprobante de Pago - " + formatDate(payment.date);
+    var body = 
+        "Estimado/a " + (client ? client.firstName + " " + client.lastName : "Cliente") + ",\n\n" +
+        "Adjuntamos el comprobante de su pago realizado.\n\n" +
+        "─────────────────────\n" +
+        "*DETALLES DEL PAGO*\n" +
+        "─────────────────────\n" +
+        "Recibo No.: " + payment.id + "\n" +
+        "Fecha: " + formatDate(payment.date) + "\n" +
+        "Hora: " + new Date(payment.date).toLocaleTimeString('es-DO') + "\n" +
+        "Préstamo: " + payment.loanId + "\n" +
+        "Cuotas: " + (loan ? (loan.type === 'fixed' ? (loan.paidInstallments || 0) + ' de ' + loan.installments : (loan.type === 'daily' ? (loan.paidDays || 0) + ' de ' + loan.days : (loan.paidInstallments || 0) + ' pagos')) : 'N/A') + "\n" +
+        "Tipo de pago: " + getPaymentTypeLabel(payment.type) + "\n" +
+        "Método de pago: " + getPaymentMethodLabel(payment.method) + "\n" +
+        "─────────────────────\n" +
+        "MONTO PAGADO: RD$ " + formatMoney(payment.amount) + "\n";
+    
+    if (payment.lateFee && payment.lateFee > 0) {
+        body += "Mora incluida: RD$ " + formatMoney(payment.lateFee) + "\n";
+    }
+    
+    body += "─────────────────────\n" +
+        "Saldo restante: RD$ " + (loan ? formatMoney(loan.remainingAmount) : "0.00") + "\n";
+    
+    if (loan && loan.nextPaymentDate) {
+        body += "Próximo pago: " + formatDate(loan.nextPaymentDate) + "\n";
+    }
+    
+    body += "─────────────────────\n\n" +
+        "Gracias por confiar en nosotros.\n\n" +
+        "Saludos cordiales,\n" +
+        (companyInfo.name || "Sistema de Préstamos");
+    
+    var mailtoLink = "mailto:" + (client && client.email ? client.email : "") + 
+                    "?subject=" + encodeURIComponent(subject) + 
+                    "&body=" + encodeURIComponent(body);
+    
+    window.location.href = mailtoLink;
+}
+
+// FUNCIÓN MODIFICADA PARA GENERAR FACTURA DE PAGO CON INFORMACIÓN DE CUOTAS Y COMPARTIR
 function generateInvoice(paymentId) {
     var payment = payments.find((p) => p.id === paymentId);
     if (!payment) {
         alert("No se encontró el pago");
         return;
     }
+    
+    // Guardar el ID del pago actual para uso en otras funciones
+    currentPaymentId = paymentId;
 
     var loan = loans.find((l) => l.id === payment.loanId);
     var client = clients.find((c) => c.id === payment.clientId);
@@ -5717,101 +6387,133 @@ function generateInvoice(paymentId) {
             totalCuotas = "∞";
             cuotasPagadas = loan.paidInstallments || 0;
             cuotasInfo = cuotasPagadas + " pagos realizados";
-            porcentaje = 0; // No hay porcentaje para préstamos indefinidos
+            porcentaje = 0;
         }
     }
     
-    var html = '<div class="text-center mb-4">';
+    // Generar HTML de factura compacta
+    var html = '<div class="compact-invoice">';
     
+    // Header con logo
+    html += '<div class="invoice-header">';
+    html += '<div class="invoice-badge">';
+    html += '<i class="fas fa-check-circle"></i> PAGADO';
+    html += '</div>';
+    html += '<div class="company-logo">';
     if (companyInfo.logoBase64) {
-        html += '<img src="' + companyInfo.logoBase64 + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">';
+        html += '<img src="' + companyInfo.logoBase64 + '" alt="Logo">';
     } else if (companyInfo.logo) {
-        html += '<img src="' + companyInfo.logo + '" style="max-width: 200px; max-height: 80px; margin-bottom: 10px;">';
+        html += '<img src="' + companyInfo.logo + '" alt="Logo">';
+    } else {
+        html += '<i class="fas fa-hand-holding-usd"></i>';
+    }
+    html += '</div>';
+    html += '<h4>' + companyName + '</h4>';
+    html += '<p>' + (address ? address.substring(0, 30) + (address.length > 30 ? '...' : '') : '') + '</p>';
+    html += '<p>' + (phone ? 'Tel: ' + phone : '') + '</p>';
+    html += '</div>';
+    
+    // Cuerpo de la factura
+    html += '<div class="invoice-body">';
+    
+    // Información en grid
+    html += '<div class="invoice-info-grid">';
+    html += '<div class="info-item">';
+    html += '<span class="label">RECIBO No.</span>';
+    html += '<span class="value">' + payment.id + '</span>';
+    html += '</div>';
+    html += '<div class="info-item">';
+    html += '<span class="label">FECHA</span>';
+    html += '<span class="value">' + formatDate(payment.date) + '</span>';
+    html += '</div>';
+    html += '<div class="info-item">';
+    html += '<span class="label">CLIENTE</span>';
+    html += '<span class="value">' + (client ? client.firstName + ' ' + client.lastName : 'N/A') + '</span>';
+    html += '</div>';
+    html += '<div class="info-item">';
+    html += '<span class="label">CÉDULA</span>';
+    html += '<span class="value">' + (client ? client.cedula : 'N/A') + '</span>';
+    html += '</div>';
+    html += '</div>';
+    
+    // Monto destacado
+    html += '<div class="invoice-amount-box">';
+    html += '<div class="amount-label">MONTO PAGADO</div>';
+    html += '<div class="amount-value">RD$ ' + formatMoney(payment.amount) + '</div>';
+    html += '<div class="amount-detail">' + getPaymentMethodLabel(payment.method) + ' - ' + getPaymentTypeLabel(payment.type) + '</div>';
+    html += '</div>';
+    
+    // Tabla de detalles
+    html += '<table class="invoice-details-table">';
+    html += '<tr><td>Préstamo No.</td><td>' + payment.loanId + '</td></tr>';
+    html += '<tr><td>Cuotas</td><td><span class="badge bg-info">' + cuotasInfo + '</span></td></tr>';
+    if (payment.lateFee && payment.lateFee > 0) {
+        html += '<tr><td>Mora aplicada</td><td class="text-danger">RD$ ' + formatMoney(payment.lateFee) + '</td></tr>';
+    }
+    html += '<tr><td>Saldo restante</td><td><strong>RD$ ' + (loan ? formatMoney(loan.remainingAmount) : '0.00') + '</strong></td></tr>';
+    if (loan && loan.nextPaymentDate) {
+        html += '<tr><td>Próximo pago</td><td>' + formatDate(loan.nextPaymentDate) + '</td></tr>';
+    }
+    if (payment.notes) {
+        html += '<tr><td>Notas</td><td>' + payment.notes + '</td></tr>';
+    }
+    html += '</table>';
+    
+    // Barra de progreso para préstamos con cuotas definidas
+    if (loan && (loan.type === "fixed" || loan.type === "daily") && totalCuotas !== "∞") {
+        html += '<div class="invoice-progress">';
+        html += '<div class="progress-label">';
+        html += '<span>Progreso</span>';
+        html += '<span>' + Math.round(porcentaje) + '%</span>';
+        html += '</div>';
+        html += '<div class="progress-bar-compact">';
+        html += '<div class="progress-fill" style="width: ' + porcentaje + '%"></div>';
+        html += '</div>';
+        html += '</div>';
     }
     
-    html +=
-        "<h3>" +
-        companyName +
-        "</h3>" +
-        "<p>" +
-        address +
-        "</p>" +
-        "<p>Tel: " +
-        phone +
-        " | RNC: " +
-        rnc +
-        "</p>" +
-        "</div>" +
-        '<h4 class="text-center mb-4">RECIBO DE PAGO</h4>' +
-        '<table class="table">' +
-        "<tr><th>Recibo No:</th><td>" +
-        payment.id +
-        "</td></tr>" +
-        "<tr><th>Fecha:</th><td>" +
-        formatDate(payment.date) +
-        "</td></tr>" +
-        "<tr><th>Hora:</th><td>" +
-        new Date(payment.date).toLocaleTimeString('es-DO', {hour: '2-digit', minute: '2-digit'}) +
-        "</td></tr>" +
-        "<tr><th>Cliente:</th><td>" +
-        (client ? client.firstName + " " + client.lastName : "N/A") +
-        "</td></tr>" +
-        "<tr><th>Cédula:</th><td>" +
-        (client ? client.cedula : "N/A") +
-        "</td></tr>" +
-        "<tr><th>Teléfono:</th><td>" +
-        (client ? client.phone : "N/A") +
-        "</td></tr>" +
-        "<tr><th>Préstamo:</th><td>" +
-        payment.loanId +
-        "</td></tr>" +
-        "<tr><th>Progreso de Cuotas:</th><td><span class='cuotas-info'>" + cuotasInfo + "</span></td></tr>" +
-        "<tr><th>Tipo de Pago:</th><td>" +
-        getPaymentTypeLabel(payment.type) +
-        "</td></tr>" +
-        "<tr><th>Método:</th><td>" +
-        getPaymentMethodLabel(payment.method) +
-        "</td></tr>" +
-        '<tr><th class="text-end">Monto Pagado:</th><td class="text-end"><strong>RD$ ' +
-        formatMoney(payment.amount) +
-        "</strong></td></tr>";
-
-    if (payment.lateFee && payment.lateFee > 0) {
-        html +=
-            '<tr><th class="text-end">Incluye Mora:</th><td class="text-end text-danger">RD$ ' +
-            formatMoney(payment.lateFee) +
-            "</td></tr>";
-    }
-
-    if (loan) {
-        html +=
-            '<tr><th class="text-end">Saldo Restante:</th><td class="text-end">RD$ ' +
-            formatMoney(loan.remainingAmount) +
-            "</td></tr>";
-    }
-
-    html += "</table>";
-
-    // Agregar barra de progreso visual si es un préstamo con cuotas definidas
-    if (loan && (loan.type === "fixed" || loan.type === "daily")) {
-        html += '<div class="mt-4">';
-        html += '<p class="mb-1"><strong>Progreso de Cuotas:</strong></p>';
-        html += '<div class="progress progress-cuotas">';
-        html += '<div class="progress-bar bg-success" role="progressbar" style="width: ' + porcentaje + '%" aria-valuenow="' + porcentaje + '" aria-valuemin="0" aria-valuemax="100"></div>';
-        html += '</div>';
-        html += '<div class="d-flex justify-content-between mt-1">';
-        html += '<small>Inicio (0)</small>';
-        html += '<small>' + cuotasInfo + ' (' + Math.round(porcentaje) + '%)</small>';
-        html += '<small>Final (' + totalCuotas + ')</small>';
+    // QR Code
+    if (printerSettings.printQR) {
+        html += '<div class="invoice-qr">';
+        html += '<div class="qr-container" id="qr-code-' + payment.id + '">';
+        html += '<i class="fas fa-qrcode fa-3x" style="color: #333;"></i>';
         html += '</div>';
         html += '</div>';
     }
-
-    if (payment.notes) {
-        html += "<p><strong>Notas:</strong> " + payment.notes + "</p>";
-    }
+    
+    html += '</div>'; // Cierra invoice-body
+    
+    // Footer con botones de compartir
+    html += '<div class="invoice-footer">';
+    html += '<p>¡Gracias por su pago!</p>';
+    html += '<div class="signature">' + companyName + '</div>';
+    html += '<p style="font-size: 0.7rem; margin-top: 5px;">RNC: ' + rnc + '</p>';
+    
+    // Botones de compartir
+    html += '<div class="share-buttons">';
+    html += '<button class="btn btn-whatsapp" onclick="shareViaWhatsApp(\'' + payment.id + '\')"><i class="fab fa-whatsapp me-1"></i> WhatsApp</button>';
+    html += '<button class="btn btn-email" onclick="shareViaEmail(\'' + payment.id + '\')"><i class="fas fa-envelope me-1"></i> Email</button>';
+    html += '<button class="btn btn-pdf" onclick="downloadPDF(\'' + payment.id + '\')"><i class="fas fa-file-pdf me-1"></i> PDF</button>';
+    html += '</div>';
+    html += '</div>';
+    
+    html += '</div>'; // Cierra compact-invoice
 
     document.getElementById("invoiceContent").innerHTML = html;
+    
+    // Generar QR después de mostrar el contenido
+    setTimeout(() => {
+        var qrContainer = document.getElementById('qr-code-' + payment.id);
+        if (qrContainer && typeof QRCode !== 'undefined') {
+            var qrData = generateQRCode(payment);
+            new QRCode(qrContainer, {
+                text: qrData,
+                width: 100,
+                height: 100
+            });
+        }
+    }, 100);
+    
     var modal = new bootstrap.Modal(document.getElementById("invoiceModal"));
     modal.show();
 }
@@ -5921,11 +6623,6 @@ function clearAllData() {
                         
                         renderClients();
                         renderLoans();
-                        renderDailyLoans();
-                        renderWeeklyLoans();
-                        renderBiweeklyLoans();
-                        renderMonthlyLoans();
-                        renderIndefiniteLoans();
                         renderFinishedLoans();
                         renderPaymentHistory();
                         renderVoidPayments();
@@ -5955,6 +6652,7 @@ function exportData() {
         companyInfo: companyInfo,
         printerSettings: printerSettings,
         lateFeeSettings: lateFeeSettings,
+        defaultReditoRate: defaultReditoRate,
         exportDate: new Date().toISOString()
     };
 
@@ -6003,6 +6701,7 @@ function importData() {
                         graceDays: 3,
                         maxLateFee: 30.0
                     };
+                    defaultReditoRate = data.defaultReditoRate || 20;
                     
                     // Actualizar contador de IDs de préstamo
                     if (loans.length > 0) {
@@ -6024,11 +6723,6 @@ function importData() {
                     // Actualizar UI
                     renderClients();
                     renderLoans();
-                    renderDailyLoans();
-                    renderWeeklyLoans();
-                    renderBiweeklyLoans();
-                    renderMonthlyLoans();
-                    renderIndefiniteLoans();
                     renderFinishedLoans();
                     renderPaymentHistory();
                     renderVoidPayments();
@@ -6299,11 +6993,6 @@ window.addEventListener("DOMContentLoaded", () => {
                 updateDashboard();
                 renderClients();
                 renderLoans();
-                renderDailyLoans();
-                renderWeeklyLoans();
-                renderBiweeklyLoans();
-                renderMonthlyLoans();
-                renderIndefiniteLoans();
                 renderFinishedLoans();
                 renderPaymentHistory();
                 renderVoidPayments();
@@ -6311,23 +7000,10 @@ window.addEventListener("DOMContentLoaded", () => {
                 loadCompanyInfo();
                 updatePrinterUI();
                 
-                // Restaurar estado del menú de préstamos
-                var savedState = localStorage.getItem('loansMenuExpanded');
-                if (savedState !== null) {
-                    loansMenuExpanded = savedState === 'true';
-                    var submenu = document.getElementById("loansSubmenu");
-                    var arrow = document.getElementById("loansArrow");
-                    
-                    if (loansMenuExpanded) {
-                        submenu.classList.add("expanded");
-                        arrow.classList.add("rotated");
-                    } else {
-                        submenu.classList.remove("expanded");
-                        arrow.classList.remove("rotated");
-                    }
-                }
-                
                 showSection('dashboard');
+                // Verificar notificaciones inmediatamente
+                checkOverduePaymentsAlert();
+                mostrarAlertaReditosVencidos();
                 startPeriodicOverdueCheck();
             });
         } else {
