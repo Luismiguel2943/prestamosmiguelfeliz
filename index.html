@@ -13,7 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <style>
         :root {
@@ -505,17 +505,17 @@
 // FIREBASE CONFIG
 // =============================================
 const firebaseConfig = {
-    apiKey: "AIzaSyC9qRFG4TWhNBK6UR9UaMxRRX0Fym70sWQ",
-    authDomain: "cistema-de-prestamos.firebaseapp.com",
-    databaseURL: "https://cistema-de-prestamos-default-rtdb.firebaseio.com",
-    projectId: "cistema-de-prestamos",
-    storageBucket: "cistema-de-prestamos.firebasestorage.app",
-    messagingSenderId: "341307238332",
-    appId: "1:341307238332:web:a8e75f2afabd9727882db9",
-    measurementId: "G-8FNR8679RX"
+    apiKey: "AIzaSyDITbS8zmbsMwairrxB24VOklmUR2AwqlM",
+    authDomain: "cistema-de-prestamos-43f50.firebaseapp.com",
+    databaseURL: "",
+    projectId: "cistema-de-prestamos-43f50",
+    storageBucket: "cistema-de-prestamos-43f50.firebasestorage.app",
+    messagingSenderId: "765146439410",
+    appId: "1:765146439410:web:03a803a2d78e3938667a6b",
+    measurementId: "G-3ETWZFRNQH"
 };
 if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-const database = firebase.database();
+const db = firebase.firestore();
 const auth = firebase.auth();
 
 // =============================================
@@ -678,10 +678,10 @@ async function registerUser(e) {
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
         const userId = userCredential.user.uid;
         const userProfile = { id: userId, personalInfo: { firstName: document.getElementById('registerFirstName').value, lastName: document.getElementById('registerLastName').value, cedula: document.getElementById('registerCedula').value, phone: document.getElementById('registerPhone').value, address: document.getElementById('registerAddress').value, email: email, createdAt: new Date().toISOString() }, companyInfo: { name: document.getElementById('registerCompanyName').value, rnc: document.getElementById('registerCompanyRNC').value, phone: document.getElementById('registerCompanyPhone').value, createdAt: new Date().toISOString() }, settings: { theme: "theme-blue", lateFeeSettings: { dailyLateFee: 1.0, graceDays: 3, maxLateFee: 30.0 } } };
-        await database.ref(`users/${userId}/profile`).set(userProfile);
-        await database.ref(`users/${userId}/clients`).set([]);
-        await database.ref(`users/${userId}/loans`).set([]);
-        await database.ref(`users/${userId}/payments`).set([]);
+        await db.collection('users').doc(userId).set({ profile: userProfile });
+        await db.collection('users').doc(userId).collection('clients').doc('_data').set({ list: [] });
+        await db.collection('users').doc(userId).collection('loans').doc('_data').set({ list: [] });
+        await db.collection('users').doc(userId).collection('payments').doc('_data').set({ list: [] });
         successDiv.textContent = '¡Cuenta creada exitosamente!'; successDiv.style.display = 'block';
         setTimeout(() => { bootstrap.Modal.getInstance(document.getElementById('registerModal')).hide(); document.getElementById('loginUsername').value = email; document.getElementById('loginPassword').value = password; document.getElementById('loginForm').dispatchEvent(new Event('submit')); }, 2000);
     } catch (error) {
@@ -700,8 +700,9 @@ async function registerUser(e) {
 async function loadData() {
     if (!currentUserId) return;
     try {
-        const profileSnapshot = await database.ref(`users/${currentUserId}/profile`).once('value');
-        const userProfile = profileSnapshot.val();
+        const userDoc = await db.collection('users').doc(currentUserId).get();
+        const userData = userDoc.exists ? userDoc.data() : {};
+        const userProfile = userData.profile || null;
         if (userProfile) {
             companyInfo = userProfile.companyInfo || {};
             if (userProfile.settings) {
@@ -715,31 +716,35 @@ async function loadData() {
                 }
             }
         }
-        const clientsSnap = await database.ref(`users/${currentUserId}/clients`).once('value');
-        clients = clientsSnap.val() || [];
-        const loansSnap = await database.ref(`users/${currentUserId}/loans`).once('value');
-        loans = loansSnap.val() || [];
+        const clientsDoc = await db.collection('users').doc(currentUserId).collection('clients').doc('_data').get();
+        clients = clientsDoc.exists ? (clientsDoc.data().list || []) : [];
+
+        const loansDoc = await db.collection('users').doc(currentUserId).collection('loans').doc('_data').get();
+        loans = loansDoc.exists ? (loansDoc.data().list || []) : [];
         if (loans.length > 0) {
             const lastId = loans[loans.length - 1].id;
             const match = lastId.match(/LOAN-\d+-\d+-(\d+)/);
             if (match) loanIdCounter = parseInt(match[1]) + 1;
         }
-        const paymentsSnap = await database.ref(`users/${currentUserId}/payments`).once('value');
-        payments = paymentsSnap.val() || [];
-        const contractSnap = await database.ref(`users/${currentUserId}/contractTemplate`).once('value');
-        contractTemplate = contractSnap.val() || "";
+
+        const paymentsDoc = await db.collection('users').doc(currentUserId).collection('payments').doc('_data').get();
+        payments = paymentsDoc.exists ? (paymentsDoc.data().list || []) : [];
+
+        const contractDoc = await db.collection('users').doc(currentUserId).collection('settings').doc('contract').get();
+        contractTemplate = contractDoc.exists ? (contractDoc.data().template || "") : "";
         if (contractTemplate) document.getElementById("contractTemplate").value = contractTemplate;
-        const printerSnap = await database.ref(`users/${currentUserId}/printerSettings`).once('value');
-        if (printerSnap.val()) { printerSettings = printerSnap.val(); updatePrinterUI(); }
+
+        const printerDoc = await db.collection('users').doc(currentUserId).collection('settings').doc('printer').get();
+        if (printerDoc.exists) { printerSettings = printerDoc.data(); updatePrinterUI(); }
     } catch (e) { console.error("Error loading data:", e); clients = []; loans = []; payments = []; companyInfo = {}; }
 }
 
-function saveClients() { if (!currentUserId) return; database.ref(`users/${currentUserId}/clients`).set(clients).catch(e => console.error(e)); }
-function saveLoans() { if (!currentUserId) return; database.ref(`users/${currentUserId}/loans`).set(loans).catch(e => console.error(e)); }
-function savePayments() { if (!currentUserId) return; database.ref(`users/${currentUserId}/payments`).set(payments).catch(e => console.error(e)); }
-function saveCompanyInfoToFirebase() { if (!currentUserId) return; database.ref(`users/${currentUserId}/companyInfo`).set(companyInfo).catch(e => console.error(e)); }
-function saveContractTemplateToFirebase() { if (!currentUserId) return; database.ref(`users/${currentUserId}/contractTemplate`).set(contractTemplate).catch(e => console.error(e)); }
-function saveThemeToFirebase() { if (!currentUserId) return; database.ref(`users/${currentUserId}/profile/settings/theme`).set(currentTheme).catch(e => console.error(e)); }
+function saveClients() { if (!currentUserId) return; db.collection('users').doc(currentUserId).collection('clients').doc('_data').set({ list: clients }).catch(e => console.error(e)); }
+function saveLoans() { if (!currentUserId) return; db.collection('users').doc(currentUserId).collection('loans').doc('_data').set({ list: loans }).catch(e => console.error(e)); }
+function savePayments() { if (!currentUserId) return; db.collection('users').doc(currentUserId).collection('payments').doc('_data').set({ list: payments }).catch(e => console.error(e)); }
+function saveCompanyInfoToFirebase() { if (!currentUserId) return; db.collection('users').doc(currentUserId).update({ 'profile.companyInfo': companyInfo }).catch(e => console.error(e)); }
+function saveContractTemplateToFirebase() { if (!currentUserId) return; db.collection('users').doc(currentUserId).collection('settings').doc('contract').set({ template: contractTemplate }).catch(e => console.error(e)); }
+function saveThemeToFirebase() { if (!currentUserId) return; db.collection('users').doc(currentUserId).update({ 'profile.settings.theme': currentTheme }).catch(e => console.error(e)); }
 
 function savePrinterSettings() {
     if (!currentUserId) return;
@@ -750,7 +755,7 @@ function savePrinterSettings() {
     printerSettings.customFooter = document.getElementById("customFooter").value;
     printerSettings.printLogo = document.getElementById("printLogo").checked;
     printerSettings.printQR = document.getElementById("printQR").checked;
-    database.ref(`users/${currentUserId}/printerSettings`).set(printerSettings).then(() => { updatePrinterUI(); alert("Configuración de impresora guardada exitosamente"); }).catch(e => console.error(e));
+    db.collection('users').doc(currentUserId).collection('settings').doc('printer').set(printerSettings).then(() => { updatePrinterUI(); alert("Configuración de impresora guardada exitosamente"); }).catch(e => console.error(e));
 }
 
 function saveLateFeeSettings() {
@@ -758,7 +763,7 @@ function saveLateFeeSettings() {
     lateFeeSettings.dailyLateFee = parseFloat(document.getElementById("dailyLateFee").value);
     lateFeeSettings.graceDays = parseInt(document.getElementById("graceDays").value);
     lateFeeSettings.maxLateFee = parseFloat(document.getElementById("maxLateFee").value);
-    database.ref(`users/${currentUserId}/profile/settings/lateFeeSettings`).set(lateFeeSettings).then(() => alert("Configuración de moras guardada exitosamente")).catch(e => console.error(e));
+    db.collection('users').doc(currentUserId).update({ 'profile.settings.lateFeeSettings': lateFeeSettings }).then(() => alert("Configuración de moras guardada exitosamente")).catch(e => console.error(e));
 }
 
 // =============================================
@@ -1346,7 +1351,7 @@ function sendOverdueWhatsApp(loanId) {
     var reditoAmount = loan.type === "indefinite" ? calculateReditoAmount(loan) : 0;
     var phone = client.whatsapp.replace(/[^\d]/g, '');
     if (phone.length === 10) phone = "1" + phone;
-    var message = "Hola Estimado Cliente " + client.firstName + " " + client.lastName + " 👋\n\n*Tienes un Pago Vencido En Nuestro Cistema * - Préstamo " + loan.id + "\n\n📋 *Detalles:*\n└ Días de atraso: " + daysOverdue + "\n└ Monto pendiente: RD$ " + formatMoney(loan.remainingAmount) + (reditoAmount > 0 ? "\n└ Rédito pendiente: RD$ " + formatMoney(reditoAmount) : "") + (lateFee > 0 ? "\n└ Mora acumulada: RD$ " + formatMoney(lateFee) : "") + "\n\n⚠️ Realice el pago lo antes posible Para evitar Mora Si ya Realizo El pago Obviar Este Mensaje.\n\n" + (companyInfo.name || "Sistema de Préstamos");
+    var message = "Hola " + client.firstName + " " + client.lastName + " 👋\n\n*Pago Vencido* - Préstamo " + loan.id + "\n\n📋 *Detalles:*\n└ Días de atraso: " + daysOverdue + "\n└ Monto pendiente: RD$ " + formatMoney(loan.remainingAmount) + (reditoAmount > 0 ? "\n└ Rédito pendiente: RD$ " + formatMoney(reditoAmount) : "") + (lateFee > 0 ? "\n└ Mora acumulada: RD$ " + formatMoney(lateFee) : "") + "\n\n⚠️ Realice el pago lo antes posible.\n\n" + (companyInfo.name || "Sistema de Préstamos");
     // wa.me abre la app instalada en móvil; WhatsApp Desktop en escritorio
     window.open("https://wa.me/" + phone + "?text=" + encodeURIComponent(message), '_blank');
     showNotification("Recordatorio enviado por WhatsApp", "success");
@@ -1758,7 +1763,7 @@ function saveCompanyInfo(e) {
     companyInfo.phone = document.getElementById("companyPhone").value;
     companyInfo.rnc = document.getElementById("companyRNC").value;
     saveCompanyInfoToFirebase();
-    if (currentUserId) database.ref(`users/${currentUserId}/profile/companyInfo`).set(companyInfo).catch(e => console.error(e));
+    if (currentUserId) db.collection('users').doc(currentUserId).update({ 'profile.companyInfo': companyInfo }).catch(e => console.error(e));
     if (companyInfo.name) document.getElementById("companyNameSidebar").textContent = companyInfo.name;
     alert("Información guardada exitosamente");
 }
@@ -1982,7 +1987,14 @@ function clearAllData() {
     if (confirm("¿Está seguro de eliminar TODOS los datos? Esta acción no se puede deshacer.")) {
         if (confirm("ÚLTIMA ADVERTENCIA: ¿Realmente desea eliminar todos los datos?")) {
             if (currentUserId) {
-                database.ref(`users/${currentUserId}`).remove().then(() => {
+                const userRef = db.collection('users').doc(currentUserId);
+                Promise.all([
+                    userRef.collection('clients').doc('_data').delete(),
+                    userRef.collection('loans').doc('_data').delete(),
+                    userRef.collection('payments').doc('_data').delete(),
+                    userRef.collection('settings').doc('contract').delete(),
+                    userRef.collection('settings').doc('printer').delete()
+                ]).then(() => {
                     clients = []; loans = []; payments = []; companyInfo = {}; contractTemplate = ""; loanIdCounter = 1;
                     renderClients(); renderLoans(); renderFinishedLoans(); renderPaymentHistory(); renderVoidPayments(); renderOverduePayments(); updateDashboard(); loadCompanyInfo(); updatePrinterUI();
                     document.getElementById("companyNameSidebar").textContent = "Sistema de Préstamos";
