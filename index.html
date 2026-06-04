@@ -1419,6 +1419,152 @@ function sendOverdueWhatsApp(loanId) {
 }
 
 // =============================================
+// FACTURA - HTML aislado para captura de imagen
+// (Completamente separado del DOM principal)
+// =============================================
+function _buildInvoiceHTML(payment) {
+    var loan = getLoanById(payment.loanId);
+    var client = getClientById(payment.clientId);
+    var companyName = companyInfo.name || "Sistema de Préstamos";
+    var cuotasInfo = "", totalCuotas = 0, cuotasPagadas = 0, porcentaje = 0;
+    if (loan) {
+        if (loan.type === "fixed") { totalCuotas = loan.installments; cuotasPagadas = loan.paidInstallments || 0; cuotasInfo = cuotasPagadas + " de " + totalCuotas; porcentaje = totalCuotas > 0 ? (cuotasPagadas / totalCuotas) * 100 : 0; }
+        else if (loan.type === "daily") { totalCuotas = loan.days; cuotasPagadas = loan.paidDays || 0; cuotasInfo = cuotasPagadas + " de " + totalCuotas; porcentaje = totalCuotas > 0 ? (cuotasPagadas / totalCuotas) * 100 : 0; }
+        else { cuotasInfo = (loan.paidInstallments || 0) + " pagos realizados"; }
+    }
+    var primaryColor = "#2563eb";
+
+    // CSS mínimo e independiente — no hereda nada del DOM principal
+    var css = `
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',Arial,sans-serif;background:#f3f4f6;display:flex;justify-content:center;align-items:flex-start;padding:20px;}
+        .ci{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.12);width:360px;}
+        .ci-header{background:linear-gradient(135deg,${primaryColor},#1e40af);color:#fff;padding:22px 18px 18px;text-align:center;position:relative;}
+        .ci-badge{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;backdrop-filter:blur(4px);}
+        .ci-logo{width:70px;height:70px;background:#fff;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;overflow:hidden;border:3px solid rgba(255,255,255,.3);}
+        .ci-logo img{width:100%;height:100%;object-fit:cover;}
+        .ci-logo-icon{font-size:36px;color:${primaryColor};}
+        .ci-header h4{font-size:17px;font-weight:700;margin-bottom:3px;}
+        .ci-header p{font-size:11px;opacity:.85;margin:1px 0;}
+        .ci-body{padding:16px;}
+        .ci-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+        .ci-item .lbl{font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;}
+        .ci-item .val{font-size:12px;font-weight:600;color:#111827;margin-top:2px;word-break:break-all;}
+        .ci-amount{background:linear-gradient(135deg,${primaryColor},#1e40af);color:#fff;border-radius:12px;padding:14px;text-align:center;margin-bottom:14px;}
+        .ci-amount .albl{font-size:10px;font-weight:600;opacity:.85;text-transform:uppercase;letter-spacing:.08em;}
+        .ci-amount .aval{font-size:28px;font-weight:800;margin:4px 0;}
+        .ci-amount .adtl{font-size:11px;opacity:.8;}
+        .ci-table{width:100%;border-collapse:collapse;margin-bottom:12px;}
+        .ci-table td{padding:7px 6px;border-bottom:1px solid #f0f0f0;font-size:12px;color:#374151;}
+        .ci-table td:first-child{color:#6b7280;font-size:11px;}
+        .ci-table td:last-child{text-align:right;font-weight:600;color:#111827;}
+        .badge-info{background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;}
+        .badge-danger{background:#fee2e2;color:#dc2626;padding:2px 8px;border-radius:6px;font-size:11px;}
+        .ci-progress{margin-bottom:12px;}
+        .ci-prog-lbl{display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:4px;}
+        .ci-prog-bar{height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden;}
+        .ci-prog-fill{height:100%;background:linear-gradient(90deg,${primaryColor},#60a5fa);border-radius:4px;transition:width .3s;}
+        .ci-footer{background:#f9fafb;padding:14px;text-align:center;border-top:1px solid #e5e7eb;}
+        .ci-footer p{font-size:13px;font-weight:700;color:${primaryColor};margin-bottom:4px;}
+        .ci-footer .sig{font-size:12px;font-weight:600;color:#374151;}
+        .ci-footer .rnc{font-size:10px;color:#9ca3af;margin-top:3px;}
+    `;
+
+    var logoHTML = '';
+    if (companyInfo.logoBase64) logoHTML = '<img src="' + companyInfo.logoBase64 + '" alt="Logo">';
+    else logoHTML = '<div class="ci-logo-icon">💰</div>';
+
+    var bodyHTML = `
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>${css}</style></head><body>
+<div class="ci">
+  <div class="ci-header">
+    <div class="ci-badge"><i class="fas fa-check-circle"></i> PAGADO</div>
+    <div class="ci-logo">${logoHTML}</div>
+    <h4>${companyName}</h4>
+    <p>${companyInfo.address ? companyInfo.address.substring(0,40) : ''}</p>
+    <p>${companyInfo.phone ? 'Tel: ' + companyInfo.phone : ''}</p>
+  </div>
+  <div class="ci-body">
+    <div class="ci-grid">
+      <div class="ci-item"><div class="lbl">Recibo No.</div><div class="val">${payment.id.substring(0,18)}</div></div>
+      <div class="ci-item"><div class="lbl">Fecha</div><div class="val">${formatDate(payment.date)}</div></div>
+      <div class="ci-item"><div class="lbl">Cliente</div><div class="val">${client ? client.firstName + ' ' + client.lastName : 'N/A'}</div></div>
+      <div class="ci-item"><div class="lbl">Cédula</div><div class="val">${client ? client.cedula : 'N/A'}</div></div>
+    </div>
+    <div class="ci-amount">
+      <div class="albl">Monto Pagado</div>
+      <div class="aval">RD$ ${formatMoney(payment.amount)}</div>
+      <div class="adtl">${getPaymentMethodLabel(payment.method)} — ${getPaymentTypeLabel(payment.type)}</div>
+    </div>
+    <table class="ci-table">
+      <tr><td>Préstamo No.</td><td>${payment.loanId.substring(0,22)}</td></tr>
+      <tr><td>Cuotas</td><td><span class="badge-info">${cuotasInfo}</span></td></tr>
+      ${payment.lateFee && payment.lateFee > 0 ? '<tr><td>Mora</td><td><span class="badge-danger">RD$ ' + formatMoney(payment.lateFee) + '</span></td></tr>' : ''}
+      <tr><td>Saldo restante</td><td><strong>RD$ ${loan ? formatMoney(loan.remainingAmount) : '0.00'}</strong></td></tr>
+      ${loan && loan.nextPaymentDate ? '<tr><td>Próximo pago</td><td>' + formatDate(loan.nextPaymentDate) + '</td></tr>' : ''}
+      ${payment.notes ? '<tr><td>Notas</td><td>' + payment.notes + '</td></tr>' : ''}
+    </table>
+    ${loan && (loan.type === 'fixed' || loan.type === 'daily') && totalCuotas > 0 ? `
+    <div class="ci-progress">
+      <div class="ci-prog-lbl"><span>Progreso del préstamo</span><span>${Math.round(porcentaje)}%</span></div>
+      <div class="ci-prog-bar"><div class="ci-prog-fill" style="width:${porcentaje}%"></div></div>
+    </div>` : ''}
+  </div>
+  <div class="ci-footer">
+    <p>¡Gracias por su pago!</p>
+    <div class="sig">${companyName}</div>
+    ${companyInfo.rnc ? '<div class="rnc">RNC: ' + companyInfo.rnc + '</div>' : ''}
+  </div>
+</div>
+</body></html>`;
+    return bodyHTML;
+}
+
+// Captura la factura en un iframe AISLADO — no toca el DOM principal
+function _captureInvoiceToBlob(payment) {
+    return new Promise(function(resolve, reject) {
+        var iframe = document.createElement('iframe');
+        iframe.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:400px;height:700px;border:none;visibility:hidden;';
+        document.body.appendChild(iframe);
+
+        var iDoc = iframe.contentDocument || iframe.contentWindow.document;
+        iDoc.open();
+        iDoc.write(_buildInvoiceHTML(payment));
+        iDoc.close();
+
+        // Esperar a que cargue el CSS/Fonts antes de capturar
+        iframe.contentWindow.addEventListener('load', function() {
+            setTimeout(function() {
+                var invoiceEl = iframe.contentDocument.querySelector('.ci');
+                if (!invoiceEl) { document.body.removeChild(iframe); reject(new Error('No se encontró la factura')); return; }
+
+                html2canvas(invoiceEl, {
+                    scale: 2.5,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#f3f4f6',
+                    logging: false,
+                    width: invoiceEl.offsetWidth,
+                    height: invoiceEl.offsetHeight,
+                    windowWidth: 400,
+                    windowHeight: 700
+                }).then(function(canvas) {
+                    document.body.removeChild(iframe);
+                    canvas.toBlob(function(blob) {
+                        blob ? resolve(blob) : reject(new Error('toBlob falló'));
+                    }, 'image/png');
+                }).catch(function(e) {
+                    document.body.removeChild(iframe);
+                    reject(e);
+                });
+            }, 300); // pequeño delay para que los estilos apliquen
+        });
+    });
+}
+
+// =============================================
 // WHATSAPP - ENVIAR FACTURA COMO IMAGEN (Web Share API)
 // =============================================
 function shareViaWhatsApp(paymentId) {
@@ -1427,10 +1573,6 @@ function shareViaWhatsApp(paymentId) {
     var loan = getLoanById(payment.loanId);
     var client = getClientById(payment.clientId);
 
-    var invoiceEl = document.querySelector('#invoiceContent .compact-invoice');
-    if (!invoiceEl) { alert("Primero debe abrir la factura antes de compartir."); return; }
-
-    // Mostrar loader en el botón
     var btn = (typeof event !== 'undefined' && event && event.target) ? event.target.closest('button') : null;
     var originalHTML = btn ? btn.innerHTML : '';
     if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Preparando...'; btn.disabled = true; }
@@ -1445,40 +1587,26 @@ function shareViaWhatsApp(paymentId) {
         + '\n🙌 ¡Gracias por su pago!\n'
         + '_' + (companyInfo.name || 'Sistema de Préstamos') + '_';
 
-    html2canvas(invoiceEl, { scale: 2.5, useCORS: true, backgroundColor: '#ffffff', logging: false })
-    .then(function(canvas) {
-        return new Promise(function(resolve, reject) {
-            canvas.toBlob(function(blob) {
-                if (blob) resolve(blob); else reject(new Error('No se pudo generar la imagen'));
-            }, 'image/png');
-        });
-    })
+    _captureInvoiceToBlob(payment)
     .then(function(blob) {
         var file = new File([blob], fileName, { type: 'image/png' });
 
-        // ── Opción 1: Web Share API con archivos (móvil Chrome/Safari) ──
+        // Opción 1: Web Share API con archivos (móvil Android/iOS)
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            return navigator.share({
-                files: [file],
-                text: mensajeTexto
-            });
+            return navigator.share({ files: [file], text: mensajeTexto });
         }
-
-        // ── Opción 2: Web Share API sin archivos (solo texto + abre apps) ──
+        // Opción 2: Web Share API sin archivos (texto + descarga)
         if (navigator.share) {
-            // Descarga silenciosa + share de texto
             _descargarBlob(blob, fileName);
             return navigator.share({ text: mensajeTexto });
         }
-
-        // ── Opción 3: Escritorio — descargar imagen y abrir WhatsApp Web ──
+        // Opción 3: Escritorio — descargar + abrir WhatsApp Web
         _descargarBlob(blob, fileName);
-        var phone = client && client.whatsapp ? client.whatsapp.replace(/[^\d]/g, '') : '';
+        var phone = client && client.whatsapp ? client.whatsapp.replace(/[^\d]/g,'') : '';
         if (phone.length === 10) phone = '1' + phone;
-        var url = phone ? 'https://wa.me/' + phone + '?text=' + encodeURIComponent(mensajeTexto)
-                        : 'https://wa.me/?text=' + encodeURIComponent(mensajeTexto);
+        var url = phone ? 'https://wa.me/' + phone + '?text=' + encodeURIComponent(mensajeTexto) : 'https://wa.me/?text=' + encodeURIComponent(mensajeTexto);
         showNotification('Imagen descargada. Adjúntala en WhatsApp.', 'info');
-        setTimeout(() => window.open(url, '_blank'), 400);
+        setTimeout(() => window.open(url, '_blank'), 500);
     })
     .then(function() {
         showNotification('✅ Factura compartida exitosamente', 'success');
@@ -1486,13 +1614,7 @@ function shareViaWhatsApp(paymentId) {
     .catch(function(err) {
         if (err && err.name === 'AbortError') { showNotification('Compartir cancelado', 'info'); return; }
         console.error('Error al compartir:', err);
-        // Fallback: descargar imagen igual
-        var invoiceEl2 = document.querySelector('#invoiceContent .compact-invoice');
-        if (invoiceEl2) {
-            html2canvas(invoiceEl2, { scale: 2.5, useCORS: true, backgroundColor: '#ffffff', logging: false })
-            .then(function(c) { c.toBlob(function(b) { if (b) _descargarBlob(b, fileName); }, 'image/png'); });
-        }
-        showNotification('Imagen guardada. Adjúntala en WhatsApp manualmente.', 'warning');
+        showNotification('Error al generar la imagen. Intente de nuevo.', 'danger');
     })
     .finally(function() {
         if (btn) { btn.innerHTML = originalHTML; btn.disabled = false; }
@@ -1508,15 +1630,17 @@ function _descargarBlob(blob, fileName) {
     setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
-// Descargar factura como imagen PNG
+// Descargar factura como imagen PNG directamente
 function downloadInvoiceAsImage(paymentId) {
-    var invoiceEl = document.querySelector('#invoiceContent .compact-invoice');
-    if (!invoiceEl) { alert("Primero abra la factura en pantalla."); return; }
-    html2canvas(invoiceEl, { scale: 2.5, useCORS: true, backgroundColor: '#ffffff', logging: false })
-    .then(function(canvas) {
-        canvas.toBlob(function(blob) {
-            if (blob) { _descargarBlob(blob, 'recibo-' + (paymentId || 'factura') + '.png'); showNotification('Imagen descargada', 'success'); }
-        }, 'image/png');
+    var payment = payments.find(p => p.id === paymentId);
+    if (!payment) { alert("Pago no encontrado."); return; }
+    showNotification('Generando imagen...', 'info');
+    _captureInvoiceToBlob(payment).then(function(blob) {
+        _descargarBlob(blob, 'recibo-' + paymentId + '.png');
+        showNotification('Imagen descargada', 'success');
+    }).catch(function(e) {
+        console.error(e);
+        showNotification('Error al generar imagen', 'danger');
     });
 }
 
