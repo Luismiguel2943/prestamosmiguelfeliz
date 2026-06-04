@@ -538,6 +538,36 @@ var lateFeeSettings = { dailyLateFee: 1.0, graceDays: 3, maxLateFee: 30.0 };
 var notifications = { overdueCount: 0, showSidebarBadge: true };
 
 // =============================================
+// CACHE MAPS - Para búsquedas O(1) en lugar de O(n)
+// =============================================
+var clientMap = {}; // clientId -> client
+var loanMap = {};   // loanId -> loan
+var paymentsByLoan = {}; // loanId -> sorted payments[]
+
+function rebuildMaps() {
+    clientMap = {};
+    clients.forEach(c => { clientMap[c.id] = c; });
+    loanMap = {};
+    loans.forEach(l => { loanMap[l.id] = l; });
+    rebuildPaymentsByLoan();
+}
+
+function rebuildPaymentsByLoan() {
+    paymentsByLoan = {};
+    payments.forEach(p => {
+        if (!paymentsByLoan[p.loanId]) paymentsByLoan[p.loanId] = [];
+        paymentsByLoan[p.loanId].push(p);
+    });
+    // Sort each list by date desc
+    Object.keys(paymentsByLoan).forEach(lid => {
+        paymentsByLoan[lid].sort((a, b) => new Date(b.date) - new Date(a.date));
+    });
+}
+
+function getClientById(id) { return clientMap[id] || clients.find(c => c.id === id) || null; }
+function getLoanById(id)   { return loanMap[id]   || loans.find(l => l.id === id)   || null; }
+
+// =============================================
 // RÉDITOS
 // =============================================
 function calculateReditoAmount(loan) {
@@ -729,6 +759,7 @@ async function loadData() {
 
         const paymentsDoc = await db.collection('users').doc(currentUserId).collection('payments').doc('_data').get();
         payments = paymentsDoc.exists ? (paymentsDoc.data().list || []) : [];
+        rebuildMaps(); // Build O(1) lookup caches
 
         const contractDoc = await db.collection('users').doc(currentUserId).collection('settings').doc('contract').get();
         contractTemplate = contractDoc.exists ? (contractDoc.data().template || "") : "";
@@ -739,9 +770,18 @@ async function loadData() {
     } catch (e) { console.error("Error loading data:", e); clients = []; loans = []; payments = []; companyInfo = {}; }
 }
 
-function saveClients() { if (!currentUserId) return; db.collection('users').doc(currentUserId).collection('clients').doc('_data').set({ list: clients }).catch(e => console.error(e)); }
-function saveLoans() { if (!currentUserId) return; db.collection('users').doc(currentUserId).collection('loans').doc('_data').set({ list: loans }).catch(e => console.error(e)); }
-function savePayments() { if (!currentUserId) return; db.collection('users').doc(currentUserId).collection('payments').doc('_data').set({ list: payments }).catch(e => console.error(e)); }
+function checkFirestoreSize(label, data) {
+    var size = new Blob([JSON.stringify(data)]).size;
+    var limitBytes = 900000; // Warn at 900KB (Firestore limit is 1MB)
+    if (size > limitBytes) {
+        console.warn("[ADVERTENCIA] " + label + " tiene " + (size/1024).toFixed(0) + " KB. Acercándose al límite de 1MB de Firestore. Considera migrar a documentos individuales.");
+        showNotification("⚠️ Base de datos grande (" + (size/1024).toFixed(0) + "KB). Contacte soporte.", "warning");
+    }
+}
+
+function saveClients() { if (!currentUserId) return; clientMap = {}; clients.forEach(c => { clientMap[c.id] = c; }); var data = { list: clients }; checkFirestoreSize("Clientes", data); db.collection('users').doc(currentUserId).collection('clients').doc('_data').set(data).catch(e => console.error(e)); }
+function saveLoans() { if (!currentUserId) return; loanMap = {}; loans.forEach(l => { loanMap[l.id] = l; }); var data = { list: loans }; checkFirestoreSize("Préstamos", data); db.collection('users').doc(currentUserId).collection('loans').doc('_data').set(data).catch(e => console.error(e)); }
+function savePayments() { if (!currentUserId) return; rebuildPaymentsByLoan(); var data = { list: payments }; checkFirestoreSize("Pagos", data); db.collection('users').doc(currentUserId).collection('payments').doc('_data').set(data).catch(e => console.error(e)); }
 function saveCompanyInfoToFirebase() { if (!currentUserId) return; db.collection('users').doc(currentUserId).update({ 'profile.companyInfo': companyInfo }).catch(e => console.error(e)); }
 function saveContractTemplateToFirebase() { if (!currentUserId) return; db.collection('users').doc(currentUserId).collection('settings').doc('contract').set({ template: contractTemplate }).catch(e => console.error(e)); }
 function saveThemeToFirebase() { if (!currentUserId) return; db.collection('users').doc(currentUserId).update({ 'profile.settings.theme': currentTheme }).catch(e => console.error(e)); }
@@ -846,9 +886,6 @@ function login(e) {
     auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
             isAuthenticated = true; currentUserId = userCredential.user.uid;
-            document.getElementById("loginScreen").style.display = "none";
-            document.getElementById("appContainer").classList.add("active");
-            loadData().then(() => { renderClients(); renderLoans(); renderPaymentHistory(); renderVoidPayments(); renderOverduePayments(); renderFinishedLoans(); updateDashboard(); loadCompanyInfo(); updatePrinterUI(); checkOverduePaymentsAlert(); mostrarAlertaReditosVencidos(); startPeriodicOverdueCheck(); });
         })
         .catch((error) => { document.getElementById("loginError").textContent = "Error: " + error.message; document.getElementById("loginError").style.display = "block"; });
 }
@@ -906,7 +943,6 @@ function updateDashboard() {
     });
     document.getElementById("overduePayments").textContent = "RD$ " + formatMoney(overdueAmt);
     document.getElementById("pagosAlDia").textContent = pagosAlDia;
-    checkOverduePaymentsAlert(); mostrarAlertaReditosVencidos();
 }
 
 // =============================================
@@ -949,11 +985,14 @@ function saveClient(e) {
 function renderClients() {
     var tbody = document.getElementById("clientsTable");
     if (!tbody) return;
-    tbody.innerHTML = "";
+    var fragment = document.createDocumentFragment();
     clients.forEach(client => {
-        var row = tbody.insertRow();
+        var row = document.createElement('tr');
         row.innerHTML = `<td>${client.id}</td><td>${client.firstName} ${client.lastName}</td><td>${client.cedula}</td><td>${client.phone}</td><td>${client.email || "N/A"}</td><td>${client.whatsapp || "N/A"}</td><td class="hide-mobile">${client.gender || "N/A"}</td><td class="hide-mobile">${client.address}</td><td class="hide-mobile">${client.occupation || "N/A"}</td><td class="hide-mobile">RD$ ${formatMoney(client.salary || 0)}</td><td><button class="btn btn-sm btn-primary me-1" onclick="editClient('${client.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger" onclick="deleteClient('${client.id}')"><i class="fas fa-trash"></i></button></td>`;
+        fragment.appendChild(row);
     });
+    tbody.innerHTML = "";
+    tbody.appendChild(fragment);
 }
 
 function searchClients() {
@@ -1086,28 +1125,36 @@ function deleteLoan(loanId) {
 function renderLoans() {
     var tbody = document.getElementById("loansTable");
     if (!tbody) return;
-    tbody.innerHTML = "";
     var activeLoans = loans.filter(l => l.status === "active");
     if (activeLoans.length === 0) { tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay préstamos activos</td></tr>'; return; }
+    var fragment = document.createDocumentFragment();
     activeLoans.forEach(loan => {
-        var client = clients.find(c => c.id === loan.clientId);
+        var client = getClientById(loan.clientId);
         var cuotasText = loan.type === "fixed" ? (loan.paidInstallments || 0) + " de " + loan.installments : loan.type === "daily" ? (loan.paidDays || 0) + " de " + loan.days : (loan.paidInstallments || 0) + " pagos";
         var tipoBadge = loan.type === "indefinite" ? '<span class="badge bg-warning text-dark">Rédito</span>' : getLoanTypeLabel(loan.type);
-        tbody.innerHTML += `<tr><td>${loan.id}</td><td>${client ? client.firstName + " " + client.lastName : "N/A"}</td><td>RD$ ${formatMoney(loan.amount)}</td><td class="hide-mobile">${tipoBadge}</td><td class="hide-mobile">${loan.interestRate}%</td><td class="hide-mobile">${formatDate(loan.startDate)}</td><td><span class="badge bg-info">${cuotasText}</span></td><td><span class="badge bg-success">Activo</span></td><td style="white-space:nowrap;"><button class="btn btn-sm btn-info me-1" onclick="viewLoanDetails('${loan.id}')"><i class="fas fa-eye"></i></button><button class="btn btn-sm btn-warning me-1" onclick="openLoanModal('${loan.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-primary me-1" onclick="generateContract('${loan.id}')"><i class="fas fa-file-contract"></i></button><button class="btn btn-sm btn-success me-1" onclick="openPaymentModal('${loan.id}')"><i class="fas fa-dollar-sign"></i></button><button class="btn btn-sm btn-danger" onclick="deleteLoan('${loan.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
+        var row = document.createElement('tr');
+        row.innerHTML = `<td>${loan.id}</td><td>${client ? client.firstName + " " + client.lastName : "N/A"}</td><td>RD$ ${formatMoney(loan.amount)}</td><td class="hide-mobile">${tipoBadge}</td><td class="hide-mobile">${loan.interestRate}%</td><td class="hide-mobile">${formatDate(loan.startDate)}</td><td><span class="badge bg-info">${cuotasText}</span></td><td><span class="badge bg-success">Activo</span></td><td style="white-space:nowrap;"><button class="btn btn-sm btn-info me-1" onclick="viewLoanDetails('${loan.id}')"><i class="fas fa-eye"></i></button><button class="btn btn-sm btn-warning me-1" onclick="openLoanModal('${loan.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-primary me-1" onclick="generateContract('${loan.id}')"><i class="fas fa-file-contract"></i></button><button class="btn btn-sm btn-success me-1" onclick="openPaymentModal('${loan.id}')"><i class="fas fa-dollar-sign"></i></button><button class="btn btn-sm btn-danger" onclick="deleteLoan('${loan.id}')"><i class="fas fa-trash"></i></button></td>`;
+        fragment.appendChild(row);
     });
+    tbody.innerHTML = "";
+    tbody.appendChild(fragment);
 }
 
 function renderFinishedLoans() {
     var tbody = document.getElementById("finishedLoansTable");
     if (!tbody) return;
-    tbody.innerHTML = "";
     var finishedLoans = loans.filter(l => l.status === "paid");
     if (finishedLoans.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay préstamos finalizados</td></tr>'; return; }
+    var fragment = document.createDocumentFragment();
     finishedLoans.forEach(loan => {
-        var client = clients.find(c => c.id === loan.clientId);
+        var client = getClientById(loan.clientId);
         var cuotasText = loan.type === "fixed" ? loan.installments + " de " + loan.installments : loan.type === "daily" ? loan.days + " de " + loan.days : (loan.paidInstallments || 0) + " pagos totales";
-        tbody.innerHTML += `<tr><td>${loan.id}</td><td>${client ? client.firstName + " " + client.lastName : "N/A"}</td><td>RD$ ${formatMoney(loan.totalAmount)}</td><td class="hide-mobile">${getLoanTypeLabel(loan.type)}</td><td class="hide-mobile">${formatDate(loan.createdAt)}</td><td>${loan.finishedAt ? formatDate(loan.finishedAt) : "N/A"}</td><td><span class="badge bg-success">${cuotasText}</span></td><td style="white-space:nowrap;"><button class="btn btn-sm btn-info me-1" onclick="viewFinishedLoanDetails('${loan.id}')"><i class="fas fa-eye"></i></button><button class="btn btn-sm btn-primary me-1" onclick="generateFinalLoanInvoice('${loan.id}')"><i class="fas fa-file-invoice"></i> Factura Final</button><button class="btn btn-sm btn-success me-1" onclick="generateClearanceLetter('${loan.id}')"><i class="fas fa-file-alt"></i> Carta de Saldo</button><button class="btn btn-sm btn-danger" onclick="deleteLoan('${loan.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
+        var row = document.createElement('tr');
+        row.innerHTML = `<td>${loan.id}</td><td>${client ? client.firstName + " " + client.lastName : "N/A"}</td><td>RD$ ${formatMoney(loan.totalAmount)}</td><td class="hide-mobile">${getLoanTypeLabel(loan.type)}</td><td class="hide-mobile">${formatDate(loan.createdAt)}</td><td>${loan.finishedAt ? formatDate(loan.finishedAt) : "N/A"}</td><td><span class="badge bg-success">${cuotasText}</span></td><td style="white-space:nowrap;"><button class="btn btn-sm btn-info me-1" onclick="viewFinishedLoanDetails('${loan.id}')"><i class="fas fa-eye"></i></button><button class="btn btn-sm btn-primary me-1" onclick="generateFinalLoanInvoice('${loan.id}')"><i class="fas fa-file-invoice"></i> Factura Final</button><button class="btn btn-sm btn-success me-1" onclick="generateClearanceLetter('${loan.id}')"><i class="fas fa-file-alt"></i> Carta de Saldo</button><button class="btn btn-sm btn-danger" onclick="deleteLoan('${loan.id}')"><i class="fas fa-trash"></i></button></td>`;
+        fragment.appendChild(row);
     });
+    tbody.innerHTML = "";
+    tbody.appendChild(fragment);
 }
 
 function searchLoans() { var term = document.getElementById("loanSearch").value.toLowerCase(); document.querySelectorAll("#loansTable tr").forEach(row => { row.style.display = row.textContent.toLowerCase().includes(term) ? "" : "none"; }); }
@@ -1256,27 +1303,37 @@ function savePayment(e) {
 function renderPaymentHistory() {
     var tbody = document.getElementById("paymentHistoryTable");
     if (!tbody) return;
-    tbody.innerHTML = "";
     if (payments.length === 0) { tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay pagos registrados</td></tr>'; return; }
-    [...payments].sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(payment => {
-        var loan = loans.find(l => l.id === payment.loanId);
-        var client = clients.find(c => c.id === payment.clientId);
+    var sorted = [...payments].sort((a, b) => new Date(b.date) - new Date(a.date));
+    var fragment = document.createDocumentFragment();
+    sorted.forEach(payment => {
+        var loan = getLoanById(payment.loanId);
+        var client = getClientById(payment.clientId);
         var cuotasInfo = loan ? (loan.type === "fixed" ? (loan.paidInstallments || 0) + " de " + loan.installments : loan.type === "daily" ? (loan.paidDays || 0) + " de " + loan.days : (loan.paidInstallments || 0) + " pagos") : "";
-        tbody.innerHTML += `<tr><td>${payment.id}</td><td>${client ? client.firstName + " " + client.lastName : "N/A"}</td><td>${payment.loanId}</td><td>RD$ ${formatMoney(payment.amount)}${payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : ""}</td><td class="hide-mobile">${getPaymentTypeLabel(payment.type)}</td><td>${formatDate(payment.date)}</td><td class="hide-mobile">${getPaymentMethodLabel(payment.method)}</td><td><span class="badge bg-info">${cuotasInfo}</span></td><td><button class="btn btn-sm btn-primary me-1" onclick="generateInvoice('${payment.id}')"><i class="fas fa-receipt"></i> Recibo</button></td></tr>`;
+        var row = document.createElement('tr');
+        row.innerHTML = `<td>${payment.id}</td><td>${client ? client.firstName + " " + client.lastName : "N/A"}</td><td>${payment.loanId}</td><td>RD$ ${formatMoney(payment.amount)}${payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : ""}</td><td class="hide-mobile">${getPaymentTypeLabel(payment.type)}</td><td>${formatDate(payment.date)}</td><td class="hide-mobile">${getPaymentMethodLabel(payment.method)}</td><td><span class="badge bg-info">${cuotasInfo}</span></td><td><button class="btn btn-sm btn-primary me-1" onclick="generateInvoice('${payment.id}')"><i class="fas fa-receipt"></i> Recibo</button></td>`;
+        fragment.appendChild(row);
     });
+    tbody.innerHTML = "";
+    tbody.appendChild(fragment);
 }
 
 function renderVoidPayments() {
     var tbody = document.getElementById("voidPaymentsTable");
     if (!tbody) return;
-    tbody.innerHTML = "";
     if (payments.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay pagos registrados</td></tr>'; return; }
-    [...payments].sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(payment => {
-        var loan = loans.find(l => l.id === payment.loanId);
-        var client = clients.find(c => c.id === payment.clientId);
+    var sorted = [...payments].sort((a, b) => new Date(b.date) - new Date(a.date));
+    var fragment = document.createDocumentFragment();
+    sorted.forEach(payment => {
+        var loan = getLoanById(payment.loanId);
+        var client = getClientById(payment.clientId);
         var cuotasInfo = loan ? (loan.type === "fixed" ? (loan.paidInstallments || 0) + " de " + loan.installments : loan.type === "daily" ? (loan.paidDays || 0) + " de " + loan.days : (loan.paidInstallments || 0) + " pagos") : "";
-        tbody.innerHTML += `<tr><td>${payment.id}</td><td>${client ? client.firstName + " " + client.lastName : "N/A"}</td><td>${payment.loanId}</td><td>RD$ ${formatMoney(payment.amount)}${payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : ""}</td><td class="hide-mobile">${formatDate(payment.date)}</td><td class="hide-mobile">${getPaymentMethodLabel(payment.method)}</td><td><span class="badge bg-info">${cuotasInfo}</span></td><td><button class="btn btn-sm btn-danger" onclick="voidPayment('${payment.id}')"><i class="fas fa-ban me-1"></i>Anular</button></td></tr>`;
+        var row = document.createElement('tr');
+        row.innerHTML = `<td>${payment.id}</td><td>${client ? client.firstName + " " + client.lastName : "N/A"}</td><td>${payment.loanId}</td><td>RD$ ${formatMoney(payment.amount)}${payment.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(payment.lateFee) + "</small>" : ""}</td><td class="hide-mobile">${formatDate(payment.date)}</td><td class="hide-mobile">${getPaymentMethodLabel(payment.method)}</td><td><span class="badge bg-info">${cuotasInfo}</span></td><td><button class="btn btn-sm btn-danger" onclick="voidPayment('${payment.id}')"><i class="fas fa-ban me-1"></i>Anular</button></td>`;
+        fragment.appendChild(row);
     });
+    tbody.innerHTML = "";
+    tbody.appendChild(fragment);
 }
 
 function searchVoidPayments() { var term = document.getElementById("voidPaymentSearch").value.toLowerCase(); document.querySelectorAll("#voidPaymentsTable tr").forEach(row => { row.style.display = row.textContent.toLowerCase().includes(term) ? "" : "none"; }); }
@@ -1303,7 +1360,6 @@ function voidPayment(paymentId) {
 function renderOverduePayments() {
     var tbody = document.getElementById("overduePaymentsTable");
     if (!tbody) return;
-    tbody.innerHTML = "";
     var today = new Date();
     var overdueLoans = [];
     loans.filter(l => l.status === 'active').forEach(loan => {
@@ -1314,16 +1370,21 @@ function renderOverduePayments() {
         }
     });
     if (overdueLoans.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay pagos vencidos</td></tr>'; return; }
+    var fragment = document.createDocumentFragment();
     overdueLoans.sort((a, b) => b.daysOverdue - a.daysOverdue).forEach(item => {
         var loan = item.loan;
-        var client = clients.find(c => c.id === loan.clientId);
+        var client = getClientById(loan.clientId);
         var clientName = client ? client.firstName + " " + client.lastName : "N/A";
         var esRedito = loan.type === "indefinite";
         var badge = esRedito ? '<span class="badge bg-warning text-dark me-1"><i class="fas fa-percent"></i> Rédito</span>' : '<span class="badge bg-info me-1"><i class="fas fa-calendar"></i> Cuota</span>';
         var hasEmail = client && client.email && client.email.trim() !== "";
         var hasWhatsApp = client && client.whatsapp && client.whatsapp.trim() !== "";
-        tbody.innerHTML += `<tr><td>${badge} ${clientName}</td><td>${loan.id}</td><td>RD$ ${formatMoney(loan.remainingAmount)}${esRedito ? "<br><small class='text-primary'>Rédito: RD$ " + formatMoney(item.reditoAmount) + "</small>" : ""}${item.lateFee > 0 ? "<br><small class='text-danger'>+ Mora: RD$ " + formatMoney(item.lateFee) + "</small>" : ""}</td><td class="hide-mobile"><span class="badge bg-danger">${item.daysOverdue} días</span></td><td class="hide-mobile">${item.lateFee > 0 ? "RD$ " + formatMoney(item.lateFee) : "N/A"}</td><td class="hide-mobile">${formatDate(item.nextPaymentDate)}</td><td><div class="btn-group btn-group-sm">${hasEmail ? '<button class="btn btn-outline-info" onclick="sendOverdueEmail(\'' + loan.id + '\')" title="Email"><i class="fas fa-envelope"></i></button>' : ''}${hasWhatsApp ? '<button class="btn btn-outline-success" onclick="sendOverdueWhatsApp(\'' + loan.id + '\')" title="WhatsApp"><i class="fab fa-whatsapp"></i></button>' : ''}${esRedito ? '<button class="btn btn-outline-warning" onclick="sendReditoReminder(\'' + loan.id + '\')" title="Recordatorio rédito"><i class="fas fa-exclamation-triangle"></i></button>' : ''}</div></td><td><button class="btn btn-sm btn-danger me-1" onclick="openPaymentModal('${loan.id}')"><i class="fas fa-dollar-sign"></i> ${esRedito ? 'Pagar Rédito' : 'Pagar'}</button><button class="btn btn-sm btn-warning" onclick="viewLoanDetails('${loan.id}')"><i class="fas fa-eye"></i></button></td></tr>`;
+        var row = document.createElement('tr');
+        row.innerHTML = `<td>${badge} ${clientName}</td><td>${loan.id}</td><td>RD$ ${formatMoney(loan.remainingAmount)}${esRedito ? "<br><small class='text-primary'>Rédito: RD$ " + formatMoney(item.reditoAmount) + "</small>" : ""}${item.lateFee > 0 ? "<br><small class='text-danger'>+ Mora: RD$ " + formatMoney(item.lateFee) + "</small>" : ""}</td><td class="hide-mobile"><span class="badge bg-danger">${item.daysOverdue} días</span></td><td class="hide-mobile">${item.lateFee > 0 ? "RD$ " + formatMoney(item.lateFee) : "N/A"}</td><td class="hide-mobile">${formatDate(item.nextPaymentDate)}</td><td><div class="btn-group btn-group-sm">${hasEmail ? '<button class="btn btn-outline-info" onclick="sendOverdueEmail(\'' + loan.id + '\')" title="Email"><i class="fas fa-envelope"></i></button>' : ''}${hasWhatsApp ? '<button class="btn btn-outline-success" onclick="sendOverdueWhatsApp(\'' + loan.id + '\')" title="WhatsApp"><i class="fab fa-whatsapp"></i></button>' : ''}${esRedito ? '<button class="btn btn-outline-warning" onclick="sendReditoReminder(\'' + loan.id + '\')" title="Recordatorio rédito"><i class="fas fa-exclamation-triangle"></i></button>' : ''}</div></td><td><button class="btn btn-sm btn-danger me-1" onclick="openPaymentModal('${loan.id}')"><i class="fas fa-dollar-sign"></i> ${esRedito ? 'Pagar Rédito' : 'Pagar'}</button><button class="btn btn-sm btn-warning" onclick="viewLoanDetails('${loan.id}')"><i class="fas fa-eye"></i></button></td>`;
+        fragment.appendChild(row);
     });
+    tbody.innerHTML = "";
+    tbody.appendChild(fragment);
 }
 
 function sendOverdueEmail(loanId) {
@@ -1581,7 +1642,9 @@ function searchClientForPayment() {
 
 function calculateNextPaymentDate(loan) {
     if (!loan) return null;
-    var lastPayment = payments.filter(p => p.loanId === loan.id).sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+    // Use O(1) cache lookup instead of O(n) filter + sort on every call
+    var loanPayments = paymentsByLoan[loan.id];
+    var lastPayment = loanPayments && loanPayments.length > 0 ? loanPayments[0] : null;
     var baseDate = lastPayment ? new Date(lastPayment.date) : (loan.firstPaymentDate ? new Date(loan.firstPaymentDate) : new Date(loan.startDate));
     var nextDate = new Date(baseDate);
     if (loan.type === 'daily') nextDate.setDate(nextDate.getDate() + 1);
@@ -1607,8 +1670,8 @@ function generateInvoice(paymentId) {
     var payment = payments.find(p => p.id === paymentId);
     if (!payment) { alert("No se encontró el pago"); return; }
     currentPaymentId = paymentId;
-    var loan = loans.find(l => l.id === payment.loanId);
-    var client = clients.find(c => c.id === payment.clientId);
+    var loan = getLoanById(payment.loanId);
+    var client = getClientById(payment.clientId);
     var companyName = companyInfo.name || "Sistema de Préstamos";
     var cuotasInfo = "", totalCuotas = 0, cuotasPagadas = 0, porcentaje = 0;
     if (loan) {
