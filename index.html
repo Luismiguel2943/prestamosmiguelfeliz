@@ -120,6 +120,10 @@
             #invoiceModal .modal-content, #contractModal .modal-content, #reportModal .modal-content, #clearanceLetterModal .modal-content { border: none !important; box-shadow: none !important; background: white !important; width: 100% !important; max-width: 100% !important; }
             #invoiceModal .modal-header, #invoiceModal .modal-footer, #contractModal .modal-header, #contractModal .modal-footer, #reportModal .modal-header, #reportModal .modal-footer, #clearanceLetterModal .modal-header, #clearanceLetterModal .modal-footer { display: none !important; }
             #invoiceModal .modal-body, #contractModal .modal-body, #reportModal .modal-body, #clearanceLetterModal .modal-body { padding: 0 !important; background: white !important; }
+            #invoiceModal.modal, #contractModal.modal, #reportModal.modal, #clearanceLetterModal.modal { position: static !important; overflow: visible !important; }
+            #invoiceModal .modal-dialog.modal-dialog-scrollable, #contractModal .modal-dialog.modal-dialog-scrollable, #reportModal .modal-dialog.modal-dialog-scrollable, #clearanceLetterModal .modal-dialog.modal-dialog-scrollable { max-height: none !important; height: auto !important; overflow: visible !important; }
+            #invoiceModal .modal-content, #contractModal .modal-content, #reportModal .modal-content, #clearanceLetterModal .modal-content { max-height: none !important; height: auto !important; overflow: visible !important; }
+            #invoiceModal .modal-body, #contractModal .modal-body, #reportModal .modal-body, #clearanceLetterModal .modal-body { max-height: none !important; height: auto !important; overflow: visible !important; }
             table { page-break-inside: auto !important; width: 100% !important; }
             tr { page-break-inside: avoid !important; page-break-after: auto !important; }
             thead { display: table-header-group !important; }
@@ -134,6 +138,12 @@
             .bg-secondary { background-color: #6c757d !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .text-white { color: white !important; }
             .badge { border: 1px solid #333 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            /* Fuerza a que el Desglose por Sección del Cierre General (Diario/Semanal/Quincenal/Mensual),
+               que normalmente está colapsado dentro de un acordeón, salga SIEMPRE expandido al imprimir,
+               para que en papel se vea todo: cada sección con sus pagos, mora y total recaudado. */
+            .accordion-collapse { display: block !important; height: auto !important; visibility: visible !important; }
+            .accordion-button { pointer-events: none !important; }
+            .accordion-button::after { display: none !important; }
         }
         @media (max-width: 1024px) and (min-width: 769px) { .main-content { padding: 20px; } .sidebar { width: 220px; } .main-content { margin-left: 220px; } }
         @media (max-width: 768px) {
@@ -170,7 +180,7 @@
         @keyframes bellRing { 0% { transform: rotate(0); } 10% { transform: rotate(10deg); } 20% { transform: rotate(-10deg); } 30% { transform: rotate(10deg); } 40% { transform: rotate(-10deg); } 50% { transform: rotate(0); } 100% { transform: rotate(0); } }
         .overdue-notification { position: fixed; top: 70px; right: 20px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 2000; font-weight: bold; animation: slideIn 0.3s ease; }
         .overdue-notification button { background: none; border: none; color: white; margin-left: 10px; cursor: pointer; }
-        .notification-icon { position: relative; display: inline-block; }
+        .notification-icon { position: relative; display: inline-block; cursor: pointer; }
         .notification-badge { position: absolute; top: -5px; right: -5px; background-color: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold; min-width: 18px; text-align: center; animation: pulse 1.5s infinite; }
         .notification-bell { animation: bellRing 2s ease-in-out; }
         .printer-status { padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; font-weight: bold; }
@@ -282,7 +292,7 @@
             <div class="logo">
                 <i class="fas fa-hand-holding-usd fa-3x mb-3"></i>
                 <h4 id="companyNameSidebar">Sistema de Préstamos</h4>
-                <div class="notification-icon mt-2">
+                <div class="notification-icon mt-2" id="sidebarNotificationIcon" onclick="showSection('overdue-payments'); closeMobileMenu();" title="Ver Pagos Vencidos" role="button" tabindex="0">
                     <i class="fas fa-bell fa-lg notification-bell" id="sidebarNotificationBell"></i>
                     <span class="notification-badge" id="sidebarNotificationBadge" style="display: none;">0</span>
                 </div>
@@ -408,7 +418,7 @@
             <!-- Reports -->
             <div id="reports" class="section">
                 <h2 class="mb-4">Reportes del Sistema</h2>
-                <div class="row"><div class="col-lg-4 col-md-6"><div class="card"><div class="card-header bg-primary text-white"><h5 class="mb-0">Reportes Financieros</h5></div><div class="card-body"><button class="btn btn-primary w-100 mb-2" onclick="generateDailyReport()"><i class="fas fa-calendar-day me-2"></i>Reporte Diario</button><button class="btn btn-primary w-100 mb-2" onclick="generateBiweeklyReport()"><i class="fas fa-calendar-week me-2"></i>Reporte Quincenal</button><button class="btn btn-primary w-100 mb-2" onclick="generateMonthlyReport()"><i class="fas fa-calendar-alt me-2"></i>Reporte Mensual</button><button class="btn btn-outline-primary w-100" onclick="exportData()"><i class="fas fa-download me-2"></i>Exportar Datos (JSON)</button><button class="btn btn-outline-success w-100 mt-2" onclick="importData()"><i class="fas fa-upload me-2"></i>Importar Datos</button></div></div></div></div>
+                <div class="row"><div class="col-lg-4 col-md-6"><div class="card"><div class="card-header bg-primary text-white"><h5 class="mb-0">Reportes Financieros</h5></div><div class="card-body"><button class="btn btn-primary w-100 mb-2" onclick="generateDailyReport()"><i class="fas fa-calendar-day me-2"></i>Reporte Diario</button><button class="btn btn-primary w-100 mb-2" onclick="generateWeeklyReport()"><i class="fas fa-calendar-week me-2"></i>Reporte Semanal</button><button class="btn btn-primary w-100 mb-2" onclick="generateBiweeklyReport()"><i class="fas fa-calendar-week me-2"></i>Reporte Quincenal</button><button class="btn btn-primary w-100 mb-2" onclick="generateMonthlyReport()"><i class="fas fa-calendar-alt me-2"></i>Reporte Mensual</button><button class="btn btn-dark w-100 mb-2" onclick="generateGeneralReport()"><i class="fas fa-list-check me-2"></i>Reporte General</button><button class="btn btn-outline-warning w-100 mb-2" onclick="viewClosuresHistory()"><i class="fas fa-history me-2"></i>Historial de Cierres</button><button class="btn btn-outline-primary w-100" onclick="exportData()"><i class="fas fa-download me-2"></i>Exportar Datos (JSON)</button><button class="btn btn-outline-success w-100 mt-2" onclick="importData()"><i class="fas fa-upload me-2"></i>Importar Datos</button></div></div></div></div>
             </div>
 
             <!-- Settings -->
@@ -447,8 +457,11 @@
                         </div></div>
                         <div class="card mt-3"><div class="card-header bg-success text-white"><h5 class="mb-0">Reportes</h5></div><div class="card-body">
                             <button class="btn btn-success w-100 mb-2" onclick="generateDailyReport()"><i class="fas fa-calendar-day me-2"></i>Reporte Diario</button>
+                            <button class="btn btn-success w-100 mb-2" onclick="generateWeeklyReport()"><i class="fas fa-calendar-week me-2"></i>Reporte Semanal</button>
                             <button class="btn btn-success w-100 mb-2" onclick="generateBiweeklyReport()"><i class="fas fa-calendar-week me-2"></i>Reporte Quincenal</button>
                             <button class="btn btn-success w-100 mb-2" onclick="generateMonthlyReport()"><i class="fas fa-file-alt me-2"></i>Reporte Mensual</button>
+                            <button class="btn btn-dark w-100 mb-2" onclick="generateGeneralReport()"><i class="fas fa-list-check me-2"></i>Reporte General</button>
+                            <button class="btn btn-outline-warning w-100 mb-2" onclick="viewClosuresHistory()"><i class="fas fa-history me-2"></i>Historial de Cierres</button>
                             <button class="btn btn-outline-success w-100" onclick="exportData()"><i class="fas fa-download me-2"></i>Exportar Datos</button>
                         </div></div>
                         <div class="card mt-3"><div class="card-header bg-primary text-white"><h5 class="mb-0">Plantilla de Contrato</h5></div><div class="card-body"><form id="contractForm">
@@ -485,7 +498,7 @@
     <div class="modal fade" id="contractModal" tabindex="-1"><div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Contrato de Préstamo</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body" id="contractContent" style="white-space: pre-wrap; font-family: 'Times New Roman', serif;"></div><div class="modal-footer no-print"><button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button><button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print me-2"></i>Imprimir Contrato</button></div></div></div></div>
 
     <!-- Report Modal -->
-    <div class="modal fade" id="reportModal" tabindex="-1"><div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Reporte</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body" id="reportContent"></div><div class="modal-footer no-print"><button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button><button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print me-2"></i>Imprimir</button></div></div></div></div>
+    <div class="modal fade" id="reportModal" tabindex="-1"><div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Reporte</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body" id="reportContent"></div><div class="modal-footer no-print"><button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button><button class="btn btn-warning" id="generateClosureBtn" onclick="generateClosure()" style="display:none;"><i class="fas fa-lock me-2"></i>Generar Cierre de Jornada</button><button class="btn btn-success" id="reportPdfBtn" onclick="downloadReportPDF()"><i class="fas fa-file-pdf me-2"></i>Generar PDF</button><button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print me-2"></i>Imprimir</button></div></div></div></div>
 
     <!-- Clearance Letter Modal -->
     <div class="modal fade" id="clearanceLetterModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Carta de Saldo</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body" id="clearanceLetterContent"></div><div class="modal-footer no-print"><button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button><button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print me-2"></i>Imprimir</button></div></div></div></div>
@@ -530,12 +543,27 @@ var currentTheme = "theme-blue";
 var isAuthenticated = false;
 var currentUserId = null;
 var currentPaymentId = null;
+var currentReportTitle = "Reporte";
 var reditosVencidos = [];
 var defaultReditoRate = 20;
 var loanIdCounter = 1;
 var printerSettings = { connected: false, printerName: "", paperSize: "50mm", fontSize: "medium", customHeader: "", customFooter: "", printLogo: true, printQR: true, lastConnected: null };
 var lateFeeSettings = { dailyLateFee: 1.0, graceDays: 3, maxLateFee: 30.0 };
 var notifications = { overdueCount: 0, showSidebarBadge: true };
+var notifiedOverdueLoanIds = [];   // IDs de préstamos vencidos cuyo popup flotante YA se mostró (persistido en Firebase)
+var notifiedReditoLoanIds = [];    // IDs de préstamos con rédito vencido cuyo popup flotante YA se mostró
+var notificationsStateLoaded = false; // evita guardar en Firebase antes de haber cargado el estado inicial
+// Última fecha de cierre de jornada/período ya notificada para cada categoría de reporte (formato "YYYY-MM-DD", hora UTC-4).
+// Si es distinta a la fecha de cierre actual calculada, se muestra el aviso de "reporte cerrado, ¿deseas generarlo?".
+var lastClosureNotified = { daily: null, weekly: null, biweekly: null, monthly: null };
+// Último Cierre de Jornada GENERADO MANUALMENTE para cada categoría de reporte. A partir de esa fecha/hora,
+// el reporte de esa categoría solo cuenta los pagos NUEVOS (los anteriores ya quedaron incluidos en ese cierre).
+// Estructura: { daily: "2026-06-25T06:00:00.000Z" (ISO de corte) | null, weekly: ..., biweekly: ..., monthly: ..., all: ... }
+// "all" corresponde al Reporte General (cierre manual, sin periodicidad automática como los demás).
+var lastClosureCutoff = { daily: null, weekly: null, biweekly: null, monthly: null, all: null };
+// Historial completo de Cierres de Jornada generados (para consulta posterior). Cada elemento:
+// { id, category, generatedAt, cutoffFrom, cutoffTo, totalCollected, count, totalLateFees, totalPrestado, totalPendiente }
+var closuresHistory = [];
 
 // =============================================
 // CACHE MAPS - Para búsquedas O(1) en lugar de O(n)
@@ -606,9 +634,18 @@ function checkReditosVencidos() {
 function mostrarAlertaReditosVencidos() {
     var resultado = checkReditosVencidos();
     if (resultado.vencidos.length > 0) {
-        mostrarNotificacionReditos(resultado.vencidos);
-        notifications.overdueCount += resultado.vencidos.length;
-        updateNotificationBadges();
+        var vencidosIdsNow = resultado.vencidos.map(r => r.loanId);
+        var nuevosVencidos = resultado.vencidos.filter(r => !notifiedReditoLoanIds.includes(r.loanId));
+        // Limpiamos del registro los que ya no están vencidos, para volver a notificar si vuelven a vencer.
+        notifiedReditoLoanIds = notifiedReditoLoanIds.filter(id => vencidosIdsNow.includes(id));
+        if (nuevosVencidos.length > 0) {
+            mostrarNotificacionReditos(nuevosVencidos);
+            notifiedReditoLoanIds = notifiedReditoLoanIds.concat(nuevosVencidos.map(r => r.loanId));
+            saveNotificationsStateToFirebase();
+        }
+    } else if (notifiedReditoLoanIds.length > 0) {
+        notifiedReditoLoanIds = [];
+        saveNotificationsStateToFirebase();
     }
     if (resultado.porVencer.length > 0) mostrarNotificacionRecordatorio(resultado.porVencer);
 }
@@ -760,14 +797,48 @@ async function loadData() {
         const paymentsDoc = await db.collection('users').doc(currentUserId).collection('payments').doc('_data').get();
         payments = paymentsDoc.exists ? (paymentsDoc.data().list || []) : [];
         rebuildMaps(); // Build O(1) lookup caches
+    } catch (e) { console.error("Error loading core data:", e); clients = []; loans = []; payments = []; companyInfo = {}; }
 
+    // A partir de aquí, datos secundarios (plantilla de contrato, impresora, notificaciones, cierres).
+    // Se aíslan en su propio try/catch para que, si alguno falla (p.ej. por reglas de seguridad de
+    // Firestore que todavía no autorizan una colección nueva), NO se borren los clientes/préstamos/pagos
+    // que ya se cargaron correctamente arriba.
+    try {
         const contractDoc = await db.collection('users').doc(currentUserId).collection('settings').doc('contract').get();
         contractTemplate = contractDoc.exists ? (contractDoc.data().template || "") : "";
         if (contractTemplate) document.getElementById("contractTemplate").value = contractTemplate;
+    } catch (e) { console.error("Error loading contract template:", e); }
 
+    try {
         const printerDoc = await db.collection('users').doc(currentUserId).collection('settings').doc('printer').get();
         if (printerDoc.exists) { printerSettings = printerDoc.data(); updatePrinterUI(); }
-    } catch (e) { console.error("Error loading data:", e); clients = []; loans = []; payments = []; companyInfo = {}; }
+    } catch (e) { console.error("Error loading printer settings:", e); }
+
+    try {
+        const notifStateDoc = await db.collection('users').doc(currentUserId).collection('settings').doc('notificationsState').get();
+        if (notifStateDoc.exists) {
+            var nsData = notifStateDoc.data();
+            notifiedOverdueLoanIds = nsData.notifiedOverdueLoanIds || [];
+            notifiedReditoLoanIds = nsData.notifiedReditoLoanIds || [];
+            lastClosureNotified = nsData.lastClosureNotified || { daily: null, weekly: null, biweekly: null, monthly: null };
+            lastClosureCutoff = nsData.lastClosureCutoff || { daily: null, weekly: null, biweekly: null, monthly: null, all: null };
+            if (lastClosureCutoff.all === undefined) lastClosureCutoff.all = null; // compatibilidad con datos guardados antes de existir el cierre del Reporte General
+        } else {
+            notifiedOverdueLoanIds = [];
+            notifiedReditoLoanIds = [];
+            lastClosureNotified = { daily: null, weekly: null, biweekly: null, monthly: null };
+            lastClosureCutoff = { daily: null, weekly: null, biweekly: null, monthly: null, all: null };
+        }
+        notificationsStateLoaded = true;
+    } catch (e) {
+        console.error("Error loading notifications state:", e);
+        notificationsStateLoaded = true; // permite seguir guardando aunque la carga inicial fallara
+    }
+
+    try {
+        const closuresDoc = await db.collection('users').doc(currentUserId).collection('closures').doc('_data').get();
+        closuresHistory = closuresDoc.exists ? (closuresDoc.data().list || []) : [];
+    } catch (e) { console.error("Error loading closures history:", e); closuresHistory = []; }
 }
 
 function checkFirestoreSize(label, data) {
@@ -785,6 +856,21 @@ function savePayments() { if (!currentUserId) return; rebuildPaymentsByLoan(); v
 function saveCompanyInfoToFirebase() { if (!currentUserId) return; db.collection('users').doc(currentUserId).update({ 'profile.companyInfo': companyInfo }).catch(e => console.error(e)); }
 function saveContractTemplateToFirebase() { if (!currentUserId) return; db.collection('users').doc(currentUserId).collection('settings').doc('contract').set({ template: contractTemplate }).catch(e => console.error(e)); }
 function saveThemeToFirebase() { if (!currentUserId) return; db.collection('users').doc(currentUserId).update({ 'profile.settings.theme': currentTheme }).catch(e => console.error(e)); }
+function saveNotificationsStateToFirebase() {
+    if (!currentUserId || !notificationsStateLoaded) return;
+    db.collection('users').doc(currentUserId).collection('settings').doc('notificationsState').set({
+        notifiedOverdueLoanIds: notifiedOverdueLoanIds,
+        notifiedReditoLoanIds: notifiedReditoLoanIds,
+        lastClosureNotified: lastClosureNotified,
+        lastClosureCutoff: lastClosureCutoff
+    }).catch(e => console.error(e));
+}
+function saveClosuresHistory() {
+    if (!currentUserId) return;
+    var data = { list: closuresHistory };
+    checkFirestoreSize("Historial de Cierres", data);
+    db.collection('users').doc(currentUserId).collection('closures').doc('_data').set(data).catch(e => console.error(e));
+}
 
 function savePrinterSettings() {
     if (!currentUserId) return;
@@ -812,22 +898,29 @@ function saveLateFeeSettings() {
 function checkOverduePaymentsAlert() {
     var today = new Date();
     var overdueCount = 0;
+    var overdueLoanIdsNow = [];
     loans.filter(l => l.status === 'active').forEach(loan => {
         var nextDate = new Date(calculateNextPaymentDate(loan));
-        if (!isNaN(nextDate.getTime()) && nextDate < today && loan.remainingAmount > 0) overdueCount++;
+        if (!isNaN(nextDate.getTime()) && nextDate < today && loan.remainingAmount > 0) {
+            overdueCount++;
+            overdueLoanIdsNow.push(loan.id);
+        }
     });
     notifications.overdueCount = overdueCount;
     updateNotificationBadges();
-    if (overdueCount > 0) {
+
+    // Solo se notifica (popup flotante) por préstamos que NO se habían notificado antes.
+    var newOverdueIds = overdueLoanIdsNow.filter(id => !notifiedOverdueLoanIds.includes(id));
+
+    // Limpiamos del registro los préstamos que ya no están vencidos (p.ej. se pagaron), para que si vuelven a vencer se vuelvan a notificar.
+    notifiedOverdueLoanIds = notifiedOverdueLoanIds.filter(id => overdueLoanIdsNow.includes(id));
+
+    if (newOverdueIds.length > 0) {
         var existing = document.getElementById('overdue-notification');
         if (!existing) showOnScreenNotification(overdueCount);
-        var lastAlertDate = localStorage.getItem('lastOverdueAlertDate');
-        var todayStr = today.toISOString().split('T')[0];
-        var activeSection = document.querySelector('.section.active');
-        if ((!lastAlertDate || lastAlertDate !== todayStr) && (!activeSection || activeSection.id !== 'overdue-payments')) {
-            localStorage.setItem('lastOverdueAlertDate', todayStr);
-            setTimeout(() => alert("⚠️ ALERTA: " + overdueCount + " préstamo(s) con pagos vencidos.\n\nConsulte la sección 'Pagos Vencidos' para más detalles.\n\nEsta alerta solo se mostrará una vez al día."), 1000);
-        }
+        setTimeout(() => alert("⚠️ ALERTA: " + newOverdueIds.length + " préstamo(s) nuevo(s) con pagos vencidos.\n\nConsulte la sección 'Pagos Vencidos' para más detalles.\n\nEsta alerta solo se muestra una vez por préstamo; luego solo verá el contador en la campana de notificaciones."), 1000);
+        notifiedOverdueLoanIds = notifiedOverdueLoanIds.concat(newOverdueIds);
+        saveNotificationsStateToFirebase();
     }
 }
 
@@ -1291,8 +1384,16 @@ function savePayment(e) {
         setTimeout(() => { if (confirm("¿Desea generar la carta de saldo?")) generateClearanceLetter(loanId); }, 500);
         return;
     }
+    // IMPORTANTE: el pago debe quedar registrado (y el caché paymentsByLoan reconstruido vía
+    // savePayments) ANTES de calcular la próxima fecha de pago. calculateNextPaymentDate() usa el
+    // último pago en paymentsByLoan como punto de partida; si se calculaba ANTES de registrar este
+    // pago, tomaba como base el pago anterior en lugar del que se está haciendo ahora, dando como
+    // "próximo pago" el mismo día de hoy en vez del día siguiente. Este orden corrige ese bug,
+    // y aplica por igual a préstamos diarios, semanales, quincenales y mensuales (todos usan la
+    // misma función calculateNextPaymentDate).
+    payments.push(paymentData); savePayments();
     loan.nextPaymentDate = calculateNextPaymentDate(loan);
-    payments.push(paymentData); savePayments(); saveLoans();
+    saveLoans();
     bootstrap.Modal.getInstance(document.getElementById("paymentModal")).hide();
     alert(paymentType === "late" ? "Pago con mora registrado exitosamente." : "Pago registrado exitosamente.");
     renderLoans(); renderPaymentHistory(); renderVoidPayments(); renderOverduePayments(); updateDashboard();
@@ -1350,9 +1451,15 @@ function voidPayment(paymentId) {
         else if (loan.type === "indefinite") loan.paidInstallments = Math.max(0, (loan.paidInstallments || 0) - 1);
         else if (loan.type === "daily") loan.paidDays = Math.max(0, (loan.paidDays || 0) - 1);
     }
-    if (loan.status === "paid") { loan.status = "active"; delete loan.finishedAt; delete loan.paidOffDate; loan.nextPaymentDate = calculateNextPaymentDate(loan); }
+    var wasFullyPaid = loan.status === "paid";
+    if (wasFullyPaid) { loan.status = "active"; delete loan.finishedAt; delete loan.paidOffDate; }
     payments = payments.filter(p => p.id !== paymentId);
-    savePayments(); saveLoans(); alert("Pago anulado exitosamente.");
+    savePayments(); // reconstruye paymentsByLoan SIN el pago anulado, antes de recalcular la fecha
+    // Si el préstamo se reactiva, recalculamos la próxima fecha de pago ya con el pago anulado
+    // fuera del caché (mismo fix que en savePayment: calcular la fecha ANTES de actualizar el
+    // caché de pagos usa datos desactualizados y da una fecha incorrecta).
+    if (wasFullyPaid) loan.nextPaymentDate = calculateNextPaymentDate(loan);
+    saveLoans(); alert("Pago anulado exitosamente.");
     renderVoidPayments(); renderPaymentHistory(); renderLoans(); renderFinishedLoans(); updateDashboard();
     setTimeout(() => mostrarAlertaReditosVencidos(), 1000);
 }
@@ -2158,55 +2265,867 @@ function printThermal() {
 }
 
 // =============================================
-// REPORTS
+// CIERRE DE JORNADA / PERÍODO (UTC-4, corte a las 2:00 AM)
 // =============================================
-function generateDailyReport() {
-    var now = new Date();
-    var today = now.toISOString().split('T')[0];
-    var dailyPayments = payments.filter(p => new Date(p.date).toISOString().split('T')[0] === today);
+// El "día de operación" diario/semanal/quincenal/mensual no cierra a la medianoche, sino a las 2:00 AM
+// hora UTC-4 (Rep. Dominicana). Es decir: lo que pase entre las 00:00 y la 1:59 AM todavía pertenece
+// al día anterior. Esto evita que un cierre de caja de madrugada quede partido en dos reportes.
+
+// Devuelve la fecha/hora actual expresada en UTC-4, como objeto Date "desplazado" (para poder
+// usar getFullYear/getMonth/getDate/getHours de forma directa, ya sea cual sea la zona del dispositivo).
+function nowInUTCMinus4() {
+    var nowUTC = Date.now() + (new Date().getTimezoneOffset() * 60000); // ahora, en UTC real
+    return new Date(nowUTC - 4 * 60 * 60 * 1000); // UTC-4
+}
+
+// Dado un "ahora" en UTC-4, devuelve la fecha (YYYY-MM-DD) del "día de operación" actual:
+// si todavía no son las 2:00 AM, el día de operación es el de AYER (aún no cerró la jornada de ayer).
+function operatingDateKey(nowUtc4) {
+    var d = new Date(nowUtc4);
+    if (d.getHours() < 2) d.setDate(d.getDate() - 1);
+    return d.toISOString().split('T')[0];
+}
+
+// Cuenta cuántos "ciclos" de longitud `stepDays` han ocurrido entre refDate y la fecha dada
+// (días completos desde la referencia, dividido entre el tamaño del ciclo).
+function cyclesSinceRef(date, stepDays, refDate) {
+    var days = Math.floor((date - refDate) / (1000 * 60 * 60 * 24));
+    return Math.floor(days / stepDays);
+}
+
+// Devuelve la lista de TODAS las fechas de cierre (YYYY-MM-DD) de una categoría que ya pasaron
+// (es decir, ya se cumplieron las 2:00 AM UTC-4 de ese día) y que son POSTERIORES a `sinceKey`
+// (la última fecha de cierre que ya se notificó al usuario). Si `sinceKey` es null, solo devuelve
+// el cierre más reciente (para no inundar de avisos atrasados la primera vez que se activa esta función).
+// - daily: un cierre por cada día de operación transcurrido (ayer, antier, etc.)
+// - weekly: un cierre cada 7 días de operación
+// - biweekly: un cierre cada 15 días de operación (a pedido del usuario, distinto del vencimiento de pago real de 14 días)
+// - monthly: un cierre por cada último día de mes transcurrido
+function getPendingClosures(category, sinceKey) {
+    var nowUtc4 = nowInUTCMinus4();
+    var todayKey = operatingDateKey(nowUtc4);
+    var todayDate = new Date(todayKey + "T00:00:00");
+    var refDate = new Date("2024-01-01T00:00:00"); // fecha de referencia fija para contar ciclos de 7/15 días
+    var pending = [];
+
+    if (category === "daily") {
+        var cursor = new Date(todayDate);
+        cursor.setDate(cursor.getDate() - 1); // el cierre más reciente posible es "ayer"
+        var sinceDate = sinceKey ? new Date(sinceKey + "T00:00:00") : null;
+        // Si nunca se ha notificado nada (sinceKey null), solo tomamos el cierre de ayer para no
+        // mostrar de golpe el historial completo de la primera vez que se usa esta función.
+        var limit = sinceDate ? 60 : 1; // tope de seguridad: máximo 60 días acumulados
+        while (limit > 0) {
+            var key = cursor.toISOString().split('T')[0];
+            if (sinceDate && cursor <= sinceDate) break;
+            pending.unshift(key);
+            cursor.setDate(cursor.getDate() - 1);
+            limit--;
+        }
+        return pending;
+    }
+
+    var stepDays = category === "weekly" ? 7 : 15; // biweekly = 15 días para este aviso
+    var totalCycles = cyclesSinceRef(todayDate, stepDays, refDate);
+    var sinceCycle = sinceKey ? cyclesSinceRef(new Date(sinceKey + "T00:00:00"), stepDays, refDate) : (totalCycles - 1);
+    for (var c = Math.max(sinceCycle + 1, 0); c <= totalCycles; c++) {
+        var closeDate = new Date(refDate.getTime() + ((c + 1) * stepDays - 1) * 86400000);
+        if (closeDate >= todayDate) break; // el ciclo todavía no cerró (cierra HOY o después)
+        pending.push(closeDate.toISOString().split('T')[0]);
+    }
+    return pending;
+}
+
+// Mensual: cierres en el último día de cada mes calendario, entre sinceKey (exclusivo) y el mes anterior al actual.
+function getPendingMonthlyClosures(sinceKey) {
+    var nowUtc4 = nowInUTCMinus4();
+    var todayKey = operatingDateKey(nowUtc4);
+    var todayDate = new Date(todayKey + "T00:00:00");
+    var sinceDate = sinceKey ? new Date(sinceKey + "T00:00:00") : null;
+    var pending = [];
+    // Cursor = último día del mes anterior al mes de "hoy"
+    var cursor = new Date(todayDate.getFullYear(), todayDate.getMonth(), 0); // día 0 del mes actual = último día del mes anterior
+    var limit = sinceDate ? 24 : 1; // tope de seguridad: máximo 24 meses acumulados
+    while (limit > 0 && cursor.getTime() > 0) {
+        if (sinceDate && cursor <= sinceDate) break;
+        pending.unshift(cursor.toISOString().split('T')[0]);
+        cursor = new Date(cursor.getFullYear(), cursor.getMonth(), 0); // retrocede al último día del mes anterior
+        limit--;
+    }
+    return pending;
+}
+
+// Revisa, para cada categoría con préstamos, todos los cierres pendientes desde el último notificado,
+// y si hay alguno nuevo, muestra UN solo aviso (al iniciar sesión) listando TODOS los cierres pendientes
+// uno por uno, con botón para generar cada reporte. No se repite hasta el siguiente cierre real.
+function checkPeriodClosureAlerts() {
+    var labels = { daily: "Diario", weekly: "Semanal", biweekly: "Quincenal", monthly: "Mensual" };
+    var generators = { daily: "generateDailyReport", weekly: "generateWeeklyReport", biweekly: "generateBiweeklyReport", monthly: "generateMonthlyReport" };
+    var categories = ["daily", "weekly", "biweekly", "monthly"];
+    var pending = [];
+
+    categories.forEach(function (cat) {
+        if (getLoansByCategory(cat).length === 0) return; // sin préstamos en esta categoría, no hay nada que cerrar
+        var sinceKey = lastClosureNotified[cat] || null;
+        var closures = cat === "monthly" ? getPendingMonthlyClosures(sinceKey) : getPendingClosures(cat, sinceKey);
+        closures.forEach(function (closeKey) {
+            pending.push({ cat: cat, closeKey: closeKey, label: labels[cat], fn: generators[cat] });
+        });
+    });
+
+    if (pending.length === 0) return;
+
+    // Actualizamos, por categoría, la última fecha de cierre que se notificó (la más reciente de cada una).
+    categories.forEach(function (cat) {
+        var catClosures = pending.filter(function (p) { return p.cat === cat; });
+        if (catClosures.length > 0) {
+            lastClosureNotified[cat] = catClosures[catClosures.length - 1].closeKey;
+        }
+    });
+    saveNotificationsStateToFirebase();
+
+    showPeriodClosureModal(pending);
+}
+
+// Muestra el modal con la lista de TODOS los cierres pendientes (uno por uno), cada uno con botón directo para generar su reporte.
+function showPeriodClosureModal(pending) {
+    var existing = document.getElementById('periodClosureModal');
+    if (existing) existing.remove();
+    var itemsHtml = pending.map(function (p) {
+        return '<button type="button" class="btn btn-outline-primary w-100 mb-2" data-bs-dismiss="modal" onclick="' + p.fn + '()"><i class="fas fa-chart-bar me-2"></i>Reporte ' + p.label + ' — cerrado el ' + formatDate(p.closeKey) + '</button>';
+    }).join('');
+    var html = '<div class="modal fade" id="periodClosureModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">'
+        + '<div class="modal-header bg-primary text-white"><h5 class="modal-title"><i class="fas fa-calendar-check me-2"></i>Jornada(s) Cerrada(s) (' + pending.length + ')</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>'
+        + '<div class="modal-body"><p>Se cerraron las siguientes jornadas/períodos. Puedes generar cada reporte ahora o más tarde desde la sección Reportes:</p>' + itemsHtml + '</div>'
+        + '<div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button></div>'
+        + '</div></div></div>';
+    document.body.insertAdjacentHTML('beforeend', html);
+    var modalEl = document.getElementById('periodClosureModal');
+    // Al terminar de ocultarse (botón Cerrar, la X, clic afuera, o al hacer clic en un reporte que usa
+    // data-bs-dismiss="modal"), eliminamos el modal del DOM. Esto evita que quede un modal o un backdrop
+    // huérfano bloqueando los clics del resto de la página (la causa típica de que el sistema "se congele").
+    modalEl.addEventListener('hidden.bs.modal', function () {
+        modalEl.remove();
+        cleanupOrphanModalBackdrops();
+    });
+    new bootstrap.Modal(modalEl).show();
+}
+
+// Medida de seguridad: elimina cualquier backdrop de Bootstrap que haya quedado en el DOM sin un
+// modal "show" correspondiente, y restaura el scroll del body. Esto previene que la página quede
+// bloqueada (no se puede hacer clic en nada) si algún modal no se cerró limpiamente.
+function cleanupOrphanModalBackdrops() {
+    var anyModalOpen = document.querySelector('.modal.show');
+    if (!anyModalOpen) {
+        document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+    }
+}
+
+
+
+
+// Devuelve el inicio del día local (00:00:00) para una fecha dada, evitando bugs de zona horaria con toISOString().
+function startOfLocalDay(date) {
+    var d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+}
+
+// Devuelve el final del día local (23:59:59.999) para una fecha dada.
+function endOfLocalDay(date) {
+    var d = new Date(date);
+    d.setHours(23, 59, 59, 999);
+    return d;
+}
+
+// Devuelve los préstamos que pertenecen a una categoría de reporte:
+// - "daily": préstamos de Tipo "Préstamo Diario" (loan.type === "daily")
+// - "weekly"/"biweekly"/"monthly": préstamos a Cuotas o a Réditos (fixed/indefinite) cuya Frecuencia de pago coincida
+// - "all": todos los préstamos del sistema, sin filtrar (Reporte General)
+function getLoansByCategory(category) {
+    if (category === "all") return loans.slice();
+    if (category === "daily") return loans.filter(function (l) { return l.type === "daily"; });
+    // weekly / biweekly / monthly: aplica a préstamos fixed e indefinite según su frecuencia
+    return loans.filter(function (l) { return (l.type === "fixed" || l.type === "indefinite") && l.frequency === category; });
+}
+
+// Filtra los pagos que pertenecen a un conjunto de préstamos dado (por loanId).
+// Si se pasa `sinceCutoffISO`, solo se incluyen los pagos realizados DESPUÉS de esa fecha/hora
+// (es decir, los pagos nuevos desde el último Cierre de Jornada generado para esa categoría).
+function filterPaymentsByLoans(loanSubset, sinceCutoffISO) {
+    var idSet = {};
+    loanSubset.forEach(function (l) { idSet[l.id] = true; });
+    var cutoffTime = sinceCutoffISO ? new Date(sinceCutoffISO).getTime() : null;
+    return payments.filter(function (p) {
+        if (!idSet[p.loanId]) return false;
+        if (cutoffTime && new Date(p.date).getTime() <= cutoffTime) return false;
+        return true;
+    });
+}
+
+// Calcula los totales de recaudo de un conjunto de pagos, desglosados por tipo.
+// "Total Recaudado" = suma de TODO lo cobrado en el período (capital + interés/cuota + mora).
+function calculatePeriodStats(periodPayments) {
+    var stats = {
+        count: periodPayments.length,
+        totalCollected: 0,
+        totalLateFees: 0,
+        totalCapitalAbono: 0,
+        totalInteresCuota: 0,
+        totalLiquidaciones: 0,
+        byMethod: {}
+    };
+    periodPayments.forEach(function (p) {
+        var amount = parseFloat(p.amount) || 0;
+        var lateFee = parseFloat(p.lateFee) || 0;
+        stats.totalCollected += amount;
+        stats.totalLateFees += lateFee;
+        if (p.type === "capital") stats.totalCapitalAbono += amount;
+        else if (p.type === "interest") stats.totalInteresCuota += amount;
+        else if (p.type === "payoff") stats.totalLiquidaciones += amount;
+        var m = p.method || "otro";
+        stats.byMethod[m] = (stats.byMethod[m] || 0) + amount;
+    });
+    return stats;
+}
+
+// Estado de cartera para un conjunto de préstamos dado (loanSubset), usando la misma lógica que el Dashboard
+// y "Pagos Vencidos" para que los números del reporte siempre cuadren con el resto del sistema.
+// Si no se pasa loanSubset, se usa toda la cartera del sistema (comportamiento de Reporte General).
+function getPortfolioSnapshot(loanSubset) {
+    var today = new Date();
+    var allLoansInCategory = loanSubset || loans;
+    var activeLoans = allLoansInCategory.filter(function (l) { return l.status === "active"; });
+    var snapshot = {
+        activeLoansCount: activeLoans.length,
+        totalLoansCount: allLoansInCategory.length, // total de préstamos en esta categoría (activos + liquidados/cancelados)
+        totalPrestado: 0,         // suma del capital prestado (loan.amount) de los préstamos activos de esta categoría
+        totalPendiente: 0,        // saldo pendiente total de los préstamos activos de esta categoría
+        overdueLoansCount: 0,     // cantidad de préstamos con pago vencido
+        totalVencido: 0,          // saldo pendiente de los préstamos vencidos
+        totalMoraAcumulada: 0,    // mora calculada sobre los préstamos vencidos
+        alDiaCount: 0             // préstamos activos que están al día
+    };
+    activeLoans.forEach(function (loan) {
+        snapshot.totalPrestado += (loan.amount || 0);
+        snapshot.totalPendiente += (loan.remainingAmount || 0);
+        var nextDate = new Date(calculateNextPaymentDate(loan));
+        var isOverdue = !isNaN(nextDate.getTime()) && nextDate < today && loan.remainingAmount > 0;
+        if (isOverdue) {
+            var daysOverdue = Math.floor((today - nextDate) / (1000 * 60 * 60 * 24));
+            snapshot.overdueLoansCount++;
+            snapshot.totalVencido += (loan.remainingAmount || 0);
+            snapshot.totalMoraAcumulada += calculateLateFee(loan, daysOverdue);
+        } else {
+            snapshot.alDiaCount++;
+        }
+    });
+    return snapshot;
+}
+
+// Construye el HTML de las tarjetas de resumen (recaudo del período + estado actual de cartera).
+function buildReportSummaryCards(periodStats, snapshot) {
+    var html = '<div class="row mb-4">';
+    html += '<div class="col-md-4 col-6"><div class="card mb-3"><div class="card-body text-center"><h6>Total de Préstamos</h6><h3 class="text-primary">' + snapshot.totalLoansCount + '</h3><small class="text-muted">' + snapshot.activeLoansCount + ' activo(s)</small></div></div></div>';
+    html += '<div class="col-md-4 col-6"><div class="card mb-3"><div class="card-body text-center"><h6>Total Prestado</h6><h3 class="text-info">RD$ ' + formatMoney(snapshot.totalPrestado) + '</h3><small class="text-muted">capital de cartera activa</small></div></div></div>';
+    html += '<div class="col-md-4 col-6"><div class="card mb-3"><div class="card-body text-center"><h6>Total Recaudado</h6><h3 class="text-success">RD$ ' + formatMoney(periodStats.totalCollected) + '</h3><small class="text-muted">' + periodStats.count + ' pago(s)</small></div></div></div>';
+    html += '<div class="col-md-4 col-6"><div class="card mb-3"><div class="card-body text-center"><h6>Total Pendiente</h6><h3 class="text-warning">RD$ ' + formatMoney(snapshot.totalPendiente) + '</h3><small class="text-muted">cartera activa</small></div></div></div>';
+    html += '<div class="col-md-4 col-6"><div class="card mb-3"><div class="card-body text-center"><h6>Total de Pagos Realizados</h6><h3 class="text-secondary">' + periodStats.count + '</h3><small class="text-muted">en este período</small></div></div></div>';
+    html += '<div class="col-md-4 col-6"><div class="card mb-3"><div class="card-body text-center"><h6>Mora Cobrada</h6><h3 class="text-danger">RD$ ' + formatMoney(periodStats.totalLateFees) + '</h3></div></div></div>';
+    html += '<div class="col-md-4 col-6"><div class="card mb-3"><div class="card-body text-center"><h6>Total Vencido</h6><h3 class="text-danger">RD$ ' + formatMoney(snapshot.totalVencido) + '</h3><small class="text-muted">' + snapshot.overdueLoansCount + ' préstamo(s)</small></div></div></div>';
+    html += '<div class="col-md-4 col-6"><div class="card mb-3"><div class="card-body text-center"><h6>Préstamos al Día</h6><h3 class="text-success">' + snapshot.alDiaCount + '</h3></div></div></div>';
+    html += '</div>';
+    return html;
+}
+
+// Construye la tabla de pagos del período (reutilizable por los 4 reportes).
+function buildPaymentsTable(periodPayments, opts) {
+    opts = opts || {};
+    var showTime = !!opts.showTime;
+    var showRate = !!opts.showRate;
+    var cols = 5 + (showRate ? 1 : 0);
+    var html = '<div class="card mb-3"><div class="card-header bg-primary text-white"><h5 class="mb-0">Detalle de Pagos (' + periodPayments.length + ')</h5></div><div class="card-body"><div class="table-responsive"><table class="table table-striped"><thead><tr><th>' + (showTime ? "Hora" : "Fecha") + '</th><th>Cliente</th><th>Préstamo</th>' + (showRate ? "<th>Tasa</th>" : "") + '<th>Monto</th><th>Cuotas</th></tr></thead><tbody>';
+    if (periodPayments.length === 0) {
+        html += '<tr><td colspan="' + cols + '" class="text-center">No hay pagos registrados en esta categoría</td></tr>';
+    } else {
+        var sorted = periodPayments.slice().sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
+        sorted.forEach(function (p) {
+            var c = clients.find(function (x) { return x.id === p.clientId; });
+            var l = loans.find(function (x) { return x.id === p.loanId; });
+            var cuotas = l ? (l.type === "fixed" ? (l.paidInstallments || 0) + " de " + l.installments : l.type === "daily" ? (l.paidDays || 0) + " de " + l.days : (l.paidInstallments || 0) + " pagos") : "";
+            var fechaCol = showTime ? new Date(p.date).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }) : formatDate(p.date);
+            html += '<tr><td>' + fechaCol + '</td><td>' + (c ? c.firstName + " " + c.lastName : "N/A") + '</td><td>' + p.loanId + '</td>' + (showRate ? "<td>" + (l ? l.interestRate + "%" : "N/A") + "</td>" : "") + '<td>RD$ ' + formatMoney(p.amount) + (p.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(p.lateFee) + "</small>" : "") + '</td><td><span class="badge bg-info">' + cuotas + '</span></td></tr>';
+        });
+    }
+    html += '</tbody></table></div></div></div>';
+    return html;
+}
+
+// Construye la tabla de préstamos vencidos a la fecha del reporte, dentro de la categoría del reporte.
+function buildOverdueLoansTable(loanSubset) {
+    var today = new Date();
+    var rows = [];
+    loanSubset.filter(function (l) { return l.status === "active"; }).forEach(function (loan) {
+        var nextDate = new Date(calculateNextPaymentDate(loan));
+        if (!isNaN(nextDate.getTime()) && nextDate < today && loan.remainingAmount > 0) {
+            var daysOverdue = Math.floor((today - nextDate) / (1000 * 60 * 60 * 24));
+            rows.push({ loan: loan, daysOverdue: daysOverdue, lateFee: calculateLateFee(loan, daysOverdue) });
+        }
+    });
+    var html = '<div class="card mb-3"><div class="card-header bg-danger text-white"><h5 class="mb-0">Préstamos Vencidos a la Fecha (' + rows.length + ')</h5></div><div class="card-body"><div class="table-responsive"><table class="table table-striped"><thead><tr><th>Cliente</th><th>Préstamo</th><th>Pendiente</th><th>Días Vencido</th><th>Mora</th></tr></thead><tbody>';
+    if (rows.length === 0) {
+        html += '<tr><td colspan="5" class="text-center">No hay préstamos vencidos</td></tr>';
+    } else {
+        rows.sort(function (a, b) { return b.daysOverdue - a.daysOverdue; }).forEach(function (item) {
+            var c = clients.find(function (x) { return x.id === item.loan.clientId; });
+            html += '<tr><td>' + (c ? c.firstName + " " + c.lastName : "N/A") + '</td><td>' + item.loan.id + '</td><td>RD$ ' + formatMoney(item.loan.remainingAmount) + '</td><td><span class="badge bg-danger">' + item.daysOverdue + ' días</span></td><td>' + (item.lateFee > 0 ? "RD$ " + formatMoney(item.lateFee) : "N/A") + '</td></tr>';
+        });
+    }
+    html += '</tbody></table></div></div></div>';
+    return html;
+}
+
+// Función genérica que arma y muestra cualquiera de los 5 reportes (4 por categoría + el General).
+// category: "daily" | "weekly" | "biweekly" | "monthly" | "all"
+var currentReportCategory = null; // categoría actualmente mostrada en el modal, usada por el botón "Generar Cierre de Jornada"
+function renderReport(title, subtitle, category, opts) {
+    opts = opts || {};
+    currentReportCategory = category;
+    var loanSubset = getLoansByCategory(category);
+    var cutoffISO = lastClosureCutoff[category] || null;
+    var periodPayments = filterPaymentsByLoans(loanSubset, cutoffISO);
+    var periodStats = calculatePeriodStats(periodPayments);
+    var snapshot = getPortfolioSnapshot(loanSubset);
+    var html = '<div class="container"><div class="text-center mb-4">';
+    if (companyInfo.logoBase64) html += '<img src="' + companyInfo.logoBase64 + '" style="max-width:200px;max-height:80px;margin-bottom:10px;">';
+    html += '<h2>' + (companyInfo.name || "Sistema de Préstamos") + '</h2><h4>' + title + '</h4>' + (subtitle ? '<p class="text-muted mb-0">' + subtitle + '</p>' : '');
+    html += cutoffISO
+        ? '<p class="text-muted mb-0"><small>Mostrando pagos desde el último Cierre de Jornada: ' + formatDate(cutoffISO) + ' ' + new Date(cutoffISO).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }) + '</small></p>'
+        : '<p class="text-muted mb-0"><small>Mostrando el histórico completo (todavía no se ha generado un Cierre de Jornada)</small></p>';
+    html += '</div>';
+    html += buildReportSummaryCards(periodStats, snapshot);
+    html += buildPaymentsTable(periodPayments, opts);
+    html += buildOverdueLoansTable(loanSubset);
+    html += '</div>';
+    document.getElementById("reportContent").innerHTML = html;
+    currentReportTitle = title; // usado para nombrar el archivo PDF
+    updateClosureButtonVisibility(category);
+    new bootstrap.Modal(document.getElementById("reportModal")).show();
+}
+
+// Muestra u oculta el botón "Generar Cierre de Jornada" según si la categoría actual admite cierres.
+// Todas las categorías de reporte (daily/weekly/biweekly/monthly/all) admiten cierre manual.
+// Las vistas internas (historial de cierres, detalle de un cierre) usan "_meta" y nunca muestran el botón.
+function updateClosureButtonVisibility(category) {
+    var btn = document.getElementById("generateClosureBtn");
+    if (!btn) return;
+    btn.style.display = (category === "_meta") ? "none" : "inline-block";
+}
+
+// Convierte una lista de pagos "crudos" del sistema en el formato compacto que se guarda
+// dentro de un registro de Cierre de Jornada (incluye nombre de cliente y tasa resueltos
+// en el momento, ya que loanId/clientId pueden eliminarse más adelante).
+function buildClosurePaymentsDetail(periodPayments) {
+    return periodPayments.map(function (p) {
+        var c = clients.find(function (x) { return x.id === p.clientId; });
+        var l = loans.find(function (x) { return x.id === p.loanId; });
+        return {
+            date: p.date,
+            clientId: p.clientId,
+            clientName: c ? (c.firstName + " " + c.lastName) : "N/A",
+            loanId: p.loanId,
+            amount: parseFloat(p.amount) || 0,
+            lateFee: parseFloat(p.lateFee) || 0,
+            type: p.type,
+            method: p.method || "otro",
+            notes: p.notes || "",
+            interestRate: l ? l.interestRate : null
+        };
+    });
+}
+
+// Construye, exclusivamente para el Cierre de Jornada del Reporte General ("all"), el desglose
+// de ese mismo cierre separado por cada sección (Diario, Semanal, Quincenal, Mensual). Cada
+// sección incluye sus propios totales, estado de cartera y el detalle completo de sus pagos,
+// usando el MISMO corte de fecha (fromISO) que el cierre general, sin tocar ni mover el cutoff
+// individual de cada sección (los cierres por sección siguen siendo independientes).
+function buildGeneralClosureBreakdown(generalPeriodPayments, fromISO) {
+    var sections = ["daily", "weekly", "biweekly", "monthly"];
+    var labels = { daily: "Diario", weekly: "Semanal", biweekly: "Quincenal", monthly: "Mensual" };
+    var breakdown = {};
+    sections.forEach(function (cat) {
+        var loanSubset = getLoansByCategory(cat);
+        var idSet = {};
+        loanSubset.forEach(function (l) { idSet[l.id] = true; });
+        // Filtra del conjunto YA recortado por el cierre general (mismo fromISO), solo los que pertenecen a esta sección.
+        var sectionPayments = generalPeriodPayments.filter(function (p) { return idSet[p.loanId]; });
+        var sectionStats = calculatePeriodStats(sectionPayments);
+        var sectionSnapshot = getPortfolioSnapshot(loanSubset);
+        breakdown[cat] = {
+            categoryLabel: labels[cat],
+            paymentsCount: sectionStats.count,
+            totalCollected: sectionStats.totalCollected,
+            totalLateFees: sectionStats.totalLateFees,
+            totalCapitalAbono: sectionStats.totalCapitalAbono,
+            totalInteresCuota: sectionStats.totalInteresCuota,
+            totalLiquidaciones: sectionStats.totalLiquidaciones,
+            byMethod: sectionStats.byMethod,
+            snapshot: sectionSnapshot,
+            payments: buildClosurePaymentsDetail(sectionPayments)
+        };
+    });
+    return breakdown;
+}
+
+// Genera un Cierre de Jornada MANUAL para la categoría del reporte actualmente abierto.
+// Congela los totales del período mostrado (desde el cierre anterior hasta ahora) en el historial,
+// y mueve el "punto de partida" del reporte al momento actual: a partir de aquí, ese reporte
+// solo contará los pagos NUEVOS hasta el próximo cierre.
+function generateClosure() {
+    var category = currentReportCategory;
+    if (!category || category === "_meta") return;
+
+    var labels = { daily: "Diario", weekly: "Semanal", biweekly: "Quincenal", monthly: "Mensual", all: "General" };
+    var fromISO = lastClosureCutoff[category] || null;
+    var nowISO = new Date().toISOString();
+
+    var loanSubset = getLoansByCategory(category);
+    var periodPayments = filterPaymentsByLoans(loanSubset, fromISO);
+    var periodStats = calculatePeriodStats(periodPayments);
+    var snapshot = getPortfolioSnapshot(loanSubset);
+
+    var confirmMsg = category === "all"
+        ? "¿Confirmas generar el Cierre de Jornada General?\n\nSe registrarán " + periodStats.count + " pago(s) de TODAS las secciones (Diario, Semanal, Quincenal, Mensual) por un total de RD$ " + formatMoney(periodStats.totalCollected) + ".\n\nA partir de este cierre, el Reporte General comenzará a contar desde cero. Esto NO afecta los cierres individuales de cada sección."
+        : "¿Confirmas generar el Cierre de Jornada " + labels[category] + "?\n\nSe registrarán " + periodStats.count + " pago(s) por un total de RD$ " + formatMoney(periodStats.totalCollected) + ".\n\nA partir de este cierre, el reporte " + labels[category] + " comenzará a contar desde cero.";
+
+    if (periodPayments.length === 0) {
+        if (!confirm("No hay pagos nuevos desde el último cierre. ¿Deseas generar el Cierre de Jornada de todas formas (quedará en cero)?")) return;
+    } else {
+        if (!confirm(confirmMsg)) return;
+    }
+
+    var closureRecord = {
+        id: "CLOSURE-" + Date.now(),
+        category: category,
+        categoryLabel: labels[category],
+        generatedAt: nowISO,
+        cutoffFrom: fromISO,    // null si es el primer cierre de esta categoría
+        cutoffTo: nowISO,
+        paymentsCount: periodStats.count,
+        totalCollected: periodStats.totalCollected,
+        totalLateFees: periodStats.totalLateFees,
+        totalCapitalAbono: periodStats.totalCapitalAbono,
+        totalInteresCuota: periodStats.totalInteresCuota,
+        totalLiquidaciones: periodStats.totalLiquidaciones,
+        totalLoansCount: snapshot.totalLoansCount,
+        totalPrestado: snapshot.totalPrestado,
+        totalPendiente: snapshot.totalPendiente,
+        // Snapshot completo de cartera al momento del cierre (para poder ver el detalle completo después).
+        snapshot: snapshot,
+        // Desglose por método de pago (efectivo, transferencia, etc.) del período cerrado.
+        byMethod: periodStats.byMethod,
+        // Solo presente en el cierre General ("all"): desglose de este mismo cierre por cada
+        // sección (Diario, Semanal, Quincenal, Mensual), cada una con sus propios totales,
+        // estado de cartera y lista de pagos. Permite ver "todos los datos de cada sección" sin
+        // salir del cierre General.
+        byCategory: category === "all" ? buildGeneralClosureBreakdown(periodPayments, fromISO) : null,
+        // Detalle de cada pago incluido en este cierre, guardado tal cual para consulta posterior
+        // desde el Historial de Cierres (incluye cliente, préstamo, monto, mora, método, tipo, etc.).
+        payments: buildClosurePaymentsDetail(periodPayments)
+    };
+
+    closuresHistory.unshift(closureRecord);
+    saveClosuresHistory();
+
+    lastClosureCutoff[category] = nowISO;
+    saveNotificationsStateToFirebase();
+
+    showNotification("✅ Cierre de Jornada " + labels[category] + " generado correctamente.", "success");
+
+    // Re-renderiza el mismo reporte: ahora arrancará en cero porque el cutoff ya se movió a "ahora".
+    var generators = { daily: generateDailyReport, weekly: generateWeeklyReport, biweekly: generateBiweeklyReport, monthly: generateMonthlyReport, all: generateGeneralReport };
+    generators[category]();
+}
+
+// Muestra el historial de Cierres de Jornada generados, más reciente primero.
+// Estos registros permanecen guardados de forma permanente en Firebase; solo se eliminan
+// manualmente con el botón de eliminar de cada fila.
+function viewClosuresHistory() {
+    var html = '<div class="container"><h4 class="mb-3"><i class="fas fa-history me-2"></i>Historial de Cierres de Jornada</h4>';
+    if (closuresHistory.length === 0) {
+        html += '<p class="text-center text-muted">Todavía no se ha generado ningún Cierre de Jornada.</p>';
+    } else {
+        html += '<p class="text-muted"><small><i class="fas fa-hand-pointer me-1"></i>Haz clic en cualquier fila para ver el detalle completo de ese cierre (pagos, recaudo, etc.).</small></p>';
+        html += '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Categoría</th><th>Generado</th><th>Período cubierto</th><th>Pagos</th><th>Total Recaudado</th><th>Acción</th></tr></thead><tbody>';
+        closuresHistory.forEach(function (c) {
+            var desde = c.cutoffFrom ? (formatDate(c.cutoffFrom) + " " + new Date(c.cutoffFrom).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' })) : "Inicio del sistema";
+            var hasta = formatDate(c.cutoffTo) + " " + new Date(c.cutoffTo).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
+            html += '<tr class="closure-row" style="cursor:pointer;" onclick="viewClosureDetail(\'' + c.id + '\')" title="Ver detalle completo de este cierre"><td><span class="badge bg-primary">' + c.categoryLabel + '</span></td><td>' + formatDate(c.generatedAt) + '</td><td><small>' + desde + '<br>hasta<br>' + hasta + '</small></td><td>' + c.paymentsCount + '</td><td>RD$ ' + formatMoney(c.totalCollected) + '</td><td><button class="btn btn-sm btn-info me-1" onclick="event.stopPropagation(); viewClosureDetail(\'' + c.id + '\')" title="Ver detalle"><i class="fas fa-eye"></i></button><button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteClosureRecord(\'' + c.id + '\')" title="Eliminar este cierre del historial"><i class="fas fa-trash"></i></button></td></tr>';
+        });
+        html += '</tbody></table></div>';
+    }
+    html += '</div>';
+    document.getElementById("reportContent").innerHTML = html;
+    currentReportTitle = "Historial de Cierres de Jornada";
+    currentReportCategory = "_meta"; // vista interna: oculta el botón de Generar Cierre
+    updateClosureButtonVisibility("_meta");
+    new bootstrap.Modal(document.getElementById("reportModal")).show();
+}
+
+// Muestra el detalle completo de un Cierre de Jornada específico: resumen de totales,
+// estado de cartera al momento del cierre, desglose por método de pago, y la lista
+// completa de todos los pagos que componen ese cierre (cliente, préstamo, monto, mora, etc.).
+function viewClosureDetail(closureId) {
+    var c = closuresHistory.find(function (x) { return x.id === closureId; });
+    if (!c) return;
+
+    var desde = c.cutoffFrom ? (formatDate(c.cutoffFrom) + " " + new Date(c.cutoffFrom).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' })) : "Inicio del sistema";
+    var hasta = formatDate(c.cutoffTo) + " " + new Date(c.cutoffTo).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
+
     var html = '<div class="container">';
+    html += '<button class="btn btn-sm btn-outline-secondary mb-3 no-print" onclick="viewClosuresHistory()"><i class="fas fa-arrow-left me-2"></i>Volver al Historial</button>';
     html += '<div class="text-center mb-4">';
     if (companyInfo.logoBase64) html += '<img src="' + companyInfo.logoBase64 + '" style="max-width:200px;max-height:80px;margin-bottom:10px;">';
-    html += '<h2>' + (companyInfo.name || "Sistema de Préstamos") + '</h2><h4>Reporte Diario - ' + formatDate(today) + '</h4></div>';
-    html += '<div class="row mb-4"><div class="col-md-4"><div class="card"><div class="card-body text-center"><h6>Total Recaudado Hoy</h6><h3 class="text-success">RD$ ' + formatMoney(dailyPayments.reduce((s, p) => s + p.amount, 0)) + '</h3></div></div></div><div class="col-md-4"><div class="card"><div class="card-body text-center"><h6>Préstamos Activos</h6><h3 class="text-primary">' + loans.filter(l => l.status === "active").length + '</h3></div></div></div></div>';
-    html += '<div class="card mb-3"><div class="card-header bg-primary text-white"><h5>Pagos de Hoy</h5></div><div class="card-body"><div class="table-responsive"><table class="table table-striped"><thead><tr><th>Hora</th><th>Cliente</th><th>Préstamo</th><th>Monto</th><th>Cuotas</th></tr></thead><tbody>';
-    if (dailyPayments.length === 0) html += '<tr><td colspan="5" class="text-center">No hay pagos hoy</td></tr>';
-    else dailyPayments.forEach(p => { var c = clients.find(x => x.id === p.clientId); var l = loans.find(x => x.id === p.loanId); var cuotas = l ? (l.type === "fixed" ? (l.paidInstallments || 0) + " de " + l.installments : l.type === "daily" ? (l.paidDays || 0) + " de " + l.days : (l.paidInstallments || 0) + " pagos") : ""; html += '<tr><td>' + new Date(p.date).toLocaleTimeString('es-DO', {hour:'2-digit',minute:'2-digit'}) + '</td><td>' + (c ? c.firstName + " " + c.lastName : "N/A") + '</td><td>' + p.loanId + '</td><td>RD$ ' + formatMoney(p.amount) + (p.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(p.lateFee) + "</small>" : "") + '</td><td><span class="badge bg-info">' + cuotas + '</span></td></tr>'; });
-    html += '</tbody></table></div></div></div></div>';
+    html += '<h2>' + (companyInfo.name || "Sistema de Préstamos") + '</h2><h4>Detalle de Cierre de Jornada</h4>';
+    html += '<p class="text-muted mb-0"><span class="badge bg-primary">' + c.categoryLabel + '</span></p>';
+    html += '<p class="text-muted mb-0"><small>Generado: ' + formatDate(c.generatedAt) + ' ' + new Date(c.generatedAt).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }) + '</small></p>';
+    html += '<p class="text-muted mb-0"><small>Período cubierto: ' + desde + ' &nbsp;hasta&nbsp; ' + hasta + '</small></p>';
+    html += '</div>';
+
+    // Tarjetas de resumen del cierre.
+    html += '<div class="row mb-4">';
+    html += '<div class="col-md-4 col-6"><div class="card mb-3"><div class="card-body text-center"><h6>Total Recaudado</h6><h3 class="text-success">RD$ ' + formatMoney(c.totalCollected) + '</h3><small class="text-muted">' + c.paymentsCount + ' pago(s)</small></div></div></div>';
+    html += '<div class="col-md-4 col-6"><div class="card mb-3"><div class="card-body text-center"><h6>Abono a Capital</h6><h3 class="text-info">RD$ ' + formatMoney(c.totalCapitalAbono) + '</h3></div></div></div>';
+    html += '<div class="col-md-4 col-6"><div class="card mb-3"><div class="card-body text-center"><h6>Interés / Cuota</h6><h3 class="text-primary">RD$ ' + formatMoney(c.totalInteresCuota) + '</h3></div></div></div>';
+    html += '<div class="col-md-4 col-6"><div class="card mb-3"><div class="card-body text-center"><h6>Mora Cobrada</h6><h3 class="text-danger">RD$ ' + formatMoney(c.totalLateFees) + '</h3></div></div></div>';
+    html += '<div class="col-md-4 col-6"><div class="card mb-3"><div class="card-body text-center"><h6>Liquidaciones</h6><h3 class="text-secondary">RD$ ' + formatMoney(c.totalLiquidaciones) + '</h3></div></div></div>';
+    html += '<div class="col-md-4 col-6"><div class="card mb-3"><div class="card-body text-center"><h6>Préstamos en la Categoría</h6><h3 class="text-dark">' + c.totalLoansCount + '</h3></div></div></div>';
+    html += '</div>';
+
+    // Estado de cartera al momento del cierre (si fue guardado).
+    if (c.snapshot) {
+        html += '<div class="card mb-3"><div class="card-header bg-secondary text-white"><h5 class="mb-0">Estado de la Cartera al Momento del Cierre</h5></div><div class="card-body"><div class="row">';
+        html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">Préstamos Activos</small><strong>' + c.snapshot.activeLoansCount + '</strong></div>';
+        html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">Total Prestado</small><strong>RD$ ' + formatMoney(c.snapshot.totalPrestado) + '</strong></div>';
+        html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">Total Pendiente</small><strong>RD$ ' + formatMoney(c.snapshot.totalPendiente) + '</strong></div>';
+        html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">Préstamos Vencidos</small><strong class="text-danger">' + c.snapshot.overdueLoansCount + '</strong></div>';
+        html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">Total Vencido</small><strong class="text-danger">RD$ ' + formatMoney(c.snapshot.totalVencido) + '</strong></div>';
+        html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">Préstamos al Día</small><strong class="text-success">' + c.snapshot.alDiaCount + '</strong></div>';
+        html += '</div></div></div>';
+    }
+
+    // Desglose por método de pago.
+    if (c.byMethod && Object.keys(c.byMethod).length > 0) {
+        html += '<div class="card mb-3"><div class="card-header bg-secondary text-white"><h5 class="mb-0">Recaudo por Método de Pago</h5></div><div class="card-body"><div class="row">';
+        Object.keys(c.byMethod).forEach(function (m) {
+            html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">' + getPaymentMethodLabel(m) + '</small><strong>RD$ ' + formatMoney(c.byMethod[m]) + '</strong></div>';
+        });
+        html += '</div></div></div>';
+    }
+
+    // Desglose por sección (SOLO presente en el Cierre General "all"): muestra, dentro de un
+    // acordeón, los datos completos de cada sección de préstamos (Diario, Semanal, Quincenal,
+    // Mensual) que componen este cierre general: totales, estado de cartera y detalle de pagos.
+    if (c.byCategory) {
+        html += '<div class="card mb-3"><div class="card-header bg-dark text-white"><h5 class="mb-0"><i class="fas fa-layer-group me-2"></i>Desglose por Sección</h5></div><div class="card-body">';
+        html += '<div class="accordion" id="closureBreakdownAccordion">';
+        var sectionOrder = ["daily", "weekly", "biweekly", "monthly"];
+        sectionOrder.forEach(function (cat, idx) {
+            var s = c.byCategory[cat];
+            if (!s) return;
+            var collapseId = "closureSection_" + c.id + "_" + cat;
+            html += '<div class="accordion-item">';
+            html += '<h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#' + collapseId + '">';
+            html += '<span class="badge bg-primary me-2">' + s.categoryLabel + '</span> ' + s.paymentsCount + ' pago(s) &nbsp;—&nbsp; RD$ ' + formatMoney(s.totalCollected) + ' recaudado';
+            html += '</button></h2>';
+            html += '<div id="' + collapseId + '" class="accordion-collapse collapse" data-bs-parent="#closureBreakdownAccordion"><div class="accordion-body">';
+
+            // Mini resumen de la sección.
+            html += '<div class="row mb-3">';
+            html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">Total Recaudado</small><strong class="text-success">RD$ ' + formatMoney(s.totalCollected) + '</strong></div>';
+            html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">Abono a Capital</small><strong>RD$ ' + formatMoney(s.totalCapitalAbono) + '</strong></div>';
+            html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">Interés / Cuota</small><strong>RD$ ' + formatMoney(s.totalInteresCuota) + '</strong></div>';
+            html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">Mora Cobrada</small><strong class="text-danger">RD$ ' + formatMoney(s.totalLateFees) + '</strong></div>';
+            if (s.snapshot) {
+                html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">Préstamos Activos</small><strong>' + s.snapshot.activeLoansCount + '</strong></div>';
+                html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">Total Pendiente</small><strong>RD$ ' + formatMoney(s.snapshot.totalPendiente) + '</strong></div>';
+                html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">Préstamos Vencidos</small><strong class="text-danger">' + s.snapshot.overdueLoansCount + '</strong></div>';
+                html += '<div class="col-md-3 col-6 mb-2"><small class="text-muted d-block">Préstamos al Día</small><strong class="text-success">' + s.snapshot.alDiaCount + '</strong></div>';
+            }
+            html += '</div>';
+
+            // Tabla de pagos de esta sección.
+            html += '<div class="table-responsive"><table class="table table-sm table-striped"><thead><tr><th>Fecha</th><th>Cliente</th><th>Préstamo</th><th>Tipo</th><th>Método</th><th>Monto</th><th>Mora</th></tr></thead><tbody>';
+            if (!s.payments || s.payments.length === 0) {
+                html += '<tr><td colspan="7" class="text-center">Sin pagos en esta sección durante el período.</td></tr>';
+            } else {
+                s.payments.slice().sort(function (a, b) { return new Date(b.date) - new Date(a.date); }).forEach(function (p) {
+                    html += '<tr><td>' + formatDate(p.date) + ' ' + new Date(p.date).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }) + '</td><td>' + p.clientName + '</td><td>' + p.loanId + '</td><td>' + getPaymentTypeLabel(p.type) + '</td><td>' + getPaymentMethodLabel(p.method) + '</td><td><strong>RD$ ' + formatMoney(p.amount) + '</strong></td><td>' + (p.lateFee ? 'RD$ ' + formatMoney(p.lateFee) : '-') + '</td></tr>';
+                });
+            }
+            html += '</tbody></table></div>';
+
+            html += '</div></div></div>';
+        });
+        html += '</div></div></div>';
+    }
+
+    // Detalle completo de cada pago incluido en este cierre.
+    var pagos = c.payments || [];
+    html += '<div class="card mb-3"><div class="card-header bg-primary text-white"><h5 class="mb-0">Detalle de Pagos (' + pagos.length + ')</h5></div><div class="card-body"><div class="table-responsive"><table class="table table-striped"><thead><tr><th>Fecha</th><th>Cliente</th><th>Préstamo</th><th>Tipo</th><th>Método</th><th>Monto</th><th>Mora</th></tr></thead><tbody>';
+    if (pagos.length === 0) {
+        html += '<tr><td colspan="7" class="text-center">Este cierre no registró pagos en el período.</td></tr>';
+    } else {
+        var sortedPagos = pagos.slice().sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
+        sortedPagos.forEach(function (p) {
+            html += '<tr><td>' + formatDate(p.date) + ' ' + new Date(p.date).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }) + '</td><td>' + p.clientName + '</td><td>' + p.loanId + '</td><td>' + getPaymentTypeLabel(p.type) + '</td><td>' + getPaymentMethodLabel(p.method) + '</td><td><strong>RD$ ' + formatMoney(p.amount) + '</strong></td><td>' + (p.lateFee ? 'RD$ ' + formatMoney(p.lateFee) : '-') + '</td></tr>';
+        });
+    }
+    html += '</tbody></table></div></div></div>';
+
+    html += '</div>';
     document.getElementById("reportContent").innerHTML = html;
+    currentReportTitle = "Detalle Cierre " + c.categoryLabel + " - " + formatDate(c.generatedAt);
+    currentReportCategory = "_meta"; // vista interna: oculta el botón de Generar Cierre
+    updateClosureButtonVisibility("_meta");
     new bootstrap.Modal(document.getElementById("reportModal")).show();
+}
+
+// Elimina manualmente un registro del Historial de Cierres de Jornada (acción irreversible).
+// Esto NO afecta los pagos, préstamos ni el punto de partida (cutoff) del reporte correspondiente;
+// solo borra ese registro histórico de la lista para consulta.
+function deleteClosureRecord(closureId) {
+    var record = closuresHistory.find(function (c) { return c.id === closureId; });
+    if (!record) return;
+    if (!confirm("¿Eliminar este registro del Historial de Cierres?\n\nCategoría: " + record.categoryLabel + "\nGenerado: " + formatDate(record.generatedAt) + "\nTotal Recaudado: RD$ " + formatMoney(record.totalCollected) + "\n\nEsta acción no se puede deshacer.")) return;
+    closuresHistory = closuresHistory.filter(function (c) { return c.id !== closureId; });
+    saveClosuresHistory();
+    showNotification("🗑️ Cierre eliminado del historial.", "info");
+    viewClosuresHistory(); // refresca la vista
+}
+
+
+
+function generateDailyReport() {
+    renderReport("Reporte Diario", "Préstamos de Tipo Diario", "daily", {});
+}
+
+function generateWeeklyReport() {
+    renderReport("Reporte Semanal", "Préstamos con Frecuencia Semanal", "weekly", {});
 }
 
 function generateBiweeklyReport() {
-    var now = new Date();
-    var twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-    var biPayments = payments.filter(p => { var d = new Date(p.date); return d >= twoWeeksAgo && d <= now; });
-    var html = '<div class="container"><div class="text-center mb-4">';
-    if (companyInfo.logoBase64) html += '<img src="' + companyInfo.logoBase64 + '" style="max-width:200px;max-height:80px;margin-bottom:10px;">';
-    html += '<h2>' + (companyInfo.name || "Sistema de Préstamos") + '</h2><h4>Reporte Quincenal</h4><p>' + formatDate(twoWeeksAgo) + ' - ' + formatDate(now) + '</p></div>';
-    html += '<div class="row mb-4"><div class="col-md-6"><div class="card"><div class="card-body text-center"><h6>Total Recaudado</h6><h3 class="text-success">RD$ ' + formatMoney(biPayments.reduce((s, p) => s + p.amount, 0)) + '</h3></div></div></div><div class="col-md-6"><div class="card"><div class="card-body text-center"><h6>Préstamos Activos</h6><h3 class="text-primary">' + loans.filter(l => l.status === "active").length + '</h3></div></div></div></div>';
-    html += '<div class="card mb-3"><div class="card-header bg-primary text-white"><h5>Pagos del Período</h5></div><div class="card-body"><div class="table-responsive"><table class="table table-striped"><thead><tr><th>Fecha</th><th>Cliente</th><th>Préstamo</th><th>Monto</th><th>Cuotas</th></tr></thead><tbody>';
-    if (biPayments.length === 0) html += '<tr><td colspan="5" class="text-center">No hay pagos en este período</td></tr>';
-    else biPayments.forEach(p => { var c = clients.find(x => x.id === p.clientId); var l = loans.find(x => x.id === p.loanId); var cuotas = l ? (l.type === "fixed" ? (l.paidInstallments || 0) + " de " + l.installments : l.type === "daily" ? (l.paidDays || 0) + " de " + l.days : (l.paidInstallments || 0) + " pagos") : ""; html += '<tr><td>' + formatDate(p.date) + '</td><td>' + (c ? c.firstName + " " + c.lastName : "N/A") + '</td><td>' + p.loanId + '</td><td>RD$ ' + formatMoney(p.amount) + (p.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(p.lateFee) + "</small>" : "") + '</td><td><span class="badge bg-info">' + cuotas + '</span></td></tr>'; });
-    html += '</tbody></table></div></div></div></div>';
-    document.getElementById("reportContent").innerHTML = html;
-    new bootstrap.Modal(document.getElementById("reportModal")).show();
+    renderReport("Reporte Quincenal", "Préstamos con Frecuencia Quincenal", "biweekly", {});
 }
 
 function generateMonthlyReport() {
-    var now = new Date();
-    var month = now.getMonth(), year = now.getFullYear();
-    var monthlyPayments = payments.filter(p => { var d = new Date(p.date); return d.getMonth() === month && d.getFullYear() === year; });
-    var html = '<div class="container"><div class="text-center mb-4">';
-    if (companyInfo.logoBase64) html += '<img src="' + companyInfo.logoBase64 + '" style="max-width:200px;max-height:80px;margin-bottom:10px;">';
-    html += '<h2>' + (companyInfo.name || "Sistema de Préstamos") + '</h2><h4>Reporte Mensual - ' + getMonthName(month) + ' ' + year + '</h4></div>';
-    html += '<div class="row mb-4"><div class="col-md-4"><div class="card"><div class="card-body text-center"><h6>Total Recaudado</h6><h3 class="text-success">RD$ ' + formatMoney(monthlyPayments.reduce((s, p) => s + p.amount, 0)) + '</h3></div></div></div><div class="col-md-4"><div class="card"><div class="card-body text-center"><h6>Préstamos Activos</h6><h3 class="text-primary">' + loans.filter(l => l.status === "active").length + '</h3></div></div></div><div class="col-md-4"><div class="card"><div class="card-body text-center"><h6>Total Pendiente</h6><h3 class="text-warning">RD$ ' + formatMoney(loans.filter(l => l.status === "active").reduce((s, l) => s + l.remainingAmount, 0)) + '</h3></div></div></div></div>';
-    html += '<div class="card mb-3"><div class="card-header bg-primary text-white"><h5>Pagos del Mes</h5></div><div class="card-body"><div class="table-responsive"><table class="table table-striped"><thead><tr><th>Fecha</th><th>Cliente</th><th>Préstamo</th><th>Tasa</th><th>Monto</th><th>Cuotas</th></tr></thead><tbody>';
-    if (monthlyPayments.length === 0) html += '<tr><td colspan="6" class="text-center">No hay pagos este mes</td></tr>';
-    else monthlyPayments.forEach(p => { var c = clients.find(x => x.id === p.clientId); var l = loans.find(x => x.id === p.loanId); var cuotas = l ? (l.type === "fixed" ? (l.paidInstallments || 0) + " de " + l.installments : l.type === "daily" ? (l.paidDays || 0) + " de " + l.days : (l.paidInstallments || 0) + " pagos") : ""; html += '<tr><td>' + formatDate(p.date) + '</td><td>' + (c ? c.firstName + " " + c.lastName : "N/A") + '</td><td>' + p.loanId + '</td><td>' + (l ? l.interestRate + "%" : "N/A") + '</td><td>RD$ ' + formatMoney(p.amount) + (p.lateFee ? "<br><small class='text-danger'>Mora: RD$ " + formatMoney(p.lateFee) + "</small>" : "") + '</td><td><span class="badge bg-info">' + cuotas + '</span></td></tr>'; });
-    html += '</tbody></table></div></div></div></div>';
-    document.getElementById("reportContent").innerHTML = html;
-    new bootstrap.Modal(document.getElementById("reportModal")).show();
+    renderReport("Reporte Mensual", "Préstamos con Frecuencia Mensual", "monthly", { showRate: true });
+}
+
+// Reporte General: incluye TODOS los préstamos y pagos del sistema, sin filtrar por tipo ni frecuencia.
+function generateGeneralReport() {
+    renderReport("Reporte General", "Todos los préstamos y pagos del sistema", "all", { showRate: true });
+}
+
+// Genera un PDF (A4, multi-página) a partir del contenido actualmente mostrado en el modal de reportes.
+function downloadReportPDF() {
+    var source = document.getElementById("reportContent");
+    if (!source || !source.innerHTML.trim()) { alert("Primero genera un reporte."); return; }
+    if (typeof jspdf === 'undefined' || !jspdf.jsPDF || typeof html2canvas === 'undefined') {
+        alert("La librería de PDF no está disponible. Usa el botón de Imprimir como alternativa.");
+        return;
+    }
+
+    var btn = document.getElementById("reportPdfBtn");
+    var originalBtnHTML = btn ? btn.innerHTML : null;
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generando...'; }
+
+    // Clon fuera de pantalla, sin restricciones de altura/scroll del modal, en ancho fijo tipo A4.
+    var clone = source.cloneNode(true);
+
+    // Si el reporte tiene secciones colapsadas (p.ej. el Desglose por Sección del Cierre General,
+    // que normalmente está oculto en un acordeón hasta que el usuario hace clic), las expandimos
+    // TODAS en el clon antes de capturar, para que el PDF/impresión muestre absolutamente todo:
+    // cada sección con sus pagos, totales, mora y recaudo, sin que nada quede oculto.
+    clone.querySelectorAll('.accordion-collapse').forEach(function (el) {
+        el.classList.add('show');
+        el.style.height = 'auto';
+        el.style.display = 'block';
+    });
+    clone.querySelectorAll('.accordion-button').forEach(function (accBtn) {
+        accBtn.classList.remove('collapsed');
+    });
+
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#ffffff;padding:20px;';
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
+
+    // Esperamos a que las fuentes web (Poppins/Inter) terminen de cargar Y a que el navegador
+    // pinte un par de frames, antes de medir posiciones o capturar. Si esto no se espera, es
+    // posible medir las posiciones de filas/tarjetas ANTES de que el texto reflowee con la
+    // fuente final, y luego capturar con html2canvas DESPUÉS de ese reflow: las posiciones
+    // medidas ya no coincidirían con el canvas real, y los cortes "ajustados" caerían en el
+    // lugar equivocado (causa probable de que un pago o sección se siga viendo cortado).
+    var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    fontsReady.then(function () {
+        return new Promise(function (resolve) { setTimeout(resolve, 150); });
+    }).then(runCapture);
+
+    function runCapture() {
+        // Antes de capturar, medimos la posición (en px CSS, relativa al wrapper) de cada elemento
+        // que NUNCA debe quedar partido entre dos páginas: filas de tabla (pagos, préstamos vencidos),
+        // tarjetas de resumen, filas de mini-estadísticas (Total Recaudado, Mora, etc. dentro de cada
+        // sección) y los encabezados de acordeón. Estos límites se usan más abajo para ajustar dónde
+        // corta cada página, de modo que el corte caiga siempre en un espacio en blanco entre
+        // elementos y nunca en la mitad de un pago, una estadística o una sección.
+        var wrapperTop = wrapper.getBoundingClientRect().top;
+        // Elementos protegidos: nunca deben quedar partidos entre dos páginas.
+        // - tr / thead: cada fila de cualquier tabla (pagos, préstamos vencidos, etc.) y su encabezado.
+        // - .card que NO contiene una tabla larga (las tarjetas de resumen tipo "Total Recaudado",
+        //   "Mora Cobrada", etc.): esas sí deben protegerse completas, porque son pequeñas y se ven
+        //   mal partidas. Las tarjetas que envuelven una tabla (Detalle de Pagos, Préstamos Vencidos)
+        //   NO se protegen como bloque completo —de lo contrario una tabla larga forzaría saltos de
+        //   página enormes—, así que ahí solo protegemos sus filas individuales.
+        // - .row que NO contiene una tabla: cubre las filas de mini-tarjetas/estadísticas (Total
+        //   Recaudado, Abono a Capital, Préstamos Activos, etc.), tanto las del resumen general del
+        //   cierre como las de cada sección dentro del acordeón. Esto era lo que faltaba: antes esas
+        //   filas de estadísticas no estaban protegidas y el corte de página caía en medio de ellas.
+        // - .accordion-header: la barra de cada sección (badge + "X pago(s) — RD$ Y recaudado"),
+        //   para que nunca quede cortada de su propio texto.
+        var protectedEls = [];
+        wrapper.querySelectorAll('tr, thead').forEach(function (el) { protectedEls.push(el); });
+        wrapper.querySelectorAll('.card, .row, .accordion-header').forEach(function (el) {
+            if (!el.querySelector('table')) protectedEls.push(el);
+        });
+        var protectedRanges = [];
+        protectedEls.forEach(function (el) {
+            var r = el.getBoundingClientRect();
+            var top = r.top - wrapperTop;
+            var bottom = r.bottom - wrapperTop;
+            if (bottom > top) protectedRanges.push({ top: top, bottom: bottom });
+        });
+        protectedRanges.sort(function (a, b) { return a.top - b.top; });
+
+        // Medimos la altura total del wrapper ANTES de capturar y, sobre todo, ANTES de removerlo
+        // del DOM. Esto es crítico: scrollHeight de un elemento ya desconectado del documento puede
+        // devolver un valor distinto (potencialmente incorrecto) al que tenía mientras estaba
+        // renderizado. Si esa medida sale mal, el factor de conversión DOM->canvas de más abajo
+        // queda desproporcionado y TODOS los puntos de corte "ajustados" caen en el lugar
+        // equivocado del canvas real — esta era la causa de que algunos pagos/secciones siguieran
+        // viéndose cortados a pesar de que la lista de elementos protegidos ya era correcta.
+        var wrapperScrollHeight = wrapper.scrollHeight;
+
+        html2canvas(wrapper, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            windowWidth: 794
+        }).then(function (canvas) {
+            document.body.removeChild(wrapper);
+
+            var { jsPDF } = jspdf;
+            var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            var pageW = doc.internal.pageSize.getWidth();
+            var pageH = doc.internal.pageSize.getHeight();
+            var margin = 8;
+            var contentW = pageW - margin * 2;
+
+            // Factor para convertir las medidas del DOM (px CSS) a píxeles del canvas capturado
+            // (html2canvas usa scale:2, así que normalmente este factor será ~2, pero se calcula
+            // en base al alto real del canvas para no depender de asumir el valor de scale).
+            var domToCanvasFactor = canvas.height / wrapperScrollHeight;
+            var protectedRangesPx = protectedRanges.map(function (rg) {
+                return { top: rg.top * domToCanvasFactor, bottom: rg.bottom * domToCanvasFactor };
+            });
+
+
+            // Altura útil de página en píxeles del canvas (límite "ideal" de corte, antes de ajustar).
+            var pxPerMm = canvas.width / contentW;
+            var pageContentH = pageH - margin * 2;
+            var idealSliceHeightPx = Math.floor(pageContentH * pxPerMm);
+
+            // Dado un límite de corte ideal, busca si cae dentro de algún elemento protegido.
+            // Si es así, mueve el corte hacia ARRIBA hasta el borde superior de ese elemento.
+            // Esto se repite (iterativo) porque retroceder a un elemento puede dejar el corte
+            // todavía dentro de OTRO elemento protegido distinto (p.ej. un encabezado de acordeón
+            // justo encima de una fila de estadísticas): se sigue retrocediendo hasta encontrar
+            // un punto que no caiga dentro de NINGÚN elemento protegido, o hasta llegar al mínimo.
+            function adjustCutPoint(idealCutPx, minCutPx) {
+                var cut = idealCutPx;
+                var guard = 0;
+                while (guard < 500) {
+                    guard++;
+                    var moved = false;
+                    for (var i = 0; i < protectedRangesPx.length; i++) {
+                        var rg = protectedRangesPx[i];
+                        if (rg.top < cut && rg.bottom > cut) {
+                            if (rg.top > minCutPx) {
+                                cut = rg.top;
+                                moved = true;
+                                break;
+                            } else {
+                                // No se puede retroceder más sin dejar la página vacía: se acepta
+                                // el corte actual (caso límite: elemento más alto que una página).
+                                return cut;
+                            }
+                        }
+                    }
+                    if (!moved) return cut; // ningún elemento protegido contiene ya este punto
+                }
+                return cut;
+            }
+
+            var renderedHeightPx = 0;
+            var pageIndex = 0;
+            while (renderedHeightPx < canvas.height) {
+                var remaining = canvas.height - renderedHeightPx;
+                var idealCut = renderedHeightPx + Math.min(idealSliceHeightPx, remaining);
+                var thisSliceHeightPx;
+                if (idealCut >= canvas.height) {
+                    thisSliceHeightPx = remaining; // última página: lo que quede, sin más ajustes
+                } else {
+                    var adjustedCut = adjustCutPoint(idealCut, renderedHeightPx + 1);
+                    thisSliceHeightPx = adjustedCut - renderedHeightPx;
+                }
+                // Salvaguarda: ante cualquier caso límite de redondeo que produjera un alto inválido,
+                // se usa el corte ideal sin ajustar para garantizar que el bucle siempre avance.
+                if (!thisSliceHeightPx || thisSliceHeightPx <= 0) {
+                    thisSliceHeightPx = Math.max(1, Math.min(idealSliceHeightPx, remaining));
+                }
+
+                var pageCanvas = document.createElement('canvas');
+                pageCanvas.width = canvas.width;
+                pageCanvas.height = thisSliceHeightPx;
+                var ctx = pageCanvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+                ctx.drawImage(canvas, 0, renderedHeightPx, canvas.width, thisSliceHeightPx, 0, 0, canvas.width, thisSliceHeightPx);
+
+                var sliceImgH = (thisSliceHeightPx * contentW) / canvas.width;
+                if (pageIndex > 0) doc.addPage();
+                doc.addImage(pageCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, margin, contentW, sliceImgH);
+
+                renderedHeightPx += thisSliceHeightPx;
+                pageIndex++;
+            }
+
+            var safeName = (currentReportTitle || "Reporte").replace(/[^a-zA-Z0-9_\- ]/g, "").replace(/\s+/g, "_");
+            doc.save(safeName + "_" + new Date().toISOString().split('T')[0] + ".pdf");
+
+            if (btn) { btn.disabled = false; btn.innerHTML = originalBtnHTML; }
+        }).catch(function (err) {
+            document.body.removeChild(wrapper);
+            console.error(err);
+            alert("Ocurrió un error generando el PDF. Intenta con el botón de Imprimir.");
+            if (btn) { btn.disabled = false; btn.innerHTML = originalBtnHTML; }
+        });
+    }
 }
 
 // =============================================
@@ -2306,6 +3225,12 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("paymentForm").addEventListener("submit", savePayment);
     document.getElementById("companyForm").addEventListener("submit", saveCompanyInfo);
 
+    // Red de seguridad general: cada vez que se cierra CUALQUIER modal de Bootstrap en el sistema,
+    // verificamos que no haya quedado un backdrop huérfano bloqueando los clics de la página.
+    document.addEventListener('hidden.bs.modal', function () {
+        setTimeout(cleanupOrphanModalBackdrops, 50);
+    });
+
     auth.onAuthStateChanged((user) => {
         if (user) {
             isAuthenticated = true; currentUserId = user.uid;
@@ -2315,6 +3240,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 updateDashboard(); renderClients(); renderLoans(); renderFinishedLoans(); renderPaymentHistory(); renderVoidPayments(); renderOverduePayments(); loadCompanyInfo(); updatePrinterUI();
                 showSection('dashboard');
                 checkOverduePaymentsAlert(); mostrarAlertaReditosVencidos(); startPeriodicOverdueCheck();
+                setTimeout(() => checkPeriodClosureAlerts(), 1800);
             });
         } else {
             document.getElementById("loginScreen").style.display = "flex";
